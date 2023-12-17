@@ -1,0 +1,463 @@
+# GraphQL schema example
+#
+# https://gqlgen.com/getting-started/
+
+scalar UUID
+scalar DateTime
+
+
+enum DNSStatus {
+  PENDING
+  VERIFIED
+  FAILED
+}
+
+enum StatusState {
+  PASIVE
+  ACTIVE
+}
+
+
+enum TicketStatus {
+  OPEN
+  CLOSED
+}
+
+enum TicketSender {
+  USER
+  Admin
+}
+
+
+enum PaymentStatus {
+  PENDING
+  SUCCESS
+  FAILED
+}
+
+enum RedirectionOptions {
+  TIMED
+  NOT_AUTO_REDIRECT
+  DIRECT_HTTP_REDIRECT
+  CONFIRM_REDIRECT
+}
+
+enum PaymentPlan {
+  FREE
+  MONTHLY
+}
+
+enum PlatformPermission {
+  LINK_CREATE
+  LINK_UPDATE
+  LINK_DELETE
+  PLATFORM_CREATE
+  PLATFORM_UPDATE
+  PLATFORM_DELETE
+}
+
+enum CompanyPermission {
+  DOMAIN_CREATE
+  DOMAIN_UPDATE
+  DOMAIN_DELETE
+  COMPANY_UPDATE
+  COMPANY_DELETE
+  PLATFORM_CREATE
+  PLATFORM_UPDATE
+  PLATFORM_DELETE
+  USER_INVITE
+  PLATFORM_USER_ADD
+  PLATFORM_USER_REMOVE
+  PLATFORM_USER_UPDATE
+}
+
+type Query {
+  me: User!
+  users: [User!]!
+  refreshToken(input: RefreshTokenInput!): String!
+}
+
+type User {
+  id: UUID!
+  avatar: String!
+  email: String!
+  fullname: String!
+  verified: Boolean!
+  phone: AccountPhone!
+  companies: [Company!]!
+  platforms: [Platform!]!
+  permissions: [Permission!]!
+  payments: [Payment!]!
+
+  createdAt: DateTime!
+  updatedAt: DateTime
+  deletedAt: DateTime
+}
+
+
+type PasswordReset {
+  id: UUID!
+  user: User!
+  token: String!
+  createdAt: DateTime!
+  expiresAt: DateTime!
+  updatedAt: DateTime
+  deletedAt: DateTime
+}
+
+
+type AccountPhone {
+  number: String!
+  countryCode: String!
+  verified: Boolean!
+  createdAt: DateTime!
+  updatedAt: DateTime
+}
+
+type Company {
+  id: UUID!
+  name: String!
+  website: String!
+  platforms: [Platform!]!
+  industry: [Industry!]
+  description: String!
+  location: String!
+  socialMedias: [SocialMedia!]!
+  users: [User!]!
+  domains: [Domain!]!
+  permissions: [Permission!]!
+  paymentPlan: PaymentPlan!
+  payments: [Payment!]!
+}
+
+type SocialMedia {
+  id: UUID!
+  name: String!
+  url: String!
+  icon: String!
+}
+
+
+type Industry {
+  id: UUID!
+  name: String!
+  companies: [Company!]!
+}
+
+type Domain {
+  id: UUID!
+  name: String!
+  url: String!
+  company: Company!
+  platform: Platform
+  dnsStatus: DNSStatus!
+  state: StatusState!
+  links: [Link!]
+  analytics: DomainAnalytics!
+  lastDNSVerificationAt: DateTime
+  createdAt: DateTime!
+  updatedAt: DateTime
+  deletedAt: DateTime
+}
+
+type Platform {
+  id: UUID!
+  name: String!
+  openGraph: OpenGraph!
+  redirectionChoice: RedirectionOptions!
+  company: Company!
+  domains: [Domain!]!
+  permissions: [Permission!]!
+  links: [Link!]!
+  analytics: PlatformAnalytics!
+  status: StatusState!
+  templates: [Template!]!
+  pinnedLinks: [Link!]!
+}
+
+type Template {
+  id: UUID!
+  name: String!
+  platform: Platform!
+  openGraph: OpenGraph!
+  redirectionChoice: RedirectionOptions!
+  state: StatusState!
+  createdBy: User!
+  editedBy: User!
+  createdAt: DateTime!
+  updatedAt: DateTime
+  deletedAt: DateTime
+}
+
+type OpenGraph {
+  title: String
+  description: String
+  favIcon: String
+  image: String
+  alternateImage: String
+  url: String
+  siteName: String
+  type: String
+  locale: String
+  x: OpenGraphX
+}
+
+type OpenGraphX {
+  card: String
+  site: String
+  title: String
+  description: String
+  image: String
+  url: String
+  type: String
+  creator: String
+} 
+
+type Permission {
+  id: UUID!
+  name: String!
+  description: String!
+  companies: [Company!]!
+  domains: [Domain!]!
+  platforms: [Platform!]!
+  users: [User!]!
+  links: [Link!]!
+}
+
+type Link {
+  id: UUID!
+  url: String!
+  key: String!
+  creator: User!
+  platform: Platform!
+  domain: Domain!
+  analytics: LinkAnalytics!
+  openGraph: [OpenGraph!]
+  redirectionOptions: RedirectionOptions!
+  state: StatusState!
+  createdAt: DateTime!
+  updatedAt: DateTime
+  deletedAt: DateTime
+}
+
+
+type Ticket {
+  id: UUID!
+  user: User!
+  company: Company!
+  title: String!
+  category: String!
+  description: String!
+  messages: [TicketMessage!]!
+  attachments: [String!]
+  status: TicketStatus!
+  createdAt: DateTime!
+  updatedAt: DateTime
+  deletedAt: DateTime
+}
+
+
+type TicketMessage {
+  id: UUID!
+  ticket: Ticket!
+  sender: TicketSender!
+  user: User!
+  content: String!
+  createdAt: DateTime!
+  updatedAt: DateTime
+  deletedAt: DateTime
+}
+
+input TicketMessageInput {
+  content: String!
+}
+
+type Payment {
+  id: UUID!
+  user: User!
+  company: Company!
+  amount: Float!
+  date: String!
+  status: PaymentStatus!
+  # ... Add other payment-related fields
+}
+
+type LinkAnalytics {
+  id: UUID!
+  useragent: String!
+  platformRedirectionChoice: RedirectionOptions!
+  ip: String!
+  location: String!
+  referrer: String!
+  observations: [ObservationAnalytic!]!
+}
+
+type PlatformAnalytics {
+  id: UUID!
+  totalLinks: Int!
+  totalUsers: Int!
+  observations: [ObservationAnalytic!]!
+}
+
+type DomainAnalytics {
+  id: UUID!
+  totalLinks: Int!
+  totalPlatforms: Int!
+  totalUsers: Int!
+  observations: [ObservationAnalytic!]!
+}
+
+
+type ObservationAnalytic {
+  id: UUID!
+  link: Link!
+  domain: Domain!
+  platform: Platform!
+  useragent: String!
+  ip: String!
+  referrer: String!
+  location: String!
+  redirectionChoice: RedirectionOptions!
+  success: Boolean!
+  createdAt: DateTime!
+  updatedAt: DateTime
+}
+
+input LinkInput {
+  url: String!
+  key: String!
+  redirectionOptions: RedirectionOptions!
+  openGraph: OpenGraphInput!
+}
+input TicketInput {
+  title: String!
+  category: String!
+  description: String!
+  attachments: [String!]
+}
+input ObservationInput {
+  linkId: UUID!
+  domainId: UUID!
+  platformId: UUID!
+  useragent: String!
+  ip: String!
+  referrer: String!
+  location: String!
+  redirectionChoice: RedirectionOptions!
+  success: Boolean!
+}
+
+input LoginInput {
+  username: String!
+  password: String!
+}
+
+input RefreshTokenInput{
+  newToken: String!
+  newRefreshToken: String!
+}
+
+input UserInput {
+  email: String!
+  password: String!
+  confirmPassword: String!
+  fullname: String!
+  phone: String!
+  countryCode: String!
+  useragent: String!
+  ip: String!
+}
+
+input UserUpdatePasswordInput {
+  password: String!
+  confirmPassword: String!
+  useragent: String!
+  ip: String!
+}
+
+
+input PasswordResetCreateInput {
+  email: String!
+  useragent: String!
+  ip: String!
+}
+
+input PasswordResetUpdateInput {
+  token: String!
+  password: String!
+  confirmPassword: String!
+  useragent: String!
+  ip: String!
+}
+
+
+input DomainInput {
+  name: String!
+  url: String!
+}
+
+input TemplateInput {
+  name: String!
+  openGraph: OpenGraphInput!
+  redirectionChoice: RedirectionOptions!
+  state: StatusState!
+}
+
+input OpenGraphInput {
+  title: String!
+  description: String!
+  favIcon: String!
+  image: String!
+  alternateImage: String!
+  url: String!
+  siteName: String!
+  type: String!
+  locale: String!
+  x: OpenGraphXInput!
+}
+
+input OpenGraphXInput {
+  card: String!
+  site: String!
+  title: String!
+  description: String!
+  image: String!
+  url: String!
+  type: String!
+  creator: String!
+}
+
+input PlatformInput {
+  name: String!
+  openGraph: OpenGraphInput!
+  redirectionChoice: RedirectionOptions!
+  state: StatusState!
+  templates: [TemplateInput!]!
+}
+
+input PlatformPinInput {
+  linkId: UUID!
+}
+
+
+input CompanyInput {
+  name: String!
+  website: String!
+  description: String!
+  location: String!
+  socialMedias: [SocialMediaInput!]!
+}
+
+input SocialMediaInput {
+  name: String!
+  url: String!
+  icon: String!
+}
+
+type Mutation {
+  createUser(input: UserInput!): User!
+  loginUser(input: LoginInput!): User!
+  updateUserPassword(userId: ID!, input: UserUpdatePasswordInput!): User!
+  requestPasswordReset(input: PasswordResetCreateInput!): PasswordReset!
+  resetPassword(input: PasswordResetUpdateInput!): User!
+}
