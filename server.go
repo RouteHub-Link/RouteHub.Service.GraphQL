@@ -27,7 +27,7 @@ func Serve() {
 	}
 
 	config := graph.Config{Resolvers: resolver}
-	config.Directives.Auth = auth.Auth
+	config.Directives.Auth = auth.AuthDirectiveHandler
 
 	var srv http.Handler = handler.NewDefaultServer(graph.NewExecutableSchema(config))
 
