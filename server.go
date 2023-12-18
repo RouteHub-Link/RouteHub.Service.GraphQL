@@ -7,6 +7,7 @@ import (
 
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
+	"github.com/RouteHub-Link/routehub-service-graphql/auth"
 	"github.com/RouteHub-Link/routehub-service-graphql/database"
 	"github.com/RouteHub-Link/routehub-service-graphql/graph"
 	"github.com/RouteHub-Link/routehub-service-graphql/services"
@@ -25,7 +26,12 @@ func Serve() {
 		UserService: &services.UserService{DB: database.DB},
 	}
 
-	srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: resolver}))
+	config := graph.Config{Resolvers: resolver}
+	config.Directives.Auth = auth.Auth
+
+	var srv http.Handler = handler.NewDefaultServer(graph.NewExecutableSchema(config))
+
+	srv = auth.Middleware(srv)
 
 	http.Handle("/", playground.Handler("GraphQL playground", "/query"))
 	http.Handle("/query", srv)

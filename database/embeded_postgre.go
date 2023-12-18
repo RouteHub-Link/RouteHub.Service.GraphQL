@@ -16,7 +16,7 @@ func RunEmbeddedPostgres() {
 			Database("postgres").
 			Username("postgres").
 			Password("1234").
-			Port(5432),
+			Port(5434),
 	)
 	if err := embeddedPostgres.Start(); err != nil {
 		panic(err)

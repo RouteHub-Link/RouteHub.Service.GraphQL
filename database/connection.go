@@ -12,7 +12,7 @@ var DB *gorm.DB
 
 func Init() {
 	db, err := gorm.Open(
-		postgres.Open("host=127.0.0.1 user=postgres password=1234 dbname=postgres port=5432 sslmode=disable TimeZone=UTC"),
+		postgres.Open("host=127.0.0.1 user=postgres password=1234 dbname=postgres port=5434 sslmode=disable TimeZone=UTC"),
 		&gorm.Config{
 			Logger: logger.Default.LogMode(logger.Info),
 		},

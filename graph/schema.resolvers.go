@@ -9,10 +9,11 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/RouteHub-Link/routehub-service-graphql/auth"
 	database "github.com/RouteHub-Link/routehub-service-graphql/database/models"
 	database_types "github.com/RouteHub-Link/routehub-service-graphql/database/types"
 	"github.com/RouteHub-Link/routehub-service-graphql/graph/model"
-	"github.com/google/uuid"
+	"github.com/vektah/gqlparser/v2/gqlerror"
 )
 
 // CreatedAt is the resolver for the createdAt field.
@@ -55,11 +56,6 @@ func (r *companyResolver) Payments(ctx context.Context, obj *database.Company) (
 	panic(fmt.Errorf("not implemented: Payments - payments"))
 }
 
-// ID is the resolver for the id field.
-func (r *industryResolver) ID(ctx context.Context, obj *database_types.Industry) (uuid.UUID, error) {
-	panic(fmt.Errorf("not implemented: ID - id"))
-}
-
 // Companies is the resolver for the companies field.
 func (r *industryResolver) Companies(ctx context.Context, obj *database_types.Industry) ([]*database.Company, error) {
 	panic(fmt.Errorf("not implemented: Companies - companies"))
@@ -71,8 +67,25 @@ func (r *mutationResolver) CreateUser(ctx context.Context, input model.UserInput
 }
 
 // LoginUser is the resolver for the loginUser field.
-func (r *mutationResolver) LoginUser(ctx context.Context, input model.LoginInput) (*database.User, error) {
-	panic(fmt.Errorf("not implemented: LoginUser - loginUser"))
+func (r *mutationResolver) LoginUser(ctx context.Context, input model.LoginInput) (*model.LoginPayload, error) {
+	user, err := r.UserService.Login(input.Email, input.Password)
+	if err != nil {
+		return nil, err
+	}
+
+	userSession := new(auth.UserSession)
+	userSession.ID = user.ID
+	userSession.Name = user.Fullname
+
+	token, err := auth.GenerateToken(userSession.ToClaims())
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &model.LoginPayload{
+		Token: token,
+	}, nil
 }
 
 // UpdateUserPassword is the resolver for the updateUserPassword field.
@@ -92,7 +105,12 @@ func (r *mutationResolver) ResetPassword(ctx context.Context, input model.Passwo
 
 // Me is the resolver for the me field.
 func (r *queryResolver) Me(ctx context.Context) (*database.User, error) {
-	panic(fmt.Errorf("not implemented: Me - me"))
+	userSession := auth.ForContext(ctx)
+	if userSession == nil {
+		return nil, gqlerror.Errorf("Access Denied")
+	}
+
+	return r.UserService.User(userSession.ID)
 }
 
 // Users is the resolver for the users field.
@@ -103,11 +121,6 @@ func (r *queryResolver) Users(ctx context.Context) ([]*database.User, error) {
 // RefreshToken is the resolver for the refreshToken field.
 func (r *queryResolver) RefreshToken(ctx context.Context, input model.RefreshTokenInput) (string, error) {
 	panic(fmt.Errorf("not implemented: RefreshToken - refreshToken"))
-}
-
-// ID is the resolver for the id field.
-func (r *socialMediaResolver) ID(ctx context.Context, obj *database_types.SocialMedia) (uuid.UUID, error) {
-	panic(fmt.Errorf("not implemented: ID - id"))
 }
 
 // Companies is the resolver for the companies field.
@@ -145,9 +158,6 @@ func (r *Resolver) Mutation() MutationResolver { return &mutationResolver{r} }
 // Query returns QueryResolver implementation.
 func (r *Resolver) Query() QueryResolver { return &queryResolver{r} }
 
-// SocialMedia returns SocialMediaResolver implementation.
-func (r *Resolver) SocialMedia() SocialMediaResolver { return &socialMediaResolver{r} }
-
 // User returns UserResolver implementation.
 func (r *Resolver) User() UserResolver { return &userResolver{r} }
 
@@ -156,5 +166,4 @@ type companyResolver struct{ *Resolver }
 type industryResolver struct{ *Resolver }
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
-type socialMediaResolver struct{ *Resolver }
 type userResolver struct{ *Resolver }

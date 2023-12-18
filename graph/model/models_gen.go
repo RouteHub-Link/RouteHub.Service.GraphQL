@@ -84,8 +84,13 @@ type LinkInput struct {
 }
 
 type LoginInput struct {
-	Username string `json:"username"`
+	Email    string `json:"email"`
 	Password string `json:"password"`
+}
+
+type LoginPayload struct {
+	Token        string `json:"token"`
+	RefreshToken string `json:"refreshToken"`
 }
 
 type ObservationAnalytic struct {

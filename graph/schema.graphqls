@@ -5,7 +5,6 @@
 scalar UUID
 scalar DateTime
 
-
 enum DNSStatus {
   PENDING
   VERIFIED
@@ -71,8 +70,10 @@ enum CompanyPermission {
   PLATFORM_USER_UPDATE
 }
 
+directive @auth on FIELD_DEFINITION
+
 type Query {
-  me: User!
+  me: User! @auth
   users: [User!]!
   refreshToken(input: RefreshTokenInput!): String!
 }
@@ -131,15 +132,12 @@ type Company {
 }
 
 type SocialMedia {
-  id: UUID!
   name: String!
   url: String!
   icon: String!
 }
 
-
 type Industry {
-  id: UUID!
   name: String!
   companies: [Company!]!
 }
@@ -256,6 +254,10 @@ type Ticket {
   deletedAt: DateTime
 }
 
+type LoginPayload {
+  token: String!
+  refreshToken: String!
+}
 
 type TicketMessage {
   id: UUID!
@@ -348,7 +350,7 @@ input ObservationInput {
 }
 
 input LoginInput {
-  username: String!
+  email: String!
   password: String!
 }
 
@@ -454,9 +456,10 @@ input SocialMediaInput {
   icon: String!
 }
 
+
 type Mutation {
   createUser(input: UserInput!): User!
-  loginUser(input: LoginInput!): User!
+  loginUser(input: LoginInput!): LoginPayload!
   updateUserPassword(userId: ID!, input: UserUpdatePasswordInput!): User!
   requestPasswordReset(input: PasswordResetCreateInput!): PasswordReset!
   resetPassword(input: PasswordResetUpdateInput!): User!
