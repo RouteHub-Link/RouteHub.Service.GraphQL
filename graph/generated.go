@@ -17,6 +17,7 @@ import (
 	"github.com/99designs/gqlgen/graphql/introspection"
 	database_enums "github.com/RouteHub-Link/routehub-service-graphql/database/enums"
 	database_models "github.com/RouteHub-Link/routehub-service-graphql/database/models"
+	database_relations "github.com/RouteHub-Link/routehub-service-graphql/database/relations"
 	database_types "github.com/RouteHub-Link/routehub-service-graphql/database/types"
 	"github.com/RouteHub-Link/routehub-service-graphql/graph/model"
 	"github.com/google/uuid"
@@ -45,11 +46,14 @@ type Config struct {
 
 type ResolverRoot interface {
 	AccountPhone() AccountPhoneResolver
-	Company() CompanyResolver
 	Industry() IndustryResolver
 	Mutation() MutationResolver
+	Organization() OrganizationResolver
 	Query() QueryResolver
 	User() UserResolver
+	UserInvite() UserInviteResolver
+	OrganizationsWithPermissionsInput() OrganizationsWithPermissionsInputResolver
+	PlatformsWithPermissionsInput() PlatformsWithPermissionsInputResolver
 }
 
 type DirectiveRoot struct {
@@ -65,25 +69,8 @@ type ComplexityRoot struct {
 		Verified    func(childComplexity int) int
 	}
 
-	Company struct {
-		Description  func(childComplexity int) int
-		Domains      func(childComplexity int) int
-		ID           func(childComplexity int) int
-		Industry     func(childComplexity int) int
-		Location     func(childComplexity int) int
-		Name         func(childComplexity int) int
-		PaymentPlan  func(childComplexity int) int
-		Payments     func(childComplexity int) int
-		Permissions  func(childComplexity int) int
-		Platforms    func(childComplexity int) int
-		SocialMedias func(childComplexity int) int
-		Users        func(childComplexity int) int
-		Website      func(childComplexity int) int
-	}
-
 	Domain struct {
 		Analytics             func(childComplexity int) int
-		Company               func(childComplexity int) int
 		CreatedAt             func(childComplexity int) int
 		DNSStatus             func(childComplexity int) int
 		DeletedAt             func(childComplexity int) int
@@ -91,6 +78,7 @@ type ComplexityRoot struct {
 		LastDNSVerificationAt func(childComplexity int) int
 		Links                 func(childComplexity int) int
 		Name                  func(childComplexity int) int
+		Organization          func(childComplexity int) int
 		Platform              func(childComplexity int) int
 		State                 func(childComplexity int) int
 		URL                   func(childComplexity int) int
@@ -106,8 +94,8 @@ type ComplexityRoot struct {
 	}
 
 	Industry struct {
-		Companies func(childComplexity int) int
-		Name      func(childComplexity int) int
+		Name          func(childComplexity int) int
+		Organizations func(childComplexity int) int
 	}
 
 	Link struct {
@@ -143,9 +131,11 @@ type ComplexityRoot struct {
 
 	Mutation struct {
 		CreateUser           func(childComplexity int, input model.UserInput) int
+		InviteUser           func(childComplexity int, input model.UserInviteInput) int
 		LoginUser            func(childComplexity int, input model.LoginInput) int
 		RequestPasswordReset func(childComplexity int, input model.PasswordResetCreateInput) int
 		ResetPassword        func(childComplexity int, input model.PasswordResetUpdateInput) int
+		UpdateUserInvitation func(childComplexity int, input model.UpdateUserInviteInput) int
 		UpdateUserPassword   func(childComplexity int, userID string, input model.UserUpdatePasswordInput) int
 	}
 
@@ -188,6 +178,22 @@ type ComplexityRoot struct {
 		URL         func(childComplexity int) int
 	}
 
+	Organization struct {
+		Description  func(childComplexity int) int
+		Domains      func(childComplexity int) int
+		ID           func(childComplexity int) int
+		Industry     func(childComplexity int) int
+		Location     func(childComplexity int) int
+		Name         func(childComplexity int) int
+		PaymentPlan  func(childComplexity int) int
+		Payments     func(childComplexity int) int
+		Permissions  func(childComplexity int) int
+		Platforms    func(childComplexity int) int
+		SocialMedias func(childComplexity int) int
+		Users        func(childComplexity int) int
+		Website      func(childComplexity int) int
+	}
+
 	PasswordReset struct {
 		CreatedAt func(childComplexity int) int
 		DeletedAt func(childComplexity int) int
@@ -199,33 +205,31 @@ type ComplexityRoot struct {
 	}
 
 	Payment struct {
-		Amount  func(childComplexity int) int
-		Company func(childComplexity int) int
-		Date    func(childComplexity int) int
-		ID      func(childComplexity int) int
-		Status  func(childComplexity int) int
-		User    func(childComplexity int) int
+		Amount       func(childComplexity int) int
+		Date         func(childComplexity int) int
+		ID           func(childComplexity int) int
+		Organization func(childComplexity int) int
+		Status       func(childComplexity int) int
+		User         func(childComplexity int) int
 	}
 
 	Permission struct {
-		Companies   func(childComplexity int) int
-		Description func(childComplexity int) int
-		Domains     func(childComplexity int) int
-		ID          func(childComplexity int) int
-		Links       func(childComplexity int) int
-		Name        func(childComplexity int) int
-		Platforms   func(childComplexity int) int
-		Users       func(childComplexity int) int
+		Description   func(childComplexity int) int
+		Domains       func(childComplexity int) int
+		ID            func(childComplexity int) int
+		Name          func(childComplexity int) int
+		Organizations func(childComplexity int) int
+		Platforms     func(childComplexity int) int
 	}
 
 	Platform struct {
 		Analytics         func(childComplexity int) int
-		Company           func(childComplexity int) int
 		Domains           func(childComplexity int) int
 		ID                func(childComplexity int) int
 		Links             func(childComplexity int) int
 		Name              func(childComplexity int) int
 		OpenGraph         func(childComplexity int) int
+		Organization      func(childComplexity int) int
 		Permissions       func(childComplexity int) int
 		PinnedLinks       func(childComplexity int) int
 		RedirectionChoice func(childComplexity int) int
@@ -241,9 +245,11 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
-		Me           func(childComplexity int) int
-		RefreshToken func(childComplexity int, input model.RefreshTokenInput) int
-		Users        func(childComplexity int) int
+		Me            func(childComplexity int) int
+		Organizations func(childComplexity int) int
+		Platforms     func(childComplexity int) int
+		RefreshToken  func(childComplexity int, input model.RefreshTokenInput) int
+		Users         func(childComplexity int) int
 	}
 
 	SocialMedia struct {
@@ -267,18 +273,18 @@ type ComplexityRoot struct {
 	}
 
 	Ticket struct {
-		Attachments func(childComplexity int) int
-		Category    func(childComplexity int) int
-		Company     func(childComplexity int) int
-		CreatedAt   func(childComplexity int) int
-		DeletedAt   func(childComplexity int) int
-		Description func(childComplexity int) int
-		ID          func(childComplexity int) int
-		Messages    func(childComplexity int) int
-		Status      func(childComplexity int) int
-		Title       func(childComplexity int) int
-		UpdatedAt   func(childComplexity int) int
-		User        func(childComplexity int) int
+		Attachments  func(childComplexity int) int
+		Category     func(childComplexity int) int
+		CreatedAt    func(childComplexity int) int
+		DeletedAt    func(childComplexity int) int
+		Description  func(childComplexity int) int
+		ID           func(childComplexity int) int
+		Messages     func(childComplexity int) int
+		Organization func(childComplexity int) int
+		Status       func(childComplexity int) int
+		Title        func(childComplexity int) int
+		UpdatedAt    func(childComplexity int) int
+		User         func(childComplexity int) int
 	}
 
 	TicketMessage struct {
@@ -293,19 +299,33 @@ type ComplexityRoot struct {
 	}
 
 	User struct {
-		Avatar      func(childComplexity int) int
-		Companies   func(childComplexity int) int
-		CreatedAt   func(childComplexity int) int
-		DeletedAt   func(childComplexity int) int
-		Email       func(childComplexity int) int
-		Fullname    func(childComplexity int) int
-		ID          func(childComplexity int) int
-		Payments    func(childComplexity int) int
-		Permissions func(childComplexity int) int
-		Phone       func(childComplexity int) int
-		Platforms   func(childComplexity int) int
-		UpdatedAt   func(childComplexity int) int
-		Verified    func(childComplexity int) int
+		Avatar        func(childComplexity int) int
+		CreatedAt     func(childComplexity int) int
+		DeletedAt     func(childComplexity int) int
+		Email         func(childComplexity int) int
+		Fullname      func(childComplexity int) int
+		ID            func(childComplexity int) int
+		Organizations func(childComplexity int) int
+		Payments      func(childComplexity int) int
+		Permissions   func(childComplexity int) int
+		Phone         func(childComplexity int) int
+		Platforms     func(childComplexity int) int
+		UpdatedAt     func(childComplexity int) int
+		UserInvites   func(childComplexity int) int
+		Verified      func(childComplexity int) int
+	}
+
+	UserInvite struct {
+		Code         func(childComplexity int) int
+		CreatedAt    func(childComplexity int) int
+		DeletedAt    func(childComplexity int) int
+		Email        func(childComplexity int) int
+		ID           func(childComplexity int) int
+		Organization func(childComplexity int) int
+		Platforms    func(childComplexity int) int
+		Status       func(childComplexity int) int
+		UpdatedAt    func(childComplexity int) int
+		User         func(childComplexity int) int
 	}
 }
 
@@ -313,35 +333,54 @@ type AccountPhoneResolver interface {
 	CreatedAt(ctx context.Context, obj *database_types.AccountPhone) (*time.Time, error)
 	UpdatedAt(ctx context.Context, obj *database_types.AccountPhone) (*time.Time, error)
 }
-type CompanyResolver interface {
-	Platforms(ctx context.Context, obj *database_models.Company) ([]*model.Platform, error)
-
-	Users(ctx context.Context, obj *database_models.Company) ([]*database_models.User, error)
-	Domains(ctx context.Context, obj *database_models.Company) ([]*model.Domain, error)
-	Permissions(ctx context.Context, obj *database_models.Company) ([]*model.Permission, error)
-	PaymentPlan(ctx context.Context, obj *database_models.Company) (model.PaymentPlan, error)
-	Payments(ctx context.Context, obj *database_models.Company) ([]*model.Payment, error)
-}
 type IndustryResolver interface {
-	Companies(ctx context.Context, obj *database_types.Industry) ([]*database_models.Company, error)
+	Organizations(ctx context.Context, obj *database_types.Industry) ([]*database_models.Organization, error)
 }
 type MutationResolver interface {
 	CreateUser(ctx context.Context, input model.UserInput) (*database_models.User, error)
 	LoginUser(ctx context.Context, input model.LoginInput) (*model.LoginPayload, error)
+	InviteUser(ctx context.Context, input model.UserInviteInput) (*database_relations.UserInvite, error)
+	UpdateUserInvitation(ctx context.Context, input model.UpdateUserInviteInput) (database_enums.InvitationStatus, error)
 	UpdateUserPassword(ctx context.Context, userID string, input model.UserUpdatePasswordInput) (*database_models.User, error)
 	RequestPasswordReset(ctx context.Context, input model.PasswordResetCreateInput) (*model.PasswordReset, error)
 	ResetPassword(ctx context.Context, input model.PasswordResetUpdateInput) (*database_models.User, error)
 }
+type OrganizationResolver interface {
+	Permissions(ctx context.Context, obj *database_models.Organization) ([]database_enums.OrganizationPermission, error)
+	Platforms(ctx context.Context, obj *database_models.Organization) ([]*model.Platform, error)
+
+	Users(ctx context.Context, obj *database_models.Organization) ([]*database_models.User, error)
+	Domains(ctx context.Context, obj *database_models.Organization) ([]*model.Domain, error)
+	PaymentPlan(ctx context.Context, obj *database_models.Organization) (model.PaymentPlan, error)
+	Payments(ctx context.Context, obj *database_models.Organization) ([]*model.Payment, error)
+}
 type QueryResolver interface {
 	Me(ctx context.Context) (*database_models.User, error)
 	Users(ctx context.Context) ([]*database_models.User, error)
+	Organizations(ctx context.Context) ([]*database_models.Organization, error)
+	Platforms(ctx context.Context) ([]*model.Platform, error)
 	RefreshToken(ctx context.Context, input model.RefreshTokenInput) (string, error)
 }
 type UserResolver interface {
-	Companies(ctx context.Context, obj *database_models.User) ([]*database_models.Company, error)
+	Organizations(ctx context.Context, obj *database_models.User) ([]*database_models.Organization, error)
 	Platforms(ctx context.Context, obj *database_models.User) ([]*model.Platform, error)
 	Permissions(ctx context.Context, obj *database_models.User) ([]*model.Permission, error)
 	Payments(ctx context.Context, obj *database_models.User) ([]*model.Payment, error)
+	UserInvites(ctx context.Context, obj *database_models.User) ([]*database_relations.UserInvite, error)
+}
+type UserInviteResolver interface {
+	Organization(ctx context.Context, obj *database_relations.UserInvite) (*database_models.Organization, error)
+	Platforms(ctx context.Context, obj *database_relations.UserInvite) ([]*model.Platform, error)
+	User(ctx context.Context, obj *database_relations.UserInvite) (*database_models.User, error)
+
+	DeletedAt(ctx context.Context, obj *database_relations.UserInvite) (*time.Time, error)
+}
+
+type OrganizationsWithPermissionsInputResolver interface {
+	Permissions(ctx context.Context, obj *database_relations.OrganizationsWithPermissions, data []database_enums.OrganizationPermission) error
+}
+type PlatformsWithPermissionsInputResolver interface {
+	Permissions(ctx context.Context, obj *database_relations.PlatformsWithPermissions, data []database_enums.PlatformPermission) error
 }
 
 type executableSchema struct {
@@ -398,110 +437,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.AccountPhone.Verified(childComplexity), true
 
-	case "Company.description":
-		if e.complexity.Company.Description == nil {
-			break
-		}
-
-		return e.complexity.Company.Description(childComplexity), true
-
-	case "Company.domains":
-		if e.complexity.Company.Domains == nil {
-			break
-		}
-
-		return e.complexity.Company.Domains(childComplexity), true
-
-	case "Company.id":
-		if e.complexity.Company.ID == nil {
-			break
-		}
-
-		return e.complexity.Company.ID(childComplexity), true
-
-	case "Company.industry":
-		if e.complexity.Company.Industry == nil {
-			break
-		}
-
-		return e.complexity.Company.Industry(childComplexity), true
-
-	case "Company.location":
-		if e.complexity.Company.Location == nil {
-			break
-		}
-
-		return e.complexity.Company.Location(childComplexity), true
-
-	case "Company.name":
-		if e.complexity.Company.Name == nil {
-			break
-		}
-
-		return e.complexity.Company.Name(childComplexity), true
-
-	case "Company.paymentPlan":
-		if e.complexity.Company.PaymentPlan == nil {
-			break
-		}
-
-		return e.complexity.Company.PaymentPlan(childComplexity), true
-
-	case "Company.payments":
-		if e.complexity.Company.Payments == nil {
-			break
-		}
-
-		return e.complexity.Company.Payments(childComplexity), true
-
-	case "Company.permissions":
-		if e.complexity.Company.Permissions == nil {
-			break
-		}
-
-		return e.complexity.Company.Permissions(childComplexity), true
-
-	case "Company.platforms":
-		if e.complexity.Company.Platforms == nil {
-			break
-		}
-
-		return e.complexity.Company.Platforms(childComplexity), true
-
-	case "Company.socialMedias":
-		if e.complexity.Company.SocialMedias == nil {
-			break
-		}
-
-		return e.complexity.Company.SocialMedias(childComplexity), true
-
-	case "Company.users":
-		if e.complexity.Company.Users == nil {
-			break
-		}
-
-		return e.complexity.Company.Users(childComplexity), true
-
-	case "Company.website":
-		if e.complexity.Company.Website == nil {
-			break
-		}
-
-		return e.complexity.Company.Website(childComplexity), true
-
 	case "Domain.analytics":
 		if e.complexity.Domain.Analytics == nil {
 			break
 		}
 
 		return e.complexity.Domain.Analytics(childComplexity), true
-
-	case "Domain.company":
-		if e.complexity.Domain.Company == nil {
-			break
-		}
-
-		return e.complexity.Domain.Company(childComplexity), true
 
 	case "Domain.createdAt":
 		if e.complexity.Domain.CreatedAt == nil {
@@ -551,6 +492,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Domain.Name(childComplexity), true
+
+	case "Domain.organization":
+		if e.complexity.Domain.Organization == nil {
+			break
+		}
+
+		return e.complexity.Domain.Organization(childComplexity), true
 
 	case "Domain.platform":
 		if e.complexity.Domain.Platform == nil {
@@ -615,19 +563,19 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.DomainAnalytics.TotalUsers(childComplexity), true
 
-	case "Industry.companies":
-		if e.complexity.Industry.Companies == nil {
-			break
-		}
-
-		return e.complexity.Industry.Companies(childComplexity), true
-
 	case "Industry.name":
 		if e.complexity.Industry.Name == nil {
 			break
 		}
 
 		return e.complexity.Industry.Name(childComplexity), true
+
+	case "Industry.organizations":
+		if e.complexity.Industry.Organizations == nil {
+			break
+		}
+
+		return e.complexity.Industry.Organizations(childComplexity), true
 
 	case "Link.analytics":
 		if e.complexity.Link.Analytics == nil {
@@ -795,6 +743,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.CreateUser(childComplexity, args["input"].(model.UserInput)), true
 
+	case "Mutation.inviteUser":
+		if e.complexity.Mutation.InviteUser == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_inviteUser_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.InviteUser(childComplexity, args["input"].(model.UserInviteInput)), true
+
 	case "Mutation.loginUser":
 		if e.complexity.Mutation.LoginUser == nil {
 			break
@@ -830,6 +790,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.ResetPassword(childComplexity, args["input"].(model.PasswordResetUpdateInput)), true
+
+	case "Mutation.updateUserInvitation":
+		if e.complexity.Mutation.UpdateUserInvitation == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateUserInvitation_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateUserInvitation(childComplexity, args["input"].(model.UpdateUserInviteInput)), true
 
 	case "Mutation.updateUserPassword":
 		if e.complexity.Mutation.UpdateUserPassword == nil {
@@ -1053,6 +1025,97 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.OpenGraphX.URL(childComplexity), true
 
+	case "Organization.description":
+		if e.complexity.Organization.Description == nil {
+			break
+		}
+
+		return e.complexity.Organization.Description(childComplexity), true
+
+	case "Organization.domains":
+		if e.complexity.Organization.Domains == nil {
+			break
+		}
+
+		return e.complexity.Organization.Domains(childComplexity), true
+
+	case "Organization.id":
+		if e.complexity.Organization.ID == nil {
+			break
+		}
+
+		return e.complexity.Organization.ID(childComplexity), true
+
+	case "Organization.industry":
+		if e.complexity.Organization.Industry == nil {
+			break
+		}
+
+		return e.complexity.Organization.Industry(childComplexity), true
+
+	case "Organization.location":
+		if e.complexity.Organization.Location == nil {
+			break
+		}
+
+		return e.complexity.Organization.Location(childComplexity), true
+
+	case "Organization.name":
+		if e.complexity.Organization.Name == nil {
+			break
+		}
+
+		return e.complexity.Organization.Name(childComplexity), true
+
+	case "Organization.paymentPlan":
+		if e.complexity.Organization.PaymentPlan == nil {
+			break
+		}
+
+		return e.complexity.Organization.PaymentPlan(childComplexity), true
+
+	case "Organization.payments":
+		if e.complexity.Organization.Payments == nil {
+			break
+		}
+
+		return e.complexity.Organization.Payments(childComplexity), true
+
+	case "Organization.permissions":
+		if e.complexity.Organization.Permissions == nil {
+			break
+		}
+
+		return e.complexity.Organization.Permissions(childComplexity), true
+
+	case "Organization.platforms":
+		if e.complexity.Organization.Platforms == nil {
+			break
+		}
+
+		return e.complexity.Organization.Platforms(childComplexity), true
+
+	case "Organization.socialMedias":
+		if e.complexity.Organization.SocialMedias == nil {
+			break
+		}
+
+		return e.complexity.Organization.SocialMedias(childComplexity), true
+
+	case "Organization.users":
+		if e.complexity.Organization.Users == nil {
+			break
+		}
+
+		return e.complexity.Organization.Users(childComplexity), true
+
+	case "Organization.website":
+		if e.complexity.Organization.Website == nil {
+			break
+		}
+
+		return e.complexity.Organization.Website(childComplexity), true
+
 	case "PasswordReset.createdAt":
 		if e.complexity.PasswordReset.CreatedAt == nil {
 			break
@@ -1109,13 +1172,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Payment.Amount(childComplexity), true
 
-	case "Payment.company":
-		if e.complexity.Payment.Company == nil {
-			break
-		}
-
-		return e.complexity.Payment.Company(childComplexity), true
-
 	case "Payment.date":
 		if e.complexity.Payment.Date == nil {
 			break
@@ -1130,6 +1186,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Payment.ID(childComplexity), true
 
+	case "Payment.organization":
+		if e.complexity.Payment.Organization == nil {
+			break
+		}
+
+		return e.complexity.Payment.Organization(childComplexity), true
+
 	case "Payment.status":
 		if e.complexity.Payment.Status == nil {
 			break
@@ -1143,13 +1206,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Payment.User(childComplexity), true
-
-	case "Permission.companies":
-		if e.complexity.Permission.Companies == nil {
-			break
-		}
-
-		return e.complexity.Permission.Companies(childComplexity), true
 
 	case "Permission.description":
 		if e.complexity.Permission.Description == nil {
@@ -1172,19 +1228,19 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Permission.ID(childComplexity), true
 
-	case "Permission.links":
-		if e.complexity.Permission.Links == nil {
-			break
-		}
-
-		return e.complexity.Permission.Links(childComplexity), true
-
 	case "Permission.name":
 		if e.complexity.Permission.Name == nil {
 			break
 		}
 
 		return e.complexity.Permission.Name(childComplexity), true
+
+	case "Permission.organizations":
+		if e.complexity.Permission.Organizations == nil {
+			break
+		}
+
+		return e.complexity.Permission.Organizations(childComplexity), true
 
 	case "Permission.platforms":
 		if e.complexity.Permission.Platforms == nil {
@@ -1193,26 +1249,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Permission.Platforms(childComplexity), true
 
-	case "Permission.users":
-		if e.complexity.Permission.Users == nil {
-			break
-		}
-
-		return e.complexity.Permission.Users(childComplexity), true
-
 	case "Platform.analytics":
 		if e.complexity.Platform.Analytics == nil {
 			break
 		}
 
 		return e.complexity.Platform.Analytics(childComplexity), true
-
-	case "Platform.company":
-		if e.complexity.Platform.Company == nil {
-			break
-		}
-
-		return e.complexity.Platform.Company(childComplexity), true
 
 	case "Platform.domains":
 		if e.complexity.Platform.Domains == nil {
@@ -1248,6 +1290,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Platform.OpenGraph(childComplexity), true
+
+	case "Platform.organization":
+		if e.complexity.Platform.Organization == nil {
+			break
+		}
+
+		return e.complexity.Platform.Organization(childComplexity), true
 
 	case "Platform.permissions":
 		if e.complexity.Platform.Permissions == nil {
@@ -1318,6 +1367,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.Me(childComplexity), true
+
+	case "Query.organizations":
+		if e.complexity.Query.Organizations == nil {
+			break
+		}
+
+		return e.complexity.Query.Organizations(childComplexity), true
+
+	case "Query.platforms":
+		if e.complexity.Query.Platforms == nil {
+			break
+		}
+
+		return e.complexity.Query.Platforms(childComplexity), true
 
 	case "Query.refreshToken":
 		if e.complexity.Query.RefreshToken == nil {
@@ -1450,13 +1513,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Ticket.Category(childComplexity), true
 
-	case "Ticket.company":
-		if e.complexity.Ticket.Company == nil {
-			break
-		}
-
-		return e.complexity.Ticket.Company(childComplexity), true
-
 	case "Ticket.createdAt":
 		if e.complexity.Ticket.CreatedAt == nil {
 			break
@@ -1491,6 +1547,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Ticket.Messages(childComplexity), true
+
+	case "Ticket.organization":
+		if e.complexity.Ticket.Organization == nil {
+			break
+		}
+
+		return e.complexity.Ticket.Organization(childComplexity), true
 
 	case "Ticket.status":
 		if e.complexity.Ticket.Status == nil {
@@ -1583,13 +1646,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.User.Avatar(childComplexity), true
 
-	case "User.companies":
-		if e.complexity.User.Companies == nil {
-			break
-		}
-
-		return e.complexity.User.Companies(childComplexity), true
-
 	case "User.createdAt":
 		if e.complexity.User.CreatedAt == nil {
 			break
@@ -1624,6 +1680,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.User.ID(childComplexity), true
+
+	case "User.organizations":
+		if e.complexity.User.Organizations == nil {
+			break
+		}
+
+		return e.complexity.User.Organizations(childComplexity), true
 
 	case "User.payments":
 		if e.complexity.User.Payments == nil {
@@ -1660,12 +1723,89 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.User.UpdatedAt(childComplexity), true
 
+	case "User.userInvites":
+		if e.complexity.User.UserInvites == nil {
+			break
+		}
+
+		return e.complexity.User.UserInvites(childComplexity), true
+
 	case "User.verified":
 		if e.complexity.User.Verified == nil {
 			break
 		}
 
 		return e.complexity.User.Verified(childComplexity), true
+
+	case "UserInvite.code":
+		if e.complexity.UserInvite.Code == nil {
+			break
+		}
+
+		return e.complexity.UserInvite.Code(childComplexity), true
+
+	case "UserInvite.createdAt":
+		if e.complexity.UserInvite.CreatedAt == nil {
+			break
+		}
+
+		return e.complexity.UserInvite.CreatedAt(childComplexity), true
+
+	case "UserInvite.deletedAt":
+		if e.complexity.UserInvite.DeletedAt == nil {
+			break
+		}
+
+		return e.complexity.UserInvite.DeletedAt(childComplexity), true
+
+	case "UserInvite.email":
+		if e.complexity.UserInvite.Email == nil {
+			break
+		}
+
+		return e.complexity.UserInvite.Email(childComplexity), true
+
+	case "UserInvite.id":
+		if e.complexity.UserInvite.ID == nil {
+			break
+		}
+
+		return e.complexity.UserInvite.ID(childComplexity), true
+
+	case "UserInvite.organization":
+		if e.complexity.UserInvite.Organization == nil {
+			break
+		}
+
+		return e.complexity.UserInvite.Organization(childComplexity), true
+
+	case "UserInvite.platforms":
+		if e.complexity.UserInvite.Platforms == nil {
+			break
+		}
+
+		return e.complexity.UserInvite.Platforms(childComplexity), true
+
+	case "UserInvite.status":
+		if e.complexity.UserInvite.Status == nil {
+			break
+		}
+
+		return e.complexity.UserInvite.Status(childComplexity), true
+
+	case "UserInvite.updatedAt":
+		if e.complexity.UserInvite.UpdatedAt == nil {
+			break
+		}
+
+		return e.complexity.UserInvite.UpdatedAt(childComplexity), true
+
+	case "UserInvite.user":
+		if e.complexity.UserInvite.User == nil {
+			break
+		}
+
+		return e.complexity.UserInvite.User(childComplexity), true
 
 	}
 	return 0, false
@@ -1675,23 +1815,26 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	rc := graphql.GetOperationContext(ctx)
 	ec := executionContext{rc, e, 0, 0, make(chan graphql.DeferredResult)}
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
-		ec.unmarshalInputCompanyInput,
 		ec.unmarshalInputDomainInput,
 		ec.unmarshalInputLinkInput,
 		ec.unmarshalInputLoginInput,
 		ec.unmarshalInputObservationInput,
 		ec.unmarshalInputOpenGraphInput,
 		ec.unmarshalInputOpenGraphXInput,
+		ec.unmarshalInputOrganizationInput,
+		ec.unmarshalInputOrganizationsWithPermissionsInput,
 		ec.unmarshalInputPasswordResetCreateInput,
 		ec.unmarshalInputPasswordResetUpdateInput,
 		ec.unmarshalInputPlatformInput,
-		ec.unmarshalInputPlatformPinInput,
+		ec.unmarshalInputPlatformsWithPermissionsInput,
 		ec.unmarshalInputRefreshTokenInput,
 		ec.unmarshalInputSocialMediaInput,
 		ec.unmarshalInputTemplateInput,
 		ec.unmarshalInputTicketInput,
 		ec.unmarshalInputTicketMessageInput,
+		ec.unmarshalInputUpdateUserInviteInput,
 		ec.unmarshalInputUserInput,
+		ec.unmarshalInputUserInviteInput,
 		ec.unmarshalInputUserUpdatePasswordInput,
 	)
 	first := true
@@ -1824,6 +1967,21 @@ func (ec *executionContext) field_Mutation_createUser_args(ctx context.Context, 
 	return args, nil
 }
 
+func (ec *executionContext) field_Mutation_inviteUser_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.UserInviteInput
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalNUserInviteInput2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐUserInviteInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Mutation_loginUser_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -1861,6 +2019,21 @@ func (ec *executionContext) field_Mutation_resetPassword_args(ctx context.Contex
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
 		arg0, err = ec.unmarshalNPasswordResetUpdateInput2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐPasswordResetUpdateInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_updateUserInvitation_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.UpdateUserInviteInput
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalNUpdateUserInviteInput2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐUpdateUserInviteInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -2178,703 +2351,6 @@ func (ec *executionContext) fieldContext_AccountPhone_updatedAt(ctx context.Cont
 	return fc, nil
 }
 
-func (ec *executionContext) _Company_id(ctx context.Context, field graphql.CollectedField, obj *database_models.Company) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Company_id(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.ID, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(uuid.UUID)
-	fc.Result = res
-	return ec.marshalNUUID2githubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Company_id(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Company",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type UUID does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Company_name(ctx context.Context, field graphql.CollectedField, obj *database_models.Company) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Company_name(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Name, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Company_name(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Company",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Company_website(ctx context.Context, field graphql.CollectedField, obj *database_models.Company) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Company_website(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Website, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Company_website(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Company",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Company_platforms(ctx context.Context, field graphql.CollectedField, obj *database_models.Company) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Company_platforms(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Company().Platforms(rctx, obj)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.([]*model.Platform)
-	fc.Result = res
-	return ec.marshalNPlatform2ᚕᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐPlatformᚄ(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Company_platforms(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Company",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_Platform_id(ctx, field)
-			case "name":
-				return ec.fieldContext_Platform_name(ctx, field)
-			case "openGraph":
-				return ec.fieldContext_Platform_openGraph(ctx, field)
-			case "redirectionChoice":
-				return ec.fieldContext_Platform_redirectionChoice(ctx, field)
-			case "company":
-				return ec.fieldContext_Platform_company(ctx, field)
-			case "domains":
-				return ec.fieldContext_Platform_domains(ctx, field)
-			case "permissions":
-				return ec.fieldContext_Platform_permissions(ctx, field)
-			case "links":
-				return ec.fieldContext_Platform_links(ctx, field)
-			case "analytics":
-				return ec.fieldContext_Platform_analytics(ctx, field)
-			case "status":
-				return ec.fieldContext_Platform_status(ctx, field)
-			case "templates":
-				return ec.fieldContext_Platform_templates(ctx, field)
-			case "pinnedLinks":
-				return ec.fieldContext_Platform_pinnedLinks(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Platform", field.Name)
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Company_industry(ctx context.Context, field graphql.CollectedField, obj *database_models.Company) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Company_industry(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Industry, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]*database_types.Industry)
-	fc.Result = res
-	return ec.marshalOIndustry2ᚕᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐIndustryᚄ(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Company_industry(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Company",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "name":
-				return ec.fieldContext_Industry_name(ctx, field)
-			case "companies":
-				return ec.fieldContext_Industry_companies(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Industry", field.Name)
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Company_description(ctx context.Context, field graphql.CollectedField, obj *database_models.Company) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Company_description(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Description, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Company_description(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Company",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Company_location(ctx context.Context, field graphql.CollectedField, obj *database_models.Company) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Company_location(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Location, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Company_location(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Company",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Company_socialMedias(ctx context.Context, field graphql.CollectedField, obj *database_models.Company) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Company_socialMedias(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.SocialMedias, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.([]*database_types.SocialMedia)
-	fc.Result = res
-	return ec.marshalNSocialMedia2ᚕᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐSocialMediaᚄ(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Company_socialMedias(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Company",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "name":
-				return ec.fieldContext_SocialMedia_name(ctx, field)
-			case "url":
-				return ec.fieldContext_SocialMedia_url(ctx, field)
-			case "icon":
-				return ec.fieldContext_SocialMedia_icon(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type SocialMedia", field.Name)
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Company_users(ctx context.Context, field graphql.CollectedField, obj *database_models.Company) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Company_users(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Company().Users(rctx, obj)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.([]*database_models.User)
-	fc.Result = res
-	return ec.marshalNUser2ᚕᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋmodelsᚐUserᚄ(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Company_users(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Company",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_User_id(ctx, field)
-			case "avatar":
-				return ec.fieldContext_User_avatar(ctx, field)
-			case "email":
-				return ec.fieldContext_User_email(ctx, field)
-			case "fullname":
-				return ec.fieldContext_User_fullname(ctx, field)
-			case "verified":
-				return ec.fieldContext_User_verified(ctx, field)
-			case "phone":
-				return ec.fieldContext_User_phone(ctx, field)
-			case "companies":
-				return ec.fieldContext_User_companies(ctx, field)
-			case "platforms":
-				return ec.fieldContext_User_platforms(ctx, field)
-			case "permissions":
-				return ec.fieldContext_User_permissions(ctx, field)
-			case "payments":
-				return ec.fieldContext_User_payments(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_User_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_User_updatedAt(ctx, field)
-			case "deletedAt":
-				return ec.fieldContext_User_deletedAt(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Company_domains(ctx context.Context, field graphql.CollectedField, obj *database_models.Company) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Company_domains(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Company().Domains(rctx, obj)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.([]*model.Domain)
-	fc.Result = res
-	return ec.marshalNDomain2ᚕᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐDomainᚄ(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Company_domains(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Company",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_Domain_id(ctx, field)
-			case "name":
-				return ec.fieldContext_Domain_name(ctx, field)
-			case "url":
-				return ec.fieldContext_Domain_url(ctx, field)
-			case "company":
-				return ec.fieldContext_Domain_company(ctx, field)
-			case "platform":
-				return ec.fieldContext_Domain_platform(ctx, field)
-			case "dnsStatus":
-				return ec.fieldContext_Domain_dnsStatus(ctx, field)
-			case "state":
-				return ec.fieldContext_Domain_state(ctx, field)
-			case "links":
-				return ec.fieldContext_Domain_links(ctx, field)
-			case "analytics":
-				return ec.fieldContext_Domain_analytics(ctx, field)
-			case "lastDNSVerificationAt":
-				return ec.fieldContext_Domain_lastDNSVerificationAt(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Domain_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_Domain_updatedAt(ctx, field)
-			case "deletedAt":
-				return ec.fieldContext_Domain_deletedAt(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Domain", field.Name)
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Company_permissions(ctx context.Context, field graphql.CollectedField, obj *database_models.Company) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Company_permissions(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Company().Permissions(rctx, obj)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.([]*model.Permission)
-	fc.Result = res
-	return ec.marshalNPermission2ᚕᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐPermissionᚄ(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Company_permissions(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Company",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_Permission_id(ctx, field)
-			case "name":
-				return ec.fieldContext_Permission_name(ctx, field)
-			case "description":
-				return ec.fieldContext_Permission_description(ctx, field)
-			case "companies":
-				return ec.fieldContext_Permission_companies(ctx, field)
-			case "domains":
-				return ec.fieldContext_Permission_domains(ctx, field)
-			case "platforms":
-				return ec.fieldContext_Permission_platforms(ctx, field)
-			case "users":
-				return ec.fieldContext_Permission_users(ctx, field)
-			case "links":
-				return ec.fieldContext_Permission_links(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Permission", field.Name)
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Company_paymentPlan(ctx context.Context, field graphql.CollectedField, obj *database_models.Company) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Company_paymentPlan(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Company().PaymentPlan(rctx, obj)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(model.PaymentPlan)
-	fc.Result = res
-	return ec.marshalNPaymentPlan2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐPaymentPlan(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Company_paymentPlan(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Company",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type PaymentPlan does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Company_payments(ctx context.Context, field graphql.CollectedField, obj *database_models.Company) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Company_payments(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Company().Payments(rctx, obj)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.([]*model.Payment)
-	fc.Result = res
-	return ec.marshalNPayment2ᚕᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐPaymentᚄ(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Company_payments(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Company",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_Payment_id(ctx, field)
-			case "user":
-				return ec.fieldContext_Payment_user(ctx, field)
-			case "company":
-				return ec.fieldContext_Payment_company(ctx, field)
-			case "amount":
-				return ec.fieldContext_Payment_amount(ctx, field)
-			case "date":
-				return ec.fieldContext_Payment_date(ctx, field)
-			case "status":
-				return ec.fieldContext_Payment_status(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Payment", field.Name)
-		},
-	}
-	return fc, nil
-}
-
 func (ec *executionContext) _Domain_id(ctx context.Context, field graphql.CollectedField, obj *model.Domain) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Domain_id(ctx, field)
 	if err != nil {
@@ -3007,8 +2483,8 @@ func (ec *executionContext) fieldContext_Domain_url(ctx context.Context, field g
 	return fc, nil
 }
 
-func (ec *executionContext) _Domain_company(ctx context.Context, field graphql.CollectedField, obj *model.Domain) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Domain_company(ctx, field)
+func (ec *executionContext) _Domain_organization(ctx context.Context, field graphql.CollectedField, obj *model.Domain) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Domain_organization(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -3021,7 +2497,7 @@ func (ec *executionContext) _Domain_company(ctx context.Context, field graphql.C
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Company, nil
+		return obj.Organization, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3033,12 +2509,12 @@ func (ec *executionContext) _Domain_company(ctx context.Context, field graphql.C
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*database_models.Company)
+	res := resTmp.(*database_models.Organization)
 	fc.Result = res
-	return ec.marshalNCompany2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋmodelsᚐCompany(ctx, field.Selections, res)
+	return ec.marshalNOrganization2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋmodelsᚐOrganization(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Domain_company(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Domain_organization(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Domain",
 		Field:      field,
@@ -3047,33 +2523,33 @@ func (ec *executionContext) fieldContext_Domain_company(ctx context.Context, fie
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "id":
-				return ec.fieldContext_Company_id(ctx, field)
+				return ec.fieldContext_Organization_id(ctx, field)
 			case "name":
-				return ec.fieldContext_Company_name(ctx, field)
+				return ec.fieldContext_Organization_name(ctx, field)
 			case "website":
-				return ec.fieldContext_Company_website(ctx, field)
-			case "platforms":
-				return ec.fieldContext_Company_platforms(ctx, field)
-			case "industry":
-				return ec.fieldContext_Company_industry(ctx, field)
-			case "description":
-				return ec.fieldContext_Company_description(ctx, field)
-			case "location":
-				return ec.fieldContext_Company_location(ctx, field)
-			case "socialMedias":
-				return ec.fieldContext_Company_socialMedias(ctx, field)
-			case "users":
-				return ec.fieldContext_Company_users(ctx, field)
-			case "domains":
-				return ec.fieldContext_Company_domains(ctx, field)
+				return ec.fieldContext_Organization_website(ctx, field)
 			case "permissions":
-				return ec.fieldContext_Company_permissions(ctx, field)
+				return ec.fieldContext_Organization_permissions(ctx, field)
+			case "platforms":
+				return ec.fieldContext_Organization_platforms(ctx, field)
+			case "industry":
+				return ec.fieldContext_Organization_industry(ctx, field)
+			case "description":
+				return ec.fieldContext_Organization_description(ctx, field)
+			case "location":
+				return ec.fieldContext_Organization_location(ctx, field)
+			case "socialMedias":
+				return ec.fieldContext_Organization_socialMedias(ctx, field)
+			case "users":
+				return ec.fieldContext_Organization_users(ctx, field)
+			case "domains":
+				return ec.fieldContext_Organization_domains(ctx, field)
 			case "paymentPlan":
-				return ec.fieldContext_Company_paymentPlan(ctx, field)
+				return ec.fieldContext_Organization_paymentPlan(ctx, field)
 			case "payments":
-				return ec.fieldContext_Company_payments(ctx, field)
+				return ec.fieldContext_Organization_payments(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type Company", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type Organization", field.Name)
 		},
 	}
 	return fc, nil
@@ -3123,8 +2599,8 @@ func (ec *executionContext) fieldContext_Domain_platform(ctx context.Context, fi
 				return ec.fieldContext_Platform_openGraph(ctx, field)
 			case "redirectionChoice":
 				return ec.fieldContext_Platform_redirectionChoice(ctx, field)
-			case "company":
-				return ec.fieldContext_Platform_company(ctx, field)
+			case "organization":
+				return ec.fieldContext_Platform_organization(ctx, field)
 			case "domains":
 				return ec.fieldContext_Platform_domains(ctx, field)
 			case "permissions":
@@ -3816,8 +3292,8 @@ func (ec *executionContext) fieldContext_Industry_name(ctx context.Context, fiel
 	return fc, nil
 }
 
-func (ec *executionContext) _Industry_companies(ctx context.Context, field graphql.CollectedField, obj *database_types.Industry) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Industry_companies(ctx, field)
+func (ec *executionContext) _Industry_organizations(ctx context.Context, field graphql.CollectedField, obj *database_types.Industry) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Industry_organizations(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -3830,7 +3306,7 @@ func (ec *executionContext) _Industry_companies(ctx context.Context, field graph
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Industry().Companies(rctx, obj)
+		return ec.resolvers.Industry().Organizations(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3842,12 +3318,12 @@ func (ec *executionContext) _Industry_companies(ctx context.Context, field graph
 		}
 		return graphql.Null
 	}
-	res := resTmp.([]*database_models.Company)
+	res := resTmp.([]*database_models.Organization)
 	fc.Result = res
-	return ec.marshalNCompany2ᚕᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋmodelsᚐCompanyᚄ(ctx, field.Selections, res)
+	return ec.marshalNOrganization2ᚕᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋmodelsᚐOrganizationᚄ(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Industry_companies(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Industry_organizations(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Industry",
 		Field:      field,
@@ -3856,33 +3332,33 @@ func (ec *executionContext) fieldContext_Industry_companies(ctx context.Context,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "id":
-				return ec.fieldContext_Company_id(ctx, field)
+				return ec.fieldContext_Organization_id(ctx, field)
 			case "name":
-				return ec.fieldContext_Company_name(ctx, field)
+				return ec.fieldContext_Organization_name(ctx, field)
 			case "website":
-				return ec.fieldContext_Company_website(ctx, field)
-			case "platforms":
-				return ec.fieldContext_Company_platforms(ctx, field)
-			case "industry":
-				return ec.fieldContext_Company_industry(ctx, field)
-			case "description":
-				return ec.fieldContext_Company_description(ctx, field)
-			case "location":
-				return ec.fieldContext_Company_location(ctx, field)
-			case "socialMedias":
-				return ec.fieldContext_Company_socialMedias(ctx, field)
-			case "users":
-				return ec.fieldContext_Company_users(ctx, field)
-			case "domains":
-				return ec.fieldContext_Company_domains(ctx, field)
+				return ec.fieldContext_Organization_website(ctx, field)
 			case "permissions":
-				return ec.fieldContext_Company_permissions(ctx, field)
+				return ec.fieldContext_Organization_permissions(ctx, field)
+			case "platforms":
+				return ec.fieldContext_Organization_platforms(ctx, field)
+			case "industry":
+				return ec.fieldContext_Organization_industry(ctx, field)
+			case "description":
+				return ec.fieldContext_Organization_description(ctx, field)
+			case "location":
+				return ec.fieldContext_Organization_location(ctx, field)
+			case "socialMedias":
+				return ec.fieldContext_Organization_socialMedias(ctx, field)
+			case "users":
+				return ec.fieldContext_Organization_users(ctx, field)
+			case "domains":
+				return ec.fieldContext_Organization_domains(ctx, field)
 			case "paymentPlan":
-				return ec.fieldContext_Company_paymentPlan(ctx, field)
+				return ec.fieldContext_Organization_paymentPlan(ctx, field)
 			case "payments":
-				return ec.fieldContext_Company_payments(ctx, field)
+				return ec.fieldContext_Organization_payments(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type Company", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type Organization", field.Name)
 		},
 	}
 	return fc, nil
@@ -4071,14 +3547,16 @@ func (ec *executionContext) fieldContext_Link_creator(ctx context.Context, field
 				return ec.fieldContext_User_verified(ctx, field)
 			case "phone":
 				return ec.fieldContext_User_phone(ctx, field)
-			case "companies":
-				return ec.fieldContext_User_companies(ctx, field)
+			case "organizations":
+				return ec.fieldContext_User_organizations(ctx, field)
 			case "platforms":
 				return ec.fieldContext_User_platforms(ctx, field)
 			case "permissions":
 				return ec.fieldContext_User_permissions(ctx, field)
 			case "payments":
 				return ec.fieldContext_User_payments(ctx, field)
+			case "userInvites":
+				return ec.fieldContext_User_userInvites(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_User_createdAt(ctx, field)
 			case "updatedAt":
@@ -4139,8 +3617,8 @@ func (ec *executionContext) fieldContext_Link_platform(ctx context.Context, fiel
 				return ec.fieldContext_Platform_openGraph(ctx, field)
 			case "redirectionChoice":
 				return ec.fieldContext_Platform_redirectionChoice(ctx, field)
-			case "company":
-				return ec.fieldContext_Platform_company(ctx, field)
+			case "organization":
+				return ec.fieldContext_Platform_organization(ctx, field)
 			case "domains":
 				return ec.fieldContext_Platform_domains(ctx, field)
 			case "permissions":
@@ -4207,8 +3685,8 @@ func (ec *executionContext) fieldContext_Link_domain(ctx context.Context, field 
 				return ec.fieldContext_Domain_name(ctx, field)
 			case "url":
 				return ec.fieldContext_Domain_url(ctx, field)
-			case "company":
-				return ec.fieldContext_Domain_company(ctx, field)
+			case "organization":
+				return ec.fieldContext_Domain_organization(ctx, field)
 			case "platform":
 				return ec.fieldContext_Domain_platform(ctx, field)
 			case "dnsStatus":
@@ -5044,14 +4522,16 @@ func (ec *executionContext) fieldContext_Mutation_createUser(ctx context.Context
 				return ec.fieldContext_User_verified(ctx, field)
 			case "phone":
 				return ec.fieldContext_User_phone(ctx, field)
-			case "companies":
-				return ec.fieldContext_User_companies(ctx, field)
+			case "organizations":
+				return ec.fieldContext_User_organizations(ctx, field)
 			case "platforms":
 				return ec.fieldContext_User_platforms(ctx, field)
 			case "permissions":
 				return ec.fieldContext_User_permissions(ctx, field)
 			case "payments":
 				return ec.fieldContext_User_payments(ctx, field)
+			case "userInvites":
+				return ec.fieldContext_User_userInvites(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_User_createdAt(ctx, field)
 			case "updatedAt":
@@ -5137,6 +4617,158 @@ func (ec *executionContext) fieldContext_Mutation_loginUser(ctx context.Context,
 	return fc, nil
 }
 
+func (ec *executionContext) _Mutation_inviteUser(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_inviteUser(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Mutation().InviteUser(rctx, fc.Args["input"].(model.UserInviteInput))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Auth == nil {
+				return nil, errors.New("directive auth is not implemented")
+			}
+			return ec.directives.Auth(ctx, nil, directive0)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*database_relations.UserInvite); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/RouteHub-Link/routehub-service-graphql/database/relations.UserInvite`, tmp)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*database_relations.UserInvite)
+	fc.Result = res
+	return ec.marshalNUserInvite2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋrelationsᚐUserInvite(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_inviteUser(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_UserInvite_id(ctx, field)
+			case "email":
+				return ec.fieldContext_UserInvite_email(ctx, field)
+			case "code":
+				return ec.fieldContext_UserInvite_code(ctx, field)
+			case "organization":
+				return ec.fieldContext_UserInvite_organization(ctx, field)
+			case "platforms":
+				return ec.fieldContext_UserInvite_platforms(ctx, field)
+			case "user":
+				return ec.fieldContext_UserInvite_user(ctx, field)
+			case "status":
+				return ec.fieldContext_UserInvite_status(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_UserInvite_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_UserInvite_updatedAt(ctx, field)
+			case "deletedAt":
+				return ec.fieldContext_UserInvite_deletedAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type UserInvite", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_inviteUser_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_updateUserInvitation(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_updateUserInvitation(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UpdateUserInvitation(rctx, fc.Args["input"].(model.UpdateUserInviteInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(database_enums.InvitationStatus)
+	fc.Result = res
+	return ec.marshalNInvitationStatus2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐInvitationStatus(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_updateUserInvitation(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type InvitationStatus does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_updateUserInvitation_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Mutation_updateUserPassword(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Mutation_updateUserPassword(ctx, field)
 	if err != nil {
@@ -5188,14 +4820,16 @@ func (ec *executionContext) fieldContext_Mutation_updateUserPassword(ctx context
 				return ec.fieldContext_User_verified(ctx, field)
 			case "phone":
 				return ec.fieldContext_User_phone(ctx, field)
-			case "companies":
-				return ec.fieldContext_User_companies(ctx, field)
+			case "organizations":
+				return ec.fieldContext_User_organizations(ctx, field)
 			case "platforms":
 				return ec.fieldContext_User_platforms(ctx, field)
 			case "permissions":
 				return ec.fieldContext_User_permissions(ctx, field)
 			case "payments":
 				return ec.fieldContext_User_payments(ctx, field)
+			case "userInvites":
+				return ec.fieldContext_User_userInvites(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_User_createdAt(ctx, field)
 			case "updatedAt":
@@ -5342,14 +4976,16 @@ func (ec *executionContext) fieldContext_Mutation_resetPassword(ctx context.Cont
 				return ec.fieldContext_User_verified(ctx, field)
 			case "phone":
 				return ec.fieldContext_User_phone(ctx, field)
-			case "companies":
-				return ec.fieldContext_User_companies(ctx, field)
+			case "organizations":
+				return ec.fieldContext_User_organizations(ctx, field)
 			case "platforms":
 				return ec.fieldContext_User_platforms(ctx, field)
 			case "permissions":
 				return ec.fieldContext_User_permissions(ctx, field)
 			case "payments":
 				return ec.fieldContext_User_payments(ctx, field)
+			case "userInvites":
+				return ec.fieldContext_User_userInvites(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_User_createdAt(ctx, field)
 			case "updatedAt":
@@ -5535,8 +5171,8 @@ func (ec *executionContext) fieldContext_ObservationAnalytic_domain(ctx context.
 				return ec.fieldContext_Domain_name(ctx, field)
 			case "url":
 				return ec.fieldContext_Domain_url(ctx, field)
-			case "company":
-				return ec.fieldContext_Domain_company(ctx, field)
+			case "organization":
+				return ec.fieldContext_Domain_organization(ctx, field)
 			case "platform":
 				return ec.fieldContext_Domain_platform(ctx, field)
 			case "dnsStatus":
@@ -5609,8 +5245,8 @@ func (ec *executionContext) fieldContext_ObservationAnalytic_platform(ctx contex
 				return ec.fieldContext_Platform_openGraph(ctx, field)
 			case "redirectionChoice":
 				return ec.fieldContext_Platform_redirectionChoice(ctx, field)
-			case "company":
-				return ec.fieldContext_Platform_company(ctx, field)
+			case "organization":
+				return ec.fieldContext_Platform_organization(ctx, field)
 			case "domains":
 				return ec.fieldContext_Platform_domains(ctx, field)
 			case "permissions":
@@ -6737,6 +6373,687 @@ func (ec *executionContext) fieldContext_OpenGraphX_creator(ctx context.Context,
 	return fc, nil
 }
 
+func (ec *executionContext) _Organization_id(ctx context.Context, field graphql.CollectedField, obj *database_models.Organization) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Organization_id(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(uuid.UUID)
+	fc.Result = res
+	return ec.marshalNUUID2githubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Organization_id(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Organization",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type UUID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Organization_name(ctx context.Context, field graphql.CollectedField, obj *database_models.Organization) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Organization_name(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Name, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Organization_name(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Organization",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Organization_website(ctx context.Context, field graphql.CollectedField, obj *database_models.Organization) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Organization_website(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Website, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Organization_website(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Organization",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Organization_permissions(ctx context.Context, field graphql.CollectedField, obj *database_models.Organization) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Organization_permissions(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Organization().Permissions(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]database_enums.OrganizationPermission)
+	fc.Result = res
+	return ec.marshalNOrganizationPermission2ᚕgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐOrganizationPermissionᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Organization_permissions(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Organization",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type OrganizationPermission does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Organization_platforms(ctx context.Context, field graphql.CollectedField, obj *database_models.Organization) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Organization_platforms(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Organization().Platforms(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Platform)
+	fc.Result = res
+	return ec.marshalNPlatform2ᚕᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐPlatformᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Organization_platforms(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Organization",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Platform_id(ctx, field)
+			case "name":
+				return ec.fieldContext_Platform_name(ctx, field)
+			case "openGraph":
+				return ec.fieldContext_Platform_openGraph(ctx, field)
+			case "redirectionChoice":
+				return ec.fieldContext_Platform_redirectionChoice(ctx, field)
+			case "organization":
+				return ec.fieldContext_Platform_organization(ctx, field)
+			case "domains":
+				return ec.fieldContext_Platform_domains(ctx, field)
+			case "permissions":
+				return ec.fieldContext_Platform_permissions(ctx, field)
+			case "links":
+				return ec.fieldContext_Platform_links(ctx, field)
+			case "analytics":
+				return ec.fieldContext_Platform_analytics(ctx, field)
+			case "status":
+				return ec.fieldContext_Platform_status(ctx, field)
+			case "templates":
+				return ec.fieldContext_Platform_templates(ctx, field)
+			case "pinnedLinks":
+				return ec.fieldContext_Platform_pinnedLinks(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Platform", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Organization_industry(ctx context.Context, field graphql.CollectedField, obj *database_models.Organization) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Organization_industry(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Industry, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*database_types.Industry)
+	fc.Result = res
+	return ec.marshalOIndustry2ᚕᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐIndustryᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Organization_industry(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Organization",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "name":
+				return ec.fieldContext_Industry_name(ctx, field)
+			case "organizations":
+				return ec.fieldContext_Industry_organizations(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Industry", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Organization_description(ctx context.Context, field graphql.CollectedField, obj *database_models.Organization) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Organization_description(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Description, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Organization_description(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Organization",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Organization_location(ctx context.Context, field graphql.CollectedField, obj *database_models.Organization) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Organization_location(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Location, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Organization_location(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Organization",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Organization_socialMedias(ctx context.Context, field graphql.CollectedField, obj *database_models.Organization) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Organization_socialMedias(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.SocialMedias, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*database_types.SocialMedia)
+	fc.Result = res
+	return ec.marshalNSocialMedia2ᚕᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐSocialMediaᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Organization_socialMedias(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Organization",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "name":
+				return ec.fieldContext_SocialMedia_name(ctx, field)
+			case "url":
+				return ec.fieldContext_SocialMedia_url(ctx, field)
+			case "icon":
+				return ec.fieldContext_SocialMedia_icon(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type SocialMedia", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Organization_users(ctx context.Context, field graphql.CollectedField, obj *database_models.Organization) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Organization_users(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Organization().Users(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*database_models.User)
+	fc.Result = res
+	return ec.marshalNUser2ᚕᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋmodelsᚐUserᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Organization_users(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Organization",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_User_id(ctx, field)
+			case "avatar":
+				return ec.fieldContext_User_avatar(ctx, field)
+			case "email":
+				return ec.fieldContext_User_email(ctx, field)
+			case "fullname":
+				return ec.fieldContext_User_fullname(ctx, field)
+			case "verified":
+				return ec.fieldContext_User_verified(ctx, field)
+			case "phone":
+				return ec.fieldContext_User_phone(ctx, field)
+			case "organizations":
+				return ec.fieldContext_User_organizations(ctx, field)
+			case "platforms":
+				return ec.fieldContext_User_platforms(ctx, field)
+			case "permissions":
+				return ec.fieldContext_User_permissions(ctx, field)
+			case "payments":
+				return ec.fieldContext_User_payments(ctx, field)
+			case "userInvites":
+				return ec.fieldContext_User_userInvites(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_User_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_User_updatedAt(ctx, field)
+			case "deletedAt":
+				return ec.fieldContext_User_deletedAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Organization_domains(ctx context.Context, field graphql.CollectedField, obj *database_models.Organization) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Organization_domains(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Organization().Domains(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Domain)
+	fc.Result = res
+	return ec.marshalNDomain2ᚕᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐDomainᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Organization_domains(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Organization",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Domain_id(ctx, field)
+			case "name":
+				return ec.fieldContext_Domain_name(ctx, field)
+			case "url":
+				return ec.fieldContext_Domain_url(ctx, field)
+			case "organization":
+				return ec.fieldContext_Domain_organization(ctx, field)
+			case "platform":
+				return ec.fieldContext_Domain_platform(ctx, field)
+			case "dnsStatus":
+				return ec.fieldContext_Domain_dnsStatus(ctx, field)
+			case "state":
+				return ec.fieldContext_Domain_state(ctx, field)
+			case "links":
+				return ec.fieldContext_Domain_links(ctx, field)
+			case "analytics":
+				return ec.fieldContext_Domain_analytics(ctx, field)
+			case "lastDNSVerificationAt":
+				return ec.fieldContext_Domain_lastDNSVerificationAt(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Domain_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Domain_updatedAt(ctx, field)
+			case "deletedAt":
+				return ec.fieldContext_Domain_deletedAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Domain", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Organization_paymentPlan(ctx context.Context, field graphql.CollectedField, obj *database_models.Organization) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Organization_paymentPlan(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Organization().PaymentPlan(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(model.PaymentPlan)
+	fc.Result = res
+	return ec.marshalNPaymentPlan2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐPaymentPlan(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Organization_paymentPlan(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Organization",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type PaymentPlan does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Organization_payments(ctx context.Context, field graphql.CollectedField, obj *database_models.Organization) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Organization_payments(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Organization().Payments(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Payment)
+	fc.Result = res
+	return ec.marshalNPayment2ᚕᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐPaymentᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Organization_payments(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Organization",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Payment_id(ctx, field)
+			case "user":
+				return ec.fieldContext_Payment_user(ctx, field)
+			case "organization":
+				return ec.fieldContext_Payment_organization(ctx, field)
+			case "amount":
+				return ec.fieldContext_Payment_amount(ctx, field)
+			case "date":
+				return ec.fieldContext_Payment_date(ctx, field)
+			case "status":
+				return ec.fieldContext_Payment_status(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Payment", field.Name)
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _PasswordReset_id(ctx context.Context, field graphql.CollectedField, obj *model.PasswordReset) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_PasswordReset_id(ctx, field)
 	if err != nil {
@@ -6832,14 +7149,16 @@ func (ec *executionContext) fieldContext_PasswordReset_user(ctx context.Context,
 				return ec.fieldContext_User_verified(ctx, field)
 			case "phone":
 				return ec.fieldContext_User_phone(ctx, field)
-			case "companies":
-				return ec.fieldContext_User_companies(ctx, field)
+			case "organizations":
+				return ec.fieldContext_User_organizations(ctx, field)
 			case "platforms":
 				return ec.fieldContext_User_platforms(ctx, field)
 			case "permissions":
 				return ec.fieldContext_User_permissions(ctx, field)
 			case "payments":
 				return ec.fieldContext_User_payments(ctx, field)
+			case "userInvites":
+				return ec.fieldContext_User_userInvites(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_User_createdAt(ctx, field)
 			case "updatedAt":
@@ -7162,14 +7481,16 @@ func (ec *executionContext) fieldContext_Payment_user(ctx context.Context, field
 				return ec.fieldContext_User_verified(ctx, field)
 			case "phone":
 				return ec.fieldContext_User_phone(ctx, field)
-			case "companies":
-				return ec.fieldContext_User_companies(ctx, field)
+			case "organizations":
+				return ec.fieldContext_User_organizations(ctx, field)
 			case "platforms":
 				return ec.fieldContext_User_platforms(ctx, field)
 			case "permissions":
 				return ec.fieldContext_User_permissions(ctx, field)
 			case "payments":
 				return ec.fieldContext_User_payments(ctx, field)
+			case "userInvites":
+				return ec.fieldContext_User_userInvites(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_User_createdAt(ctx, field)
 			case "updatedAt":
@@ -7183,8 +7504,8 @@ func (ec *executionContext) fieldContext_Payment_user(ctx context.Context, field
 	return fc, nil
 }
 
-func (ec *executionContext) _Payment_company(ctx context.Context, field graphql.CollectedField, obj *model.Payment) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Payment_company(ctx, field)
+func (ec *executionContext) _Payment_organization(ctx context.Context, field graphql.CollectedField, obj *model.Payment) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Payment_organization(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -7197,7 +7518,7 @@ func (ec *executionContext) _Payment_company(ctx context.Context, field graphql.
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Company, nil
+		return obj.Organization, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -7209,12 +7530,12 @@ func (ec *executionContext) _Payment_company(ctx context.Context, field graphql.
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*database_models.Company)
+	res := resTmp.(*database_models.Organization)
 	fc.Result = res
-	return ec.marshalNCompany2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋmodelsᚐCompany(ctx, field.Selections, res)
+	return ec.marshalNOrganization2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋmodelsᚐOrganization(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Payment_company(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Payment_organization(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Payment",
 		Field:      field,
@@ -7223,33 +7544,33 @@ func (ec *executionContext) fieldContext_Payment_company(ctx context.Context, fi
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "id":
-				return ec.fieldContext_Company_id(ctx, field)
+				return ec.fieldContext_Organization_id(ctx, field)
 			case "name":
-				return ec.fieldContext_Company_name(ctx, field)
+				return ec.fieldContext_Organization_name(ctx, field)
 			case "website":
-				return ec.fieldContext_Company_website(ctx, field)
-			case "platforms":
-				return ec.fieldContext_Company_platforms(ctx, field)
-			case "industry":
-				return ec.fieldContext_Company_industry(ctx, field)
-			case "description":
-				return ec.fieldContext_Company_description(ctx, field)
-			case "location":
-				return ec.fieldContext_Company_location(ctx, field)
-			case "socialMedias":
-				return ec.fieldContext_Company_socialMedias(ctx, field)
-			case "users":
-				return ec.fieldContext_Company_users(ctx, field)
-			case "domains":
-				return ec.fieldContext_Company_domains(ctx, field)
+				return ec.fieldContext_Organization_website(ctx, field)
 			case "permissions":
-				return ec.fieldContext_Company_permissions(ctx, field)
+				return ec.fieldContext_Organization_permissions(ctx, field)
+			case "platforms":
+				return ec.fieldContext_Organization_platforms(ctx, field)
+			case "industry":
+				return ec.fieldContext_Organization_industry(ctx, field)
+			case "description":
+				return ec.fieldContext_Organization_description(ctx, field)
+			case "location":
+				return ec.fieldContext_Organization_location(ctx, field)
+			case "socialMedias":
+				return ec.fieldContext_Organization_socialMedias(ctx, field)
+			case "users":
+				return ec.fieldContext_Organization_users(ctx, field)
+			case "domains":
+				return ec.fieldContext_Organization_domains(ctx, field)
 			case "paymentPlan":
-				return ec.fieldContext_Company_paymentPlan(ctx, field)
+				return ec.fieldContext_Organization_paymentPlan(ctx, field)
 			case "payments":
-				return ec.fieldContext_Company_payments(ctx, field)
+				return ec.fieldContext_Organization_payments(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type Company", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type Organization", field.Name)
 		},
 	}
 	return fc, nil
@@ -7519,8 +7840,8 @@ func (ec *executionContext) fieldContext_Permission_description(ctx context.Cont
 	return fc, nil
 }
 
-func (ec *executionContext) _Permission_companies(ctx context.Context, field graphql.CollectedField, obj *model.Permission) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Permission_companies(ctx, field)
+func (ec *executionContext) _Permission_organizations(ctx context.Context, field graphql.CollectedField, obj *model.Permission) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Permission_organizations(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -7533,7 +7854,7 @@ func (ec *executionContext) _Permission_companies(ctx context.Context, field gra
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Companies, nil
+		return obj.Organizations, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -7545,12 +7866,12 @@ func (ec *executionContext) _Permission_companies(ctx context.Context, field gra
 		}
 		return graphql.Null
 	}
-	res := resTmp.([]*database_models.Company)
+	res := resTmp.([]*database_models.Organization)
 	fc.Result = res
-	return ec.marshalNCompany2ᚕᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋmodelsᚐCompanyᚄ(ctx, field.Selections, res)
+	return ec.marshalNOrganization2ᚕᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋmodelsᚐOrganizationᚄ(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Permission_companies(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Permission_organizations(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Permission",
 		Field:      field,
@@ -7559,33 +7880,33 @@ func (ec *executionContext) fieldContext_Permission_companies(ctx context.Contex
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "id":
-				return ec.fieldContext_Company_id(ctx, field)
+				return ec.fieldContext_Organization_id(ctx, field)
 			case "name":
-				return ec.fieldContext_Company_name(ctx, field)
+				return ec.fieldContext_Organization_name(ctx, field)
 			case "website":
-				return ec.fieldContext_Company_website(ctx, field)
-			case "platforms":
-				return ec.fieldContext_Company_platforms(ctx, field)
-			case "industry":
-				return ec.fieldContext_Company_industry(ctx, field)
-			case "description":
-				return ec.fieldContext_Company_description(ctx, field)
-			case "location":
-				return ec.fieldContext_Company_location(ctx, field)
-			case "socialMedias":
-				return ec.fieldContext_Company_socialMedias(ctx, field)
-			case "users":
-				return ec.fieldContext_Company_users(ctx, field)
-			case "domains":
-				return ec.fieldContext_Company_domains(ctx, field)
+				return ec.fieldContext_Organization_website(ctx, field)
 			case "permissions":
-				return ec.fieldContext_Company_permissions(ctx, field)
+				return ec.fieldContext_Organization_permissions(ctx, field)
+			case "platforms":
+				return ec.fieldContext_Organization_platforms(ctx, field)
+			case "industry":
+				return ec.fieldContext_Organization_industry(ctx, field)
+			case "description":
+				return ec.fieldContext_Organization_description(ctx, field)
+			case "location":
+				return ec.fieldContext_Organization_location(ctx, field)
+			case "socialMedias":
+				return ec.fieldContext_Organization_socialMedias(ctx, field)
+			case "users":
+				return ec.fieldContext_Organization_users(ctx, field)
+			case "domains":
+				return ec.fieldContext_Organization_domains(ctx, field)
 			case "paymentPlan":
-				return ec.fieldContext_Company_paymentPlan(ctx, field)
+				return ec.fieldContext_Organization_paymentPlan(ctx, field)
 			case "payments":
-				return ec.fieldContext_Company_payments(ctx, field)
+				return ec.fieldContext_Organization_payments(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type Company", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type Organization", field.Name)
 		},
 	}
 	return fc, nil
@@ -7636,8 +7957,8 @@ func (ec *executionContext) fieldContext_Permission_domains(ctx context.Context,
 				return ec.fieldContext_Domain_name(ctx, field)
 			case "url":
 				return ec.fieldContext_Domain_url(ctx, field)
-			case "company":
-				return ec.fieldContext_Domain_company(ctx, field)
+			case "organization":
+				return ec.fieldContext_Domain_organization(ctx, field)
 			case "platform":
 				return ec.fieldContext_Domain_platform(ctx, field)
 			case "dnsStatus":
@@ -7710,8 +8031,8 @@ func (ec *executionContext) fieldContext_Permission_platforms(ctx context.Contex
 				return ec.fieldContext_Platform_openGraph(ctx, field)
 			case "redirectionChoice":
 				return ec.fieldContext_Platform_redirectionChoice(ctx, field)
-			case "company":
-				return ec.fieldContext_Platform_company(ctx, field)
+			case "organization":
+				return ec.fieldContext_Platform_organization(ctx, field)
 			case "domains":
 				return ec.fieldContext_Platform_domains(ctx, field)
 			case "permissions":
@@ -7728,150 +8049,6 @@ func (ec *executionContext) fieldContext_Permission_platforms(ctx context.Contex
 				return ec.fieldContext_Platform_pinnedLinks(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Platform", field.Name)
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Permission_users(ctx context.Context, field graphql.CollectedField, obj *model.Permission) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Permission_users(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Users, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.([]*database_models.User)
-	fc.Result = res
-	return ec.marshalNUser2ᚕᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋmodelsᚐUserᚄ(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Permission_users(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Permission",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_User_id(ctx, field)
-			case "avatar":
-				return ec.fieldContext_User_avatar(ctx, field)
-			case "email":
-				return ec.fieldContext_User_email(ctx, field)
-			case "fullname":
-				return ec.fieldContext_User_fullname(ctx, field)
-			case "verified":
-				return ec.fieldContext_User_verified(ctx, field)
-			case "phone":
-				return ec.fieldContext_User_phone(ctx, field)
-			case "companies":
-				return ec.fieldContext_User_companies(ctx, field)
-			case "platforms":
-				return ec.fieldContext_User_platforms(ctx, field)
-			case "permissions":
-				return ec.fieldContext_User_permissions(ctx, field)
-			case "payments":
-				return ec.fieldContext_User_payments(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_User_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_User_updatedAt(ctx, field)
-			case "deletedAt":
-				return ec.fieldContext_User_deletedAt(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Permission_links(ctx context.Context, field graphql.CollectedField, obj *model.Permission) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Permission_links(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Links, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.([]*model.Link)
-	fc.Result = res
-	return ec.marshalNLink2ᚕᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐLinkᚄ(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Permission_links(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Permission",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_Link_id(ctx, field)
-			case "url":
-				return ec.fieldContext_Link_url(ctx, field)
-			case "key":
-				return ec.fieldContext_Link_key(ctx, field)
-			case "creator":
-				return ec.fieldContext_Link_creator(ctx, field)
-			case "platform":
-				return ec.fieldContext_Link_platform(ctx, field)
-			case "domain":
-				return ec.fieldContext_Link_domain(ctx, field)
-			case "analytics":
-				return ec.fieldContext_Link_analytics(ctx, field)
-			case "openGraph":
-				return ec.fieldContext_Link_openGraph(ctx, field)
-			case "redirectionOptions":
-				return ec.fieldContext_Link_redirectionOptions(ctx, field)
-			case "state":
-				return ec.fieldContext_Link_state(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Link_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_Link_updatedAt(ctx, field)
-			case "deletedAt":
-				return ec.fieldContext_Link_deletedAt(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Link", field.Name)
 		},
 	}
 	return fc, nil
@@ -8075,8 +8252,8 @@ func (ec *executionContext) fieldContext_Platform_redirectionChoice(ctx context.
 	return fc, nil
 }
 
-func (ec *executionContext) _Platform_company(ctx context.Context, field graphql.CollectedField, obj *model.Platform) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Platform_company(ctx, field)
+func (ec *executionContext) _Platform_organization(ctx context.Context, field graphql.CollectedField, obj *model.Platform) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Platform_organization(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -8089,7 +8266,7 @@ func (ec *executionContext) _Platform_company(ctx context.Context, field graphql
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Company, nil
+		return obj.Organization, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -8101,12 +8278,12 @@ func (ec *executionContext) _Platform_company(ctx context.Context, field graphql
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*database_models.Company)
+	res := resTmp.(*database_models.Organization)
 	fc.Result = res
-	return ec.marshalNCompany2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋmodelsᚐCompany(ctx, field.Selections, res)
+	return ec.marshalNOrganization2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋmodelsᚐOrganization(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Platform_company(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Platform_organization(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Platform",
 		Field:      field,
@@ -8115,33 +8292,33 @@ func (ec *executionContext) fieldContext_Platform_company(ctx context.Context, f
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "id":
-				return ec.fieldContext_Company_id(ctx, field)
+				return ec.fieldContext_Organization_id(ctx, field)
 			case "name":
-				return ec.fieldContext_Company_name(ctx, field)
+				return ec.fieldContext_Organization_name(ctx, field)
 			case "website":
-				return ec.fieldContext_Company_website(ctx, field)
-			case "platforms":
-				return ec.fieldContext_Company_platforms(ctx, field)
-			case "industry":
-				return ec.fieldContext_Company_industry(ctx, field)
-			case "description":
-				return ec.fieldContext_Company_description(ctx, field)
-			case "location":
-				return ec.fieldContext_Company_location(ctx, field)
-			case "socialMedias":
-				return ec.fieldContext_Company_socialMedias(ctx, field)
-			case "users":
-				return ec.fieldContext_Company_users(ctx, field)
-			case "domains":
-				return ec.fieldContext_Company_domains(ctx, field)
+				return ec.fieldContext_Organization_website(ctx, field)
 			case "permissions":
-				return ec.fieldContext_Company_permissions(ctx, field)
+				return ec.fieldContext_Organization_permissions(ctx, field)
+			case "platforms":
+				return ec.fieldContext_Organization_platforms(ctx, field)
+			case "industry":
+				return ec.fieldContext_Organization_industry(ctx, field)
+			case "description":
+				return ec.fieldContext_Organization_description(ctx, field)
+			case "location":
+				return ec.fieldContext_Organization_location(ctx, field)
+			case "socialMedias":
+				return ec.fieldContext_Organization_socialMedias(ctx, field)
+			case "users":
+				return ec.fieldContext_Organization_users(ctx, field)
+			case "domains":
+				return ec.fieldContext_Organization_domains(ctx, field)
 			case "paymentPlan":
-				return ec.fieldContext_Company_paymentPlan(ctx, field)
+				return ec.fieldContext_Organization_paymentPlan(ctx, field)
 			case "payments":
-				return ec.fieldContext_Company_payments(ctx, field)
+				return ec.fieldContext_Organization_payments(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type Company", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type Organization", field.Name)
 		},
 	}
 	return fc, nil
@@ -8192,8 +8369,8 @@ func (ec *executionContext) fieldContext_Platform_domains(ctx context.Context, f
 				return ec.fieldContext_Domain_name(ctx, field)
 			case "url":
 				return ec.fieldContext_Domain_url(ctx, field)
-			case "company":
-				return ec.fieldContext_Domain_company(ctx, field)
+			case "organization":
+				return ec.fieldContext_Domain_organization(ctx, field)
 			case "platform":
 				return ec.fieldContext_Domain_platform(ctx, field)
 			case "dnsStatus":
@@ -8245,9 +8422,9 @@ func (ec *executionContext) _Platform_permissions(ctx context.Context, field gra
 		}
 		return graphql.Null
 	}
-	res := resTmp.([]*model.Permission)
+	res := resTmp.([]database_enums.PlatformPermission)
 	fc.Result = res
-	return ec.marshalNPermission2ᚕᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐPermissionᚄ(ctx, field.Selections, res)
+	return ec.marshalNPlatformPermission2ᚕgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐPlatformPermissionᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Platform_permissions(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -8257,25 +8434,7 @@ func (ec *executionContext) fieldContext_Platform_permissions(ctx context.Contex
 		IsMethod:   false,
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_Permission_id(ctx, field)
-			case "name":
-				return ec.fieldContext_Permission_name(ctx, field)
-			case "description":
-				return ec.fieldContext_Permission_description(ctx, field)
-			case "companies":
-				return ec.fieldContext_Permission_companies(ctx, field)
-			case "domains":
-				return ec.fieldContext_Permission_domains(ctx, field)
-			case "platforms":
-				return ec.fieldContext_Permission_platforms(ctx, field)
-			case "users":
-				return ec.fieldContext_Permission_users(ctx, field)
-			case "links":
-				return ec.fieldContext_Permission_links(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Permission", field.Name)
+			return nil, errors.New("field of type PlatformPermission does not have child fields")
 		},
 	}
 	return fc, nil
@@ -8864,14 +9023,16 @@ func (ec *executionContext) fieldContext_Query_me(ctx context.Context, field gra
 				return ec.fieldContext_User_verified(ctx, field)
 			case "phone":
 				return ec.fieldContext_User_phone(ctx, field)
-			case "companies":
-				return ec.fieldContext_User_companies(ctx, field)
+			case "organizations":
+				return ec.fieldContext_User_organizations(ctx, field)
 			case "platforms":
 				return ec.fieldContext_User_platforms(ctx, field)
 			case "permissions":
 				return ec.fieldContext_User_permissions(ctx, field)
 			case "payments":
 				return ec.fieldContext_User_payments(ctx, field)
+			case "userInvites":
+				return ec.fieldContext_User_userInvites(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_User_createdAt(ctx, field)
 			case "updatedAt":
@@ -8936,14 +9097,16 @@ func (ec *executionContext) fieldContext_Query_users(ctx context.Context, field 
 				return ec.fieldContext_User_verified(ctx, field)
 			case "phone":
 				return ec.fieldContext_User_phone(ctx, field)
-			case "companies":
-				return ec.fieldContext_User_companies(ctx, field)
+			case "organizations":
+				return ec.fieldContext_User_organizations(ctx, field)
 			case "platforms":
 				return ec.fieldContext_User_platforms(ctx, field)
 			case "permissions":
 				return ec.fieldContext_User_permissions(ctx, field)
 			case "payments":
 				return ec.fieldContext_User_payments(ctx, field)
+			case "userInvites":
+				return ec.fieldContext_User_userInvites(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_User_createdAt(ctx, field)
 			case "updatedAt":
@@ -8952,6 +9115,148 @@ func (ec *executionContext) fieldContext_Query_users(ctx context.Context, field 
 				return ec.fieldContext_User_deletedAt(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_organizations(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_organizations(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().Organizations(rctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*database_models.Organization)
+	fc.Result = res
+	return ec.marshalNOrganization2ᚕᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋmodelsᚐOrganizationᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_organizations(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Organization_id(ctx, field)
+			case "name":
+				return ec.fieldContext_Organization_name(ctx, field)
+			case "website":
+				return ec.fieldContext_Organization_website(ctx, field)
+			case "permissions":
+				return ec.fieldContext_Organization_permissions(ctx, field)
+			case "platforms":
+				return ec.fieldContext_Organization_platforms(ctx, field)
+			case "industry":
+				return ec.fieldContext_Organization_industry(ctx, field)
+			case "description":
+				return ec.fieldContext_Organization_description(ctx, field)
+			case "location":
+				return ec.fieldContext_Organization_location(ctx, field)
+			case "socialMedias":
+				return ec.fieldContext_Organization_socialMedias(ctx, field)
+			case "users":
+				return ec.fieldContext_Organization_users(ctx, field)
+			case "domains":
+				return ec.fieldContext_Organization_domains(ctx, field)
+			case "paymentPlan":
+				return ec.fieldContext_Organization_paymentPlan(ctx, field)
+			case "payments":
+				return ec.fieldContext_Organization_payments(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Organization", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_platforms(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_platforms(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().Platforms(rctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Platform)
+	fc.Result = res
+	return ec.marshalNPlatform2ᚕᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐPlatformᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_platforms(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Platform_id(ctx, field)
+			case "name":
+				return ec.fieldContext_Platform_name(ctx, field)
+			case "openGraph":
+				return ec.fieldContext_Platform_openGraph(ctx, field)
+			case "redirectionChoice":
+				return ec.fieldContext_Platform_redirectionChoice(ctx, field)
+			case "organization":
+				return ec.fieldContext_Platform_organization(ctx, field)
+			case "domains":
+				return ec.fieldContext_Platform_domains(ctx, field)
+			case "permissions":
+				return ec.fieldContext_Platform_permissions(ctx, field)
+			case "links":
+				return ec.fieldContext_Platform_links(ctx, field)
+			case "analytics":
+				return ec.fieldContext_Platform_analytics(ctx, field)
+			case "status":
+				return ec.fieldContext_Platform_status(ctx, field)
+			case "templates":
+				return ec.fieldContext_Platform_templates(ctx, field)
+			case "pinnedLinks":
+				return ec.fieldContext_Platform_pinnedLinks(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Platform", field.Name)
 		},
 	}
 	return fc, nil
@@ -9408,8 +9713,8 @@ func (ec *executionContext) fieldContext_Template_platform(ctx context.Context, 
 				return ec.fieldContext_Platform_openGraph(ctx, field)
 			case "redirectionChoice":
 				return ec.fieldContext_Platform_redirectionChoice(ctx, field)
-			case "company":
-				return ec.fieldContext_Platform_company(ctx, field)
+			case "organization":
+				return ec.fieldContext_Platform_organization(ctx, field)
 			case "domains":
 				return ec.fieldContext_Platform_domains(ctx, field)
 			case "permissions":
@@ -9636,14 +9941,16 @@ func (ec *executionContext) fieldContext_Template_createdBy(ctx context.Context,
 				return ec.fieldContext_User_verified(ctx, field)
 			case "phone":
 				return ec.fieldContext_User_phone(ctx, field)
-			case "companies":
-				return ec.fieldContext_User_companies(ctx, field)
+			case "organizations":
+				return ec.fieldContext_User_organizations(ctx, field)
 			case "platforms":
 				return ec.fieldContext_User_platforms(ctx, field)
 			case "permissions":
 				return ec.fieldContext_User_permissions(ctx, field)
 			case "payments":
 				return ec.fieldContext_User_payments(ctx, field)
+			case "userInvites":
+				return ec.fieldContext_User_userInvites(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_User_createdAt(ctx, field)
 			case "updatedAt":
@@ -9708,14 +10015,16 @@ func (ec *executionContext) fieldContext_Template_editedBy(ctx context.Context, 
 				return ec.fieldContext_User_verified(ctx, field)
 			case "phone":
 				return ec.fieldContext_User_phone(ctx, field)
-			case "companies":
-				return ec.fieldContext_User_companies(ctx, field)
+			case "organizations":
+				return ec.fieldContext_User_organizations(ctx, field)
 			case "platforms":
 				return ec.fieldContext_User_platforms(ctx, field)
 			case "permissions":
 				return ec.fieldContext_User_permissions(ctx, field)
 			case "payments":
 				return ec.fieldContext_User_payments(ctx, field)
+			case "userInvites":
+				return ec.fieldContext_User_userInvites(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_User_createdAt(ctx, field)
 			case "updatedAt":
@@ -9950,14 +10259,16 @@ func (ec *executionContext) fieldContext_Ticket_user(ctx context.Context, field 
 				return ec.fieldContext_User_verified(ctx, field)
 			case "phone":
 				return ec.fieldContext_User_phone(ctx, field)
-			case "companies":
-				return ec.fieldContext_User_companies(ctx, field)
+			case "organizations":
+				return ec.fieldContext_User_organizations(ctx, field)
 			case "platforms":
 				return ec.fieldContext_User_platforms(ctx, field)
 			case "permissions":
 				return ec.fieldContext_User_permissions(ctx, field)
 			case "payments":
 				return ec.fieldContext_User_payments(ctx, field)
+			case "userInvites":
+				return ec.fieldContext_User_userInvites(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_User_createdAt(ctx, field)
 			case "updatedAt":
@@ -9971,8 +10282,8 @@ func (ec *executionContext) fieldContext_Ticket_user(ctx context.Context, field 
 	return fc, nil
 }
 
-func (ec *executionContext) _Ticket_company(ctx context.Context, field graphql.CollectedField, obj *model.Ticket) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Ticket_company(ctx, field)
+func (ec *executionContext) _Ticket_organization(ctx context.Context, field graphql.CollectedField, obj *model.Ticket) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Ticket_organization(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -9985,7 +10296,7 @@ func (ec *executionContext) _Ticket_company(ctx context.Context, field graphql.C
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Company, nil
+		return obj.Organization, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -9997,12 +10308,12 @@ func (ec *executionContext) _Ticket_company(ctx context.Context, field graphql.C
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*database_models.Company)
+	res := resTmp.(*database_models.Organization)
 	fc.Result = res
-	return ec.marshalNCompany2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋmodelsᚐCompany(ctx, field.Selections, res)
+	return ec.marshalNOrganization2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋmodelsᚐOrganization(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Ticket_company(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Ticket_organization(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Ticket",
 		Field:      field,
@@ -10011,33 +10322,33 @@ func (ec *executionContext) fieldContext_Ticket_company(ctx context.Context, fie
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "id":
-				return ec.fieldContext_Company_id(ctx, field)
+				return ec.fieldContext_Organization_id(ctx, field)
 			case "name":
-				return ec.fieldContext_Company_name(ctx, field)
+				return ec.fieldContext_Organization_name(ctx, field)
 			case "website":
-				return ec.fieldContext_Company_website(ctx, field)
-			case "platforms":
-				return ec.fieldContext_Company_platforms(ctx, field)
-			case "industry":
-				return ec.fieldContext_Company_industry(ctx, field)
-			case "description":
-				return ec.fieldContext_Company_description(ctx, field)
-			case "location":
-				return ec.fieldContext_Company_location(ctx, field)
-			case "socialMedias":
-				return ec.fieldContext_Company_socialMedias(ctx, field)
-			case "users":
-				return ec.fieldContext_Company_users(ctx, field)
-			case "domains":
-				return ec.fieldContext_Company_domains(ctx, field)
+				return ec.fieldContext_Organization_website(ctx, field)
 			case "permissions":
-				return ec.fieldContext_Company_permissions(ctx, field)
+				return ec.fieldContext_Organization_permissions(ctx, field)
+			case "platforms":
+				return ec.fieldContext_Organization_platforms(ctx, field)
+			case "industry":
+				return ec.fieldContext_Organization_industry(ctx, field)
+			case "description":
+				return ec.fieldContext_Organization_description(ctx, field)
+			case "location":
+				return ec.fieldContext_Organization_location(ctx, field)
+			case "socialMedias":
+				return ec.fieldContext_Organization_socialMedias(ctx, field)
+			case "users":
+				return ec.fieldContext_Organization_users(ctx, field)
+			case "domains":
+				return ec.fieldContext_Organization_domains(ctx, field)
 			case "paymentPlan":
-				return ec.fieldContext_Company_paymentPlan(ctx, field)
+				return ec.fieldContext_Organization_paymentPlan(ctx, field)
 			case "payments":
-				return ec.fieldContext_Company_payments(ctx, field)
+				return ec.fieldContext_Organization_payments(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type Company", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type Organization", field.Name)
 		},
 	}
 	return fc, nil
@@ -10535,8 +10846,8 @@ func (ec *executionContext) fieldContext_TicketMessage_ticket(ctx context.Contex
 				return ec.fieldContext_Ticket_id(ctx, field)
 			case "user":
 				return ec.fieldContext_Ticket_user(ctx, field)
-			case "company":
-				return ec.fieldContext_Ticket_company(ctx, field)
+			case "organization":
+				return ec.fieldContext_Ticket_organization(ctx, field)
 			case "title":
 				return ec.fieldContext_Ticket_title(ctx, field)
 			case "category":
@@ -10657,14 +10968,16 @@ func (ec *executionContext) fieldContext_TicketMessage_user(ctx context.Context,
 				return ec.fieldContext_User_verified(ctx, field)
 			case "phone":
 				return ec.fieldContext_User_phone(ctx, field)
-			case "companies":
-				return ec.fieldContext_User_companies(ctx, field)
+			case "organizations":
+				return ec.fieldContext_User_organizations(ctx, field)
 			case "platforms":
 				return ec.fieldContext_User_platforms(ctx, field)
 			case "permissions":
 				return ec.fieldContext_User_permissions(ctx, field)
 			case "payments":
 				return ec.fieldContext_User_payments(ctx, field)
+			case "userInvites":
+				return ec.fieldContext_User_userInvites(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_User_createdAt(ctx, field)
 			case "updatedAt":
@@ -11124,8 +11437,8 @@ func (ec *executionContext) fieldContext_User_phone(ctx context.Context, field g
 	return fc, nil
 }
 
-func (ec *executionContext) _User_companies(ctx context.Context, field graphql.CollectedField, obj *database_models.User) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_User_companies(ctx, field)
+func (ec *executionContext) _User_organizations(ctx context.Context, field graphql.CollectedField, obj *database_models.User) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_User_organizations(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -11138,7 +11451,7 @@ func (ec *executionContext) _User_companies(ctx context.Context, field graphql.C
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.User().Companies(rctx, obj)
+		return ec.resolvers.User().Organizations(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -11150,12 +11463,12 @@ func (ec *executionContext) _User_companies(ctx context.Context, field graphql.C
 		}
 		return graphql.Null
 	}
-	res := resTmp.([]*database_models.Company)
+	res := resTmp.([]*database_models.Organization)
 	fc.Result = res
-	return ec.marshalNCompany2ᚕᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋmodelsᚐCompanyᚄ(ctx, field.Selections, res)
+	return ec.marshalNOrganization2ᚕᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋmodelsᚐOrganizationᚄ(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_User_companies(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_User_organizations(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "User",
 		Field:      field,
@@ -11164,33 +11477,33 @@ func (ec *executionContext) fieldContext_User_companies(ctx context.Context, fie
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "id":
-				return ec.fieldContext_Company_id(ctx, field)
+				return ec.fieldContext_Organization_id(ctx, field)
 			case "name":
-				return ec.fieldContext_Company_name(ctx, field)
+				return ec.fieldContext_Organization_name(ctx, field)
 			case "website":
-				return ec.fieldContext_Company_website(ctx, field)
-			case "platforms":
-				return ec.fieldContext_Company_platforms(ctx, field)
-			case "industry":
-				return ec.fieldContext_Company_industry(ctx, field)
-			case "description":
-				return ec.fieldContext_Company_description(ctx, field)
-			case "location":
-				return ec.fieldContext_Company_location(ctx, field)
-			case "socialMedias":
-				return ec.fieldContext_Company_socialMedias(ctx, field)
-			case "users":
-				return ec.fieldContext_Company_users(ctx, field)
-			case "domains":
-				return ec.fieldContext_Company_domains(ctx, field)
+				return ec.fieldContext_Organization_website(ctx, field)
 			case "permissions":
-				return ec.fieldContext_Company_permissions(ctx, field)
+				return ec.fieldContext_Organization_permissions(ctx, field)
+			case "platforms":
+				return ec.fieldContext_Organization_platforms(ctx, field)
+			case "industry":
+				return ec.fieldContext_Organization_industry(ctx, field)
+			case "description":
+				return ec.fieldContext_Organization_description(ctx, field)
+			case "location":
+				return ec.fieldContext_Organization_location(ctx, field)
+			case "socialMedias":
+				return ec.fieldContext_Organization_socialMedias(ctx, field)
+			case "users":
+				return ec.fieldContext_Organization_users(ctx, field)
+			case "domains":
+				return ec.fieldContext_Organization_domains(ctx, field)
 			case "paymentPlan":
-				return ec.fieldContext_Company_paymentPlan(ctx, field)
+				return ec.fieldContext_Organization_paymentPlan(ctx, field)
 			case "payments":
-				return ec.fieldContext_Company_payments(ctx, field)
+				return ec.fieldContext_Organization_payments(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type Company", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type Organization", field.Name)
 		},
 	}
 	return fc, nil
@@ -11243,8 +11556,8 @@ func (ec *executionContext) fieldContext_User_platforms(ctx context.Context, fie
 				return ec.fieldContext_Platform_openGraph(ctx, field)
 			case "redirectionChoice":
 				return ec.fieldContext_Platform_redirectionChoice(ctx, field)
-			case "company":
-				return ec.fieldContext_Platform_company(ctx, field)
+			case "organization":
+				return ec.fieldContext_Platform_organization(ctx, field)
 			case "domains":
 				return ec.fieldContext_Platform_domains(ctx, field)
 			case "permissions":
@@ -11311,16 +11624,12 @@ func (ec *executionContext) fieldContext_User_permissions(ctx context.Context, f
 				return ec.fieldContext_Permission_name(ctx, field)
 			case "description":
 				return ec.fieldContext_Permission_description(ctx, field)
-			case "companies":
-				return ec.fieldContext_Permission_companies(ctx, field)
+			case "organizations":
+				return ec.fieldContext_Permission_organizations(ctx, field)
 			case "domains":
 				return ec.fieldContext_Permission_domains(ctx, field)
 			case "platforms":
 				return ec.fieldContext_Permission_platforms(ctx, field)
-			case "users":
-				return ec.fieldContext_Permission_users(ctx, field)
-			case "links":
-				return ec.fieldContext_Permission_links(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Permission", field.Name)
 		},
@@ -11371,8 +11680,8 @@ func (ec *executionContext) fieldContext_User_payments(ctx context.Context, fiel
 				return ec.fieldContext_Payment_id(ctx, field)
 			case "user":
 				return ec.fieldContext_Payment_user(ctx, field)
-			case "company":
-				return ec.fieldContext_Payment_company(ctx, field)
+			case "organization":
+				return ec.fieldContext_Payment_organization(ctx, field)
 			case "amount":
 				return ec.fieldContext_Payment_amount(ctx, field)
 			case "date":
@@ -11381,6 +11690,72 @@ func (ec *executionContext) fieldContext_User_payments(ctx context.Context, fiel
 				return ec.fieldContext_Payment_status(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Payment", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _User_userInvites(ctx context.Context, field graphql.CollectedField, obj *database_models.User) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_User_userInvites(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.User().UserInvites(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*database_relations.UserInvite)
+	fc.Result = res
+	return ec.marshalNUserInvite2ᚕᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋrelationsᚐUserInviteᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_User_userInvites(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "User",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_UserInvite_id(ctx, field)
+			case "email":
+				return ec.fieldContext_UserInvite_email(ctx, field)
+			case "code":
+				return ec.fieldContext_UserInvite_code(ctx, field)
+			case "organization":
+				return ec.fieldContext_UserInvite_organization(ctx, field)
+			case "platforms":
+				return ec.fieldContext_UserInvite_platforms(ctx, field)
+			case "user":
+				return ec.fieldContext_UserInvite_user(ctx, field)
+			case "status":
+				return ec.fieldContext_UserInvite_status(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_UserInvite_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_UserInvite_updatedAt(ctx, field)
+			case "deletedAt":
+				return ec.fieldContext_UserInvite_deletedAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type UserInvite", field.Name)
 		},
 	}
 	return fc, nil
@@ -11505,6 +11880,524 @@ func (ec *executionContext) fieldContext_User_deletedAt(ctx context.Context, fie
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type DateTime does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UserInvite_id(ctx context.Context, field graphql.CollectedField, obj *database_relations.UserInvite) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_UserInvite_id(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(uuid.UUID)
+	fc.Result = res
+	return ec.marshalNUUID2githubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_UserInvite_id(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UserInvite",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type UUID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UserInvite_email(ctx context.Context, field graphql.CollectedField, obj *database_relations.UserInvite) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_UserInvite_email(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Email, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_UserInvite_email(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UserInvite",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UserInvite_code(ctx context.Context, field graphql.CollectedField, obj *database_relations.UserInvite) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_UserInvite_code(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Code, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_UserInvite_code(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UserInvite",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UserInvite_organization(ctx context.Context, field graphql.CollectedField, obj *database_relations.UserInvite) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_UserInvite_organization(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.UserInvite().Organization(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*database_models.Organization)
+	fc.Result = res
+	return ec.marshalNOrganization2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋmodelsᚐOrganization(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_UserInvite_organization(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UserInvite",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Organization_id(ctx, field)
+			case "name":
+				return ec.fieldContext_Organization_name(ctx, field)
+			case "website":
+				return ec.fieldContext_Organization_website(ctx, field)
+			case "permissions":
+				return ec.fieldContext_Organization_permissions(ctx, field)
+			case "platforms":
+				return ec.fieldContext_Organization_platforms(ctx, field)
+			case "industry":
+				return ec.fieldContext_Organization_industry(ctx, field)
+			case "description":
+				return ec.fieldContext_Organization_description(ctx, field)
+			case "location":
+				return ec.fieldContext_Organization_location(ctx, field)
+			case "socialMedias":
+				return ec.fieldContext_Organization_socialMedias(ctx, field)
+			case "users":
+				return ec.fieldContext_Organization_users(ctx, field)
+			case "domains":
+				return ec.fieldContext_Organization_domains(ctx, field)
+			case "paymentPlan":
+				return ec.fieldContext_Organization_paymentPlan(ctx, field)
+			case "payments":
+				return ec.fieldContext_Organization_payments(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Organization", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UserInvite_platforms(ctx context.Context, field graphql.CollectedField, obj *database_relations.UserInvite) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_UserInvite_platforms(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.UserInvite().Platforms(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Platform)
+	fc.Result = res
+	return ec.marshalNPlatform2ᚕᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐPlatformᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_UserInvite_platforms(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UserInvite",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Platform_id(ctx, field)
+			case "name":
+				return ec.fieldContext_Platform_name(ctx, field)
+			case "openGraph":
+				return ec.fieldContext_Platform_openGraph(ctx, field)
+			case "redirectionChoice":
+				return ec.fieldContext_Platform_redirectionChoice(ctx, field)
+			case "organization":
+				return ec.fieldContext_Platform_organization(ctx, field)
+			case "domains":
+				return ec.fieldContext_Platform_domains(ctx, field)
+			case "permissions":
+				return ec.fieldContext_Platform_permissions(ctx, field)
+			case "links":
+				return ec.fieldContext_Platform_links(ctx, field)
+			case "analytics":
+				return ec.fieldContext_Platform_analytics(ctx, field)
+			case "status":
+				return ec.fieldContext_Platform_status(ctx, field)
+			case "templates":
+				return ec.fieldContext_Platform_templates(ctx, field)
+			case "pinnedLinks":
+				return ec.fieldContext_Platform_pinnedLinks(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Platform", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UserInvite_user(ctx context.Context, field graphql.CollectedField, obj *database_relations.UserInvite) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_UserInvite_user(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.UserInvite().User(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*database_models.User)
+	fc.Result = res
+	return ec.marshalNUser2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋmodelsᚐUser(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_UserInvite_user(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UserInvite",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_User_id(ctx, field)
+			case "avatar":
+				return ec.fieldContext_User_avatar(ctx, field)
+			case "email":
+				return ec.fieldContext_User_email(ctx, field)
+			case "fullname":
+				return ec.fieldContext_User_fullname(ctx, field)
+			case "verified":
+				return ec.fieldContext_User_verified(ctx, field)
+			case "phone":
+				return ec.fieldContext_User_phone(ctx, field)
+			case "organizations":
+				return ec.fieldContext_User_organizations(ctx, field)
+			case "platforms":
+				return ec.fieldContext_User_platforms(ctx, field)
+			case "permissions":
+				return ec.fieldContext_User_permissions(ctx, field)
+			case "payments":
+				return ec.fieldContext_User_payments(ctx, field)
+			case "userInvites":
+				return ec.fieldContext_User_userInvites(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_User_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_User_updatedAt(ctx, field)
+			case "deletedAt":
+				return ec.fieldContext_User_deletedAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UserInvite_status(ctx context.Context, field graphql.CollectedField, obj *database_relations.UserInvite) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_UserInvite_status(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Status, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(database_enums.InvitationStatus)
+	fc.Result = res
+	return ec.marshalNInvitationStatus2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐInvitationStatus(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_UserInvite_status(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UserInvite",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type InvitationStatus does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UserInvite_createdAt(ctx context.Context, field graphql.CollectedField, obj *database_relations.UserInvite) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_UserInvite_createdAt(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CreatedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(time.Time)
+	fc.Result = res
+	return ec.marshalNDateTime2timeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_UserInvite_createdAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UserInvite",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type DateTime does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UserInvite_updatedAt(ctx context.Context, field graphql.CollectedField, obj *database_relations.UserInvite) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_UserInvite_updatedAt(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.UpdatedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(time.Time)
+	fc.Result = res
+	return ec.marshalODateTime2timeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_UserInvite_updatedAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UserInvite",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type DateTime does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UserInvite_deletedAt(ctx context.Context, field graphql.CollectedField, obj *database_relations.UserInvite) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_UserInvite_deletedAt(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.UserInvite().DeletedAt(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*time.Time)
+	fc.Result = res
+	return ec.marshalODateTime2ᚖtimeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_UserInvite_deletedAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UserInvite",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type DateTime does not have child fields")
 		},
@@ -13285,61 +14178,6 @@ func (ec *executionContext) fieldContext___Type_specifiedByURL(ctx context.Conte
 
 // region    **************************** input.gotpl *****************************
 
-func (ec *executionContext) unmarshalInputCompanyInput(ctx context.Context, obj interface{}) (model.CompanyInput, error) {
-	var it model.CompanyInput
-	asMap := map[string]interface{}{}
-	for k, v := range obj.(map[string]interface{}) {
-		asMap[k] = v
-	}
-
-	fieldsInOrder := [...]string{"name", "website", "description", "location", "socialMedias"}
-	for _, k := range fieldsInOrder {
-		v, ok := asMap[k]
-		if !ok {
-			continue
-		}
-		switch k {
-		case "name":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
-			data, err := ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Name = data
-		case "website":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("website"))
-			data, err := ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Website = data
-		case "description":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("description"))
-			data, err := ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Description = data
-		case "location":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("location"))
-			data, err := ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Location = data
-		case "socialMedias":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("socialMedias"))
-			data, err := ec.unmarshalNSocialMediaInput2ᚕᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐSocialMediaInputᚄ(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.SocialMedias = data
-		}
-	}
-
-	return it, nil
-}
-
 func (ec *executionContext) unmarshalInputDomainInput(ctx context.Context, obj interface{}) (model.DomainInput, error) {
 	var it model.DomainInput
 	asMap := map[string]interface{}{}
@@ -13705,6 +14543,97 @@ func (ec *executionContext) unmarshalInputOpenGraphXInput(ctx context.Context, o
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputOrganizationInput(ctx context.Context, obj interface{}) (model.OrganizationInput, error) {
+	var it model.OrganizationInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"name", "website", "description", "location", "socialMedias"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "name":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Name = data
+		case "website":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("website"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Website = data
+		case "description":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("description"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Description = data
+		case "location":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("location"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Location = data
+		case "socialMedias":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("socialMedias"))
+			data, err := ec.unmarshalNSocialMediaInput2ᚕᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐSocialMediaInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.SocialMedias = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputOrganizationsWithPermissionsInput(ctx context.Context, obj interface{}) (database_relations.OrganizationsWithPermissions, error) {
+	var it database_relations.OrganizationsWithPermissions
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"organizationId", "permissions"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "organizationId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("organizationId"))
+			data, err := ec.unmarshalNUUID2githubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.OrganizationID = data
+		case "permissions":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("permissions"))
+			data, err := ec.unmarshalNOrganizationPermission2ᚕgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐOrganizationPermissionᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			if err = ec.resolvers.OrganizationsWithPermissionsInput().Permissions(ctx, &it, data); err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputPasswordResetCreateInput(ctx context.Context, obj interface{}) (model.PasswordResetCreateInput, error) {
 	var it model.PasswordResetCreateInput
 	asMap := map[string]interface{}{}
@@ -13856,27 +14785,36 @@ func (ec *executionContext) unmarshalInputPlatformInput(ctx context.Context, obj
 	return it, nil
 }
 
-func (ec *executionContext) unmarshalInputPlatformPinInput(ctx context.Context, obj interface{}) (model.PlatformPinInput, error) {
-	var it model.PlatformPinInput
+func (ec *executionContext) unmarshalInputPlatformsWithPermissionsInput(ctx context.Context, obj interface{}) (database_relations.PlatformsWithPermissions, error) {
+	var it database_relations.PlatformsWithPermissions
 	asMap := map[string]interface{}{}
 	for k, v := range obj.(map[string]interface{}) {
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"linkId"}
+	fieldsInOrder := [...]string{"platformId", "permissions"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
 			continue
 		}
 		switch k {
-		case "linkId":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("linkId"))
+		case "platformId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("platformId"))
 			data, err := ec.unmarshalNUUID2githubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.LinkID = data
+			it.PlatformID = data
+		case "permissions":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("permissions"))
+			data, err := ec.unmarshalNPlatformPermission2ᚕgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐPlatformPermissionᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			if err = ec.resolvers.PlatformsWithPermissionsInput().Permissions(ctx, &it, data); err != nil {
+				return it, err
+			}
 		}
 	}
 
@@ -14081,6 +15019,47 @@ func (ec *executionContext) unmarshalInputTicketMessageInput(ctx context.Context
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputUpdateUserInviteInput(ctx context.Context, obj interface{}) (model.UpdateUserInviteInput, error) {
+	var it model.UpdateUserInviteInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"code", "status", "user"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "code":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("code"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Code = data
+		case "status":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("status"))
+			data, err := ec.unmarshalNInvitationStatus2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐInvitationStatus(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Status = data
+		case "user":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("user"))
+			data, err := ec.unmarshalNUserInput2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐUserInput(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.User = data
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputUserInput(ctx context.Context, obj interface{}) (model.UserInput, error) {
 	var it model.UserInput
 	asMap := map[string]interface{}{}
@@ -14151,6 +15130,47 @@ func (ec *executionContext) unmarshalInputUserInput(ctx context.Context, obj int
 				return it, err
 			}
 			it.IP = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputUserInviteInput(ctx context.Context, obj interface{}) (model.UserInviteInput, error) {
+	var it model.UserInviteInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"email", "organizationsPermissions", "platformsWithPermissions"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "email":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("email"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Email = data
+		case "organizationsPermissions":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("organizationsPermissions"))
+			data, err := ec.unmarshalNOrganizationsWithPermissionsInput2ᚕᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋrelationsᚐOrganizationsWithPermissionsᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.OrganizationsPermissions = data
+		case "platformsWithPermissions":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("platformsWithPermissions"))
+			data, err := ec.unmarshalNPlatformsWithPermissionsInput2ᚕᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋrelationsᚐPlatformsWithPermissionsᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.PlatformsWithPermissions = data
 		}
 	}
 
@@ -14331,288 +15351,6 @@ func (ec *executionContext) _AccountPhone(ctx context.Context, sel ast.Selection
 	return out
 }
 
-var companyImplementors = []string{"Company"}
-
-func (ec *executionContext) _Company(ctx context.Context, sel ast.SelectionSet, obj *database_models.Company) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, companyImplementors)
-
-	out := graphql.NewFieldSet(fields)
-	deferred := make(map[string]*graphql.FieldSet)
-	for i, field := range fields {
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("Company")
-		case "id":
-			out.Values[i] = ec._Company_id(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&out.Invalids, 1)
-			}
-		case "name":
-			out.Values[i] = ec._Company_name(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&out.Invalids, 1)
-			}
-		case "website":
-			out.Values[i] = ec._Company_website(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&out.Invalids, 1)
-			}
-		case "platforms":
-			field := field
-
-			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Company_platforms(ctx, field, obj)
-				if res == graphql.Null {
-					atomic.AddUint32(&fs.Invalids, 1)
-				}
-				return res
-			}
-
-			if field.Deferrable != nil {
-				dfs, ok := deferred[field.Deferrable.Label]
-				di := 0
-				if ok {
-					dfs.AddField(field)
-					di = len(dfs.Values) - 1
-				} else {
-					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
-					deferred[field.Deferrable.Label] = dfs
-				}
-				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
-					return innerFunc(ctx, dfs)
-				})
-
-				// don't run the out.Concurrently() call below
-				out.Values[i] = graphql.Null
-				continue
-			}
-
-			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "industry":
-			out.Values[i] = ec._Company_industry(ctx, field, obj)
-		case "description":
-			out.Values[i] = ec._Company_description(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&out.Invalids, 1)
-			}
-		case "location":
-			out.Values[i] = ec._Company_location(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&out.Invalids, 1)
-			}
-		case "socialMedias":
-			out.Values[i] = ec._Company_socialMedias(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&out.Invalids, 1)
-			}
-		case "users":
-			field := field
-
-			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Company_users(ctx, field, obj)
-				if res == graphql.Null {
-					atomic.AddUint32(&fs.Invalids, 1)
-				}
-				return res
-			}
-
-			if field.Deferrable != nil {
-				dfs, ok := deferred[field.Deferrable.Label]
-				di := 0
-				if ok {
-					dfs.AddField(field)
-					di = len(dfs.Values) - 1
-				} else {
-					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
-					deferred[field.Deferrable.Label] = dfs
-				}
-				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
-					return innerFunc(ctx, dfs)
-				})
-
-				// don't run the out.Concurrently() call below
-				out.Values[i] = graphql.Null
-				continue
-			}
-
-			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "domains":
-			field := field
-
-			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Company_domains(ctx, field, obj)
-				if res == graphql.Null {
-					atomic.AddUint32(&fs.Invalids, 1)
-				}
-				return res
-			}
-
-			if field.Deferrable != nil {
-				dfs, ok := deferred[field.Deferrable.Label]
-				di := 0
-				if ok {
-					dfs.AddField(field)
-					di = len(dfs.Values) - 1
-				} else {
-					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
-					deferred[field.Deferrable.Label] = dfs
-				}
-				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
-					return innerFunc(ctx, dfs)
-				})
-
-				// don't run the out.Concurrently() call below
-				out.Values[i] = graphql.Null
-				continue
-			}
-
-			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "permissions":
-			field := field
-
-			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Company_permissions(ctx, field, obj)
-				if res == graphql.Null {
-					atomic.AddUint32(&fs.Invalids, 1)
-				}
-				return res
-			}
-
-			if field.Deferrable != nil {
-				dfs, ok := deferred[field.Deferrable.Label]
-				di := 0
-				if ok {
-					dfs.AddField(field)
-					di = len(dfs.Values) - 1
-				} else {
-					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
-					deferred[field.Deferrable.Label] = dfs
-				}
-				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
-					return innerFunc(ctx, dfs)
-				})
-
-				// don't run the out.Concurrently() call below
-				out.Values[i] = graphql.Null
-				continue
-			}
-
-			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "paymentPlan":
-			field := field
-
-			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Company_paymentPlan(ctx, field, obj)
-				if res == graphql.Null {
-					atomic.AddUint32(&fs.Invalids, 1)
-				}
-				return res
-			}
-
-			if field.Deferrable != nil {
-				dfs, ok := deferred[field.Deferrable.Label]
-				di := 0
-				if ok {
-					dfs.AddField(field)
-					di = len(dfs.Values) - 1
-				} else {
-					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
-					deferred[field.Deferrable.Label] = dfs
-				}
-				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
-					return innerFunc(ctx, dfs)
-				})
-
-				// don't run the out.Concurrently() call below
-				out.Values[i] = graphql.Null
-				continue
-			}
-
-			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "payments":
-			field := field
-
-			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Company_payments(ctx, field, obj)
-				if res == graphql.Null {
-					atomic.AddUint32(&fs.Invalids, 1)
-				}
-				return res
-			}
-
-			if field.Deferrable != nil {
-				dfs, ok := deferred[field.Deferrable.Label]
-				di := 0
-				if ok {
-					dfs.AddField(field)
-					di = len(dfs.Values) - 1
-				} else {
-					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
-					deferred[field.Deferrable.Label] = dfs
-				}
-				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
-					return innerFunc(ctx, dfs)
-				})
-
-				// don't run the out.Concurrently() call below
-				out.Values[i] = graphql.Null
-				continue
-			}
-
-			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-	out.Dispatch(ctx)
-	if out.Invalids > 0 {
-		return graphql.Null
-	}
-
-	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
-
-	for label, dfs := range deferred {
-		ec.processDeferredGroup(graphql.DeferredGroup{
-			Label:    label,
-			Path:     graphql.GetPath(ctx),
-			FieldSet: dfs,
-			Context:  ctx,
-		})
-	}
-
-	return out
-}
-
 var domainImplementors = []string{"Domain"}
 
 func (ec *executionContext) _Domain(ctx context.Context, sel ast.SelectionSet, obj *model.Domain) graphql.Marshaler {
@@ -14639,8 +15377,8 @@ func (ec *executionContext) _Domain(ctx context.Context, sel ast.SelectionSet, o
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
-		case "company":
-			out.Values[i] = ec._Domain_company(ctx, field, obj)
+		case "organization":
+			out.Values[i] = ec._Domain_organization(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -14772,7 +15510,7 @@ func (ec *executionContext) _Industry(ctx context.Context, sel ast.SelectionSet,
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
-		case "companies":
+		case "organizations":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -14781,7 +15519,7 @@ func (ec *executionContext) _Industry(ctx context.Context, sel ast.SelectionSet,
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Industry_companies(ctx, field, obj)
+				res = ec._Industry_organizations(ctx, field, obj)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -15067,6 +15805,20 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
+		case "inviteUser":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_inviteUser(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "updateUserInvitation":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_updateUserInvitation(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		case "updateUserPassword":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_updateUserPassword(ctx, field)
@@ -15306,6 +16058,288 @@ func (ec *executionContext) _OpenGraphX(ctx context.Context, sel ast.SelectionSe
 	return out
 }
 
+var organizationImplementors = []string{"Organization"}
+
+func (ec *executionContext) _Organization(ctx context.Context, sel ast.SelectionSet, obj *database_models.Organization) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, organizationImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Organization")
+		case "id":
+			out.Values[i] = ec._Organization_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "name":
+			out.Values[i] = ec._Organization_name(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "website":
+			out.Values[i] = ec._Organization_website(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "permissions":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Organization_permissions(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "platforms":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Organization_platforms(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "industry":
+			out.Values[i] = ec._Organization_industry(ctx, field, obj)
+		case "description":
+			out.Values[i] = ec._Organization_description(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "location":
+			out.Values[i] = ec._Organization_location(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "socialMedias":
+			out.Values[i] = ec._Organization_socialMedias(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "users":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Organization_users(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "domains":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Organization_domains(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "paymentPlan":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Organization_paymentPlan(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "payments":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Organization_payments(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
 var passwordResetImplementors = []string{"PasswordReset"}
 
 func (ec *executionContext) _PasswordReset(ctx context.Context, sel ast.SelectionSet, obj *model.PasswordReset) graphql.Marshaler {
@@ -15390,8 +16424,8 @@ func (ec *executionContext) _Payment(ctx context.Context, sel ast.SelectionSet, 
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
-		case "company":
-			out.Values[i] = ec._Payment_company(ctx, field, obj)
+		case "organization":
+			out.Values[i] = ec._Payment_organization(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -15459,8 +16493,8 @@ func (ec *executionContext) _Permission(ctx context.Context, sel ast.SelectionSe
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
-		case "companies":
-			out.Values[i] = ec._Permission_companies(ctx, field, obj)
+		case "organizations":
+			out.Values[i] = ec._Permission_organizations(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -15471,16 +16505,6 @@ func (ec *executionContext) _Permission(ctx context.Context, sel ast.SelectionSe
 			}
 		case "platforms":
 			out.Values[i] = ec._Permission_platforms(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		case "users":
-			out.Values[i] = ec._Permission_users(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		case "links":
-			out.Values[i] = ec._Permission_links(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -15538,8 +16562,8 @@ func (ec *executionContext) _Platform(ctx context.Context, sel ast.SelectionSet,
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
-		case "company":
-			out.Values[i] = ec._Platform_company(ctx, field, obj)
+		case "organization":
+			out.Values[i] = ec._Platform_organization(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -15706,6 +16730,50 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_users(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "organizations":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_organizations(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "platforms":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_platforms(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -15924,8 +16992,8 @@ func (ec *executionContext) _Ticket(ctx context.Context, sel ast.SelectionSet, o
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
-		case "company":
-			out.Values[i] = ec._Ticket_company(ctx, field, obj)
+		case "organization":
+			out.Values[i] = ec._Ticket_organization(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -16097,7 +17165,7 @@ func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
-		case "companies":
+		case "organizations":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -16106,7 +17174,7 @@ func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._User_companies(ctx, field, obj)
+				res = ec._User_organizations(ctx, field, obj)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -16241,6 +17309,42 @@ func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "userInvites":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._User_userInvites(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "createdAt":
 			out.Values[i] = ec._User_createdAt(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -16250,6 +17354,208 @@ func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj
 			out.Values[i] = ec._User_updatedAt(ctx, field, obj)
 		case "deletedAt":
 			out.Values[i] = ec._User_deletedAt(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var userInviteImplementors = []string{"UserInvite"}
+
+func (ec *executionContext) _UserInvite(ctx context.Context, sel ast.SelectionSet, obj *database_relations.UserInvite) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, userInviteImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("UserInvite")
+		case "id":
+			out.Values[i] = ec._UserInvite_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "email":
+			out.Values[i] = ec._UserInvite_email(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "code":
+			out.Values[i] = ec._UserInvite_code(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "organization":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._UserInvite_organization(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "platforms":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._UserInvite_platforms(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "user":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._UserInvite_user(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "status":
+			out.Values[i] = ec._UserInvite_status(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "createdAt":
+			out.Values[i] = ec._UserInvite_createdAt(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "updatedAt":
+			out.Values[i] = ec._UserInvite_updatedAt(ctx, field, obj)
+		case "deletedAt":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._UserInvite_deletedAt(ctx, field, obj)
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -16624,60 +17930,6 @@ func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.Se
 	return res
 }
 
-func (ec *executionContext) marshalNCompany2ᚕᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋmodelsᚐCompanyᚄ(ctx context.Context, sel ast.SelectionSet, v []*database_models.Company) graphql.Marshaler {
-	ret := make(graphql.Array, len(v))
-	var wg sync.WaitGroup
-	isLen1 := len(v) == 1
-	if !isLen1 {
-		wg.Add(len(v))
-	}
-	for i := range v {
-		i := i
-		fc := &graphql.FieldContext{
-			Index:  &i,
-			Result: &v[i],
-		}
-		ctx := graphql.WithFieldContext(ctx, fc)
-		f := func(i int) {
-			defer func() {
-				if r := recover(); r != nil {
-					ec.Error(ctx, ec.Recover(ctx, r))
-					ret = nil
-				}
-			}()
-			if !isLen1 {
-				defer wg.Done()
-			}
-			ret[i] = ec.marshalNCompany2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋmodelsᚐCompany(ctx, sel, v[i])
-		}
-		if isLen1 {
-			f(i)
-		} else {
-			go f(i)
-		}
-
-	}
-	wg.Wait()
-
-	for _, e := range ret {
-		if e == graphql.Null {
-			return graphql.Null
-		}
-	}
-
-	return ret
-}
-
-func (ec *executionContext) marshalNCompany2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋmodelsᚐCompany(ctx context.Context, sel ast.SelectionSet, v *database_models.Company) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._Company(ctx, sel, v)
-}
-
 func (ec *executionContext) unmarshalNDNSStatus2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐDNSStatus(ctx context.Context, v interface{}) (database_enums.DNSStatus, error) {
 	var res database_enums.DNSStatus
 	err := res.UnmarshalGQL(v)
@@ -16843,6 +18095,16 @@ func (ec *executionContext) marshalNInt2int(ctx context.Context, sel ast.Selecti
 	return res
 }
 
+func (ec *executionContext) unmarshalNInvitationStatus2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐInvitationStatus(ctx context.Context, v interface{}) (database_enums.InvitationStatus, error) {
+	var res database_enums.InvitationStatus
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNInvitationStatus2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐInvitationStatus(ctx context.Context, sel ast.SelectionSet, v database_enums.InvitationStatus) graphql.Marshaler {
+	return v
+}
+
 func (ec *executionContext) marshalNLink2ᚕᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐLinkᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Link) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
@@ -16997,6 +18259,157 @@ func (ec *executionContext) unmarshalNOpenGraphInput2ᚖgithubᚗcomᚋRouteHub�
 
 func (ec *executionContext) unmarshalNOpenGraphXInput2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐOpenGraphXInput(ctx context.Context, v interface{}) (*model.OpenGraphXInput, error) {
 	res, err := ec.unmarshalInputOpenGraphXInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNOrganization2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋmodelsᚐOrganization(ctx context.Context, sel ast.SelectionSet, v database_models.Organization) graphql.Marshaler {
+	return ec._Organization(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNOrganization2ᚕᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋmodelsᚐOrganizationᚄ(ctx context.Context, sel ast.SelectionSet, v []*database_models.Organization) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNOrganization2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋmodelsᚐOrganization(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalNOrganization2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋmodelsᚐOrganization(ctx context.Context, sel ast.SelectionSet, v *database_models.Organization) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._Organization(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNOrganizationPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐOrganizationPermission(ctx context.Context, v interface{}) (database_enums.OrganizationPermission, error) {
+	var res database_enums.OrganizationPermission
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNOrganizationPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐOrganizationPermission(ctx context.Context, sel ast.SelectionSet, v database_enums.OrganizationPermission) graphql.Marshaler {
+	return v
+}
+
+func (ec *executionContext) unmarshalNOrganizationPermission2ᚕgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐOrganizationPermissionᚄ(ctx context.Context, v interface{}) ([]database_enums.OrganizationPermission, error) {
+	var vSlice []interface{}
+	if v != nil {
+		vSlice = graphql.CoerceList(v)
+	}
+	var err error
+	res := make([]database_enums.OrganizationPermission, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNOrganizationPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐOrganizationPermission(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) marshalNOrganizationPermission2ᚕgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐOrganizationPermissionᚄ(ctx context.Context, sel ast.SelectionSet, v []database_enums.OrganizationPermission) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNOrganizationPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐOrganizationPermission(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) unmarshalNOrganizationsWithPermissionsInput2ᚕᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋrelationsᚐOrganizationsWithPermissionsᚄ(ctx context.Context, v interface{}) ([]*database_relations.OrganizationsWithPermissions, error) {
+	var vSlice []interface{}
+	if v != nil {
+		vSlice = graphql.CoerceList(v)
+	}
+	var err error
+	res := make([]*database_relations.OrganizationsWithPermissions, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNOrganizationsWithPermissionsInput2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋrelationsᚐOrganizationsWithPermissions(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) unmarshalNOrganizationsWithPermissionsInput2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋrelationsᚐOrganizationsWithPermissions(ctx context.Context, v interface{}) (*database_relations.OrganizationsWithPermissions, error) {
+	res, err := ec.unmarshalInputOrganizationsWithPermissionsInput(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
@@ -17214,6 +18627,99 @@ func (ec *executionContext) marshalNPlatformAnalytics2ᚖgithubᚗcomᚋRouteHub
 		return graphql.Null
 	}
 	return ec._PlatformAnalytics(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNPlatformPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐPlatformPermission(ctx context.Context, v interface{}) (database_enums.PlatformPermission, error) {
+	var res database_enums.PlatformPermission
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNPlatformPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐPlatformPermission(ctx context.Context, sel ast.SelectionSet, v database_enums.PlatformPermission) graphql.Marshaler {
+	return v
+}
+
+func (ec *executionContext) unmarshalNPlatformPermission2ᚕgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐPlatformPermissionᚄ(ctx context.Context, v interface{}) ([]database_enums.PlatformPermission, error) {
+	var vSlice []interface{}
+	if v != nil {
+		vSlice = graphql.CoerceList(v)
+	}
+	var err error
+	res := make([]database_enums.PlatformPermission, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNPlatformPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐPlatformPermission(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) marshalNPlatformPermission2ᚕgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐPlatformPermissionᚄ(ctx context.Context, sel ast.SelectionSet, v []database_enums.PlatformPermission) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNPlatformPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐPlatformPermission(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) unmarshalNPlatformsWithPermissionsInput2ᚕᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋrelationsᚐPlatformsWithPermissionsᚄ(ctx context.Context, v interface{}) ([]*database_relations.PlatformsWithPermissions, error) {
+	var vSlice []interface{}
+	if v != nil {
+		vSlice = graphql.CoerceList(v)
+	}
+	var err error
+	res := make([]*database_relations.PlatformsWithPermissions, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNPlatformsWithPermissionsInput2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋrelationsᚐPlatformsWithPermissions(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) unmarshalNPlatformsWithPermissionsInput2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋrelationsᚐPlatformsWithPermissions(ctx context.Context, v interface{}) (*database_relations.PlatformsWithPermissions, error) {
+	res, err := ec.unmarshalInputPlatformsWithPermissionsInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalNRedirectionOptions2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐRedirectionOptions(ctx context.Context, v interface{}) (database_enums.RedirectionOptions, error) {
@@ -17507,6 +19013,11 @@ func (ec *executionContext) marshalNUUID2githubᚗcomᚋgoogleᚋuuidᚐUUID(ctx
 	return res
 }
 
+func (ec *executionContext) unmarshalNUpdateUserInviteInput2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐUpdateUserInviteInput(ctx context.Context, v interface{}) (model.UpdateUserInviteInput, error) {
+	res, err := ec.unmarshalInputUpdateUserInviteInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) marshalNUser2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋmodelsᚐUser(ctx context.Context, sel ast.SelectionSet, v database_models.User) graphql.Marshaler {
 	return ec._User(ctx, sel, &v)
 }
@@ -17567,6 +19078,74 @@ func (ec *executionContext) marshalNUser2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋrou
 
 func (ec *executionContext) unmarshalNUserInput2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐUserInput(ctx context.Context, v interface{}) (model.UserInput, error) {
 	res, err := ec.unmarshalInputUserInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNUserInput2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐUserInput(ctx context.Context, v interface{}) (*model.UserInput, error) {
+	res, err := ec.unmarshalInputUserInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNUserInvite2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋrelationsᚐUserInvite(ctx context.Context, sel ast.SelectionSet, v database_relations.UserInvite) graphql.Marshaler {
+	return ec._UserInvite(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNUserInvite2ᚕᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋrelationsᚐUserInviteᚄ(ctx context.Context, sel ast.SelectionSet, v []*database_relations.UserInvite) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNUserInvite2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋrelationsᚐUserInvite(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalNUserInvite2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋrelationsᚐUserInvite(ctx context.Context, sel ast.SelectionSet, v *database_relations.UserInvite) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._UserInvite(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNUserInviteInput2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐUserInviteInput(ctx context.Context, v interface{}) (model.UserInviteInput, error) {
+	res, err := ec.unmarshalInputUserInviteInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
@@ -17851,6 +19430,16 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 		return graphql.Null
 	}
 	res := graphql.MarshalBoolean(*v)
+	return res
+}
+
+func (ec *executionContext) unmarshalODateTime2timeᚐTime(ctx context.Context, v interface{}) (time.Time, error) {
+	res, err := graphql.UnmarshalTime(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalODateTime2timeᚐTime(ctx context.Context, sel ast.SelectionSet, v time.Time) graphql.Marshaler {
+	res := graphql.MarshalTime(v)
 	return res
 }
 

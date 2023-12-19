@@ -10,7 +10,9 @@ import (
 	"time"
 
 	"github.com/RouteHub-Link/routehub-service-graphql/auth"
+	database_enums "github.com/RouteHub-Link/routehub-service-graphql/database/enums"
 	database "github.com/RouteHub-Link/routehub-service-graphql/database/models"
+	database_relations "github.com/RouteHub-Link/routehub-service-graphql/database/relations"
 	database_types "github.com/RouteHub-Link/routehub-service-graphql/database/types"
 	"github.com/RouteHub-Link/routehub-service-graphql/graph/model"
 	"github.com/vektah/gqlparser/v2/gqlerror"
@@ -26,39 +28,9 @@ func (r *accountPhoneResolver) UpdatedAt(ctx context.Context, obj *database_type
 	panic(fmt.Errorf("not implemented: UpdatedAt - updatedAt"))
 }
 
-// Platforms is the resolver for the platforms field.
-func (r *companyResolver) Platforms(ctx context.Context, obj *database.Company) ([]*model.Platform, error) {
-	panic(fmt.Errorf("not implemented: Platforms - platforms"))
-}
-
-// Users is the resolver for the users field.
-func (r *companyResolver) Users(ctx context.Context, obj *database.Company) ([]*database.User, error) {
-	panic(fmt.Errorf("not implemented: Users - users"))
-}
-
-// Domains is the resolver for the domains field.
-func (r *companyResolver) Domains(ctx context.Context, obj *database.Company) ([]*model.Domain, error) {
-	panic(fmt.Errorf("not implemented: Domains - domains"))
-}
-
-// Permissions is the resolver for the permissions field.
-func (r *companyResolver) Permissions(ctx context.Context, obj *database.Company) ([]*model.Permission, error) {
-	panic(fmt.Errorf("not implemented: Permissions - permissions"))
-}
-
-// PaymentPlan is the resolver for the paymentPlan field.
-func (r *companyResolver) PaymentPlan(ctx context.Context, obj *database.Company) (model.PaymentPlan, error) {
-	panic(fmt.Errorf("not implemented: PaymentPlan - paymentPlan"))
-}
-
-// Payments is the resolver for the payments field.
-func (r *companyResolver) Payments(ctx context.Context, obj *database.Company) ([]*model.Payment, error) {
-	panic(fmt.Errorf("not implemented: Payments - payments"))
-}
-
-// Companies is the resolver for the companies field.
-func (r *industryResolver) Companies(ctx context.Context, obj *database_types.Industry) ([]*database.Company, error) {
-	panic(fmt.Errorf("not implemented: Companies - companies"))
+// Organizations is the resolver for the Organizations field.
+func (r *industryResolver) Organizations(ctx context.Context, obj *database_types.Industry) ([]*database.Organization, error) {
+	panic(fmt.Errorf("not implemented: Organizations - Organizations"))
 }
 
 // CreateUser is the resolver for the createUser field.
@@ -88,6 +60,40 @@ func (r *mutationResolver) LoginUser(ctx context.Context, input model.LoginInput
 	}, nil
 }
 
+// InviteUser is the resolver for the inviteUser field.
+func (r *mutationResolver) InviteUser(ctx context.Context, input model.UserInviteInput) (*database_relations.UserInvite, error) {
+	userSession := auth.ForContext(ctx)
+
+	organizationWithPermissions := []database_relations.OrganizationsWithPermissions{}
+	for _, organization := range input.OrganizationsPermissions {
+		organizationWithPermissions = append(organizationWithPermissions, database_relations.OrganizationsWithPermissions{
+			OrganizationID:          organization.OrganizationID,
+			OrganizationPermissions: organization.OrganizationPermissions,
+		})
+	}
+
+	platformWithPermissions := []database_relations.PlatformsWithPermissions{}
+	for _, platform := range input.PlatformsWithPermissions {
+		platformWithPermissions = append(platformWithPermissions, database_relations.PlatformsWithPermissions{
+			PlatformID:          platform.PlatformID,
+			PlatformPermissions: platform.PlatformPermissions,
+		})
+	}
+
+	invite, err := r.UserService.InviteUser(
+		input.Email,
+		userSession.ID,
+		organizationWithPermissions,
+		platformWithPermissions)
+
+	return invite, err
+}
+
+// UpdateUserInvitation is the resolver for the updateUserInvitation field.
+func (r *mutationResolver) UpdateUserInvitation(ctx context.Context, input model.UpdateUserInviteInput) (database_enums.InvitationStatus, error) {
+	panic(fmt.Errorf("not implemented: UpdateUserInvitation - updateUserInvitation"))
+}
+
 // UpdateUserPassword is the resolver for the updateUserPassword field.
 func (r *mutationResolver) UpdateUserPassword(ctx context.Context, userID string, input model.UserUpdatePasswordInput) (*database.User, error) {
 	panic(fmt.Errorf("not implemented: UpdateUserPassword - updateUserPassword"))
@@ -101,6 +107,36 @@ func (r *mutationResolver) RequestPasswordReset(ctx context.Context, input model
 // ResetPassword is the resolver for the resetPassword field.
 func (r *mutationResolver) ResetPassword(ctx context.Context, input model.PasswordResetUpdateInput) (*database.User, error) {
 	panic(fmt.Errorf("not implemented: ResetPassword - resetPassword"))
+}
+
+// Permissions is the resolver for the permissions field.
+func (r *organizationResolver) Permissions(ctx context.Context, obj *database.Organization) ([]database_enums.OrganizationPermission, error) {
+	panic(fmt.Errorf("not implemented: Permissions - permissions"))
+}
+
+// Platforms is the resolver for the platforms field.
+func (r *organizationResolver) Platforms(ctx context.Context, obj *database.Organization) ([]*model.Platform, error) {
+	panic(fmt.Errorf("not implemented: Platforms - platforms"))
+}
+
+// Users is the resolver for the users field.
+func (r *organizationResolver) Users(ctx context.Context, obj *database.Organization) ([]*database.User, error) {
+	panic(fmt.Errorf("not implemented: Users - users"))
+}
+
+// Domains is the resolver for the domains field.
+func (r *organizationResolver) Domains(ctx context.Context, obj *database.Organization) ([]*model.Domain, error) {
+	panic(fmt.Errorf("not implemented: Domains - domains"))
+}
+
+// PaymentPlan is the resolver for the paymentPlan field.
+func (r *organizationResolver) PaymentPlan(ctx context.Context, obj *database.Organization) (model.PaymentPlan, error) {
+	panic(fmt.Errorf("not implemented: PaymentPlan - paymentPlan"))
+}
+
+// Payments is the resolver for the payments field.
+func (r *organizationResolver) Payments(ctx context.Context, obj *database.Organization) ([]*model.Payment, error) {
+	panic(fmt.Errorf("not implemented: Payments - payments"))
 }
 
 // Me is the resolver for the me field.
@@ -118,14 +154,24 @@ func (r *queryResolver) Users(ctx context.Context) ([]*database.User, error) {
 	return r.UserService.Users()
 }
 
+// Organizations is the resolver for the organizations field.
+func (r *queryResolver) Organizations(ctx context.Context) ([]*database.Organization, error) {
+	panic(fmt.Errorf("not implemented: Organizations - organizations"))
+}
+
+// Platforms is the resolver for the platforms field.
+func (r *queryResolver) Platforms(ctx context.Context) ([]*model.Platform, error) {
+	panic(fmt.Errorf("not implemented: Platforms - platforms"))
+}
+
 // RefreshToken is the resolver for the refreshToken field.
 func (r *queryResolver) RefreshToken(ctx context.Context, input model.RefreshTokenInput) (string, error) {
 	panic(fmt.Errorf("not implemented: RefreshToken - refreshToken"))
 }
 
-// Companies is the resolver for the companies field.
-func (r *userResolver) Companies(ctx context.Context, obj *database.User) ([]*database.Company, error) {
-	return r.UserService.UserCompany(obj.ID)
+// Organizations is the resolver for the Organizations field.
+func (r *userResolver) Organizations(ctx context.Context, obj *database.User) ([]*database.Organization, error) {
+	return r.UserService.UserOrganization(obj.ID)
 }
 
 // Platforms is the resolver for the platforms field.
@@ -143,11 +189,45 @@ func (r *userResolver) Payments(ctx context.Context, obj *database.User) ([]*mod
 	panic(fmt.Errorf("not implemented: Payments - payments"))
 }
 
+// UserInvites is the resolver for the userInvites field.
+func (r *userResolver) UserInvites(ctx context.Context, obj *database.User) ([]*database_relations.UserInvite, error) {
+	panic(fmt.Errorf("not implemented: UserInvites - userInvites"))
+}
+
+// Organization is the resolver for the organization field.
+func (r *userInviteResolver) Organization(ctx context.Context, obj *database_relations.UserInvite) (*database.Organization, error) {
+	panic(fmt.Errorf("not implemented: Organization - organization"))
+}
+
+// Platforms is the resolver for the platforms field.
+func (r *userInviteResolver) Platforms(ctx context.Context, obj *database_relations.UserInvite) ([]*model.Platform, error) {
+	panic(fmt.Errorf("not implemented: Platforms - platforms"))
+}
+
+// User is the resolver for the user field.
+func (r *userInviteResolver) User(ctx context.Context, obj *database_relations.UserInvite) (*database.User, error) {
+	panic(fmt.Errorf("not implemented: User - user"))
+}
+
+// DeletedAt is the resolver for the deletedAt field.
+func (r *userInviteResolver) DeletedAt(ctx context.Context, obj *database_relations.UserInvite) (*time.Time, error) {
+	panic(fmt.Errorf("not implemented: DeletedAt - deletedAt"))
+}
+
+// Permissions is the resolver for the permissions field.
+func (r *organizationsWithPermissionsInputResolver) Permissions(ctx context.Context, obj *database_relations.OrganizationsWithPermissions, data []database_enums.OrganizationPermission) error {
+	// TODO check the organizations i guess user has permisison or just remove this
+	return nil
+}
+
+// Permissions is the resolver for the permissions field.
+func (r *platformsWithPermissionsInputResolver) Permissions(ctx context.Context, obj *database_relations.PlatformsWithPermissions, data []database_enums.PlatformPermission) error {
+	// TODO check the platform i guess user has permisison or just remove this
+	return nil
+}
+
 // AccountPhone returns AccountPhoneResolver implementation.
 func (r *Resolver) AccountPhone() AccountPhoneResolver { return &accountPhoneResolver{r} }
-
-// Company returns CompanyResolver implementation.
-func (r *Resolver) Company() CompanyResolver { return &companyResolver{r} }
 
 // Industry returns IndustryResolver implementation.
 func (r *Resolver) Industry() IndustryResolver { return &industryResolver{r} }
@@ -155,15 +235,34 @@ func (r *Resolver) Industry() IndustryResolver { return &industryResolver{r} }
 // Mutation returns MutationResolver implementation.
 func (r *Resolver) Mutation() MutationResolver { return &mutationResolver{r} }
 
+// Organization returns OrganizationResolver implementation.
+func (r *Resolver) Organization() OrganizationResolver { return &organizationResolver{r} }
+
 // Query returns QueryResolver implementation.
 func (r *Resolver) Query() QueryResolver { return &queryResolver{r} }
 
 // User returns UserResolver implementation.
 func (r *Resolver) User() UserResolver { return &userResolver{r} }
 
+// UserInvite returns UserInviteResolver implementation.
+func (r *Resolver) UserInvite() UserInviteResolver { return &userInviteResolver{r} }
+
+// OrganizationsWithPermissionsInput returns OrganizationsWithPermissionsInputResolver implementation.
+func (r *Resolver) OrganizationsWithPermissionsInput() OrganizationsWithPermissionsInputResolver {
+	return &organizationsWithPermissionsInputResolver{r}
+}
+
+// PlatformsWithPermissionsInput returns PlatformsWithPermissionsInputResolver implementation.
+func (r *Resolver) PlatformsWithPermissionsInput() PlatformsWithPermissionsInputResolver {
+	return &platformsWithPermissionsInputResolver{r}
+}
+
 type accountPhoneResolver struct{ *Resolver }
-type companyResolver struct{ *Resolver }
 type industryResolver struct{ *Resolver }
 type mutationResolver struct{ *Resolver }
+type organizationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
 type userResolver struct{ *Resolver }
+type userInviteResolver struct{ *Resolver }
+type organizationsWithPermissionsInputResolver struct{ *Resolver }
+type platformsWithPermissionsInputResolver struct{ *Resolver }

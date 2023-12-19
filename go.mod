@@ -7,6 +7,7 @@ require (
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/fergusstrange/embedded-postgres v1.25.0
 	github.com/google/uuid v1.5.0
+	github.com/matoous/go-nanoid/v2 v2.0.0
 	github.com/vektah/gqlparser v1.3.1
 	github.com/vektah/gqlparser/v2 v2.5.10
 	golang.org/x/crypto v0.14.0

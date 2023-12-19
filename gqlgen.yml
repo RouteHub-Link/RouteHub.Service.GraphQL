@@ -69,6 +69,7 @@ autobind:
   - "github.com/RouteHub-Link/routehub-service-graphql/database/models"
   - "github.com/RouteHub-Link/routehub-service-graphql/database/enums"
   - "github.com/RouteHub-Link/routehub-service-graphql/database/types"
+  - "github.com/RouteHub-Link/routehub-service-graphql/database/relations"
 
 # This section declares type mapping between the GraphQL and go type systems
 #
@@ -93,4 +94,10 @@ models:
   DateTime:
     model:
       - github.com/99designs/gqlgen/graphql.Time
+  PlatformsWithPermissionsInput:
+    model:
+      - github.com/RouteHub-Link/routehub-service-graphql/database/relations.PlatformsWithPermissions
+  OrganizationsWithPermissionsInput:
+    model:
+      - github.com/RouteHub-Link/routehub-service-graphql/database/relations.OrganizationsWithPermissions
  

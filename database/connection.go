@@ -28,7 +28,8 @@ func Init() {
 func migrate(db *gorm.DB) {
 	db.AutoMigrate(
 		&database_models.User{},
-		&database_models.Company{},
-		&database_relations.UserCompany{},
+		&database_models.Organization{},
+		&database_relations.UserOrganization{},
+		&database_relations.UserInvite{},
 	)
 }

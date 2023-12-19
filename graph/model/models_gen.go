@@ -10,31 +10,24 @@ import (
 
 	database_enums "github.com/RouteHub-Link/routehub-service-graphql/database/enums"
 	database_models "github.com/RouteHub-Link/routehub-service-graphql/database/models"
+	database_relations "github.com/RouteHub-Link/routehub-service-graphql/database/relations"
 	"github.com/google/uuid"
 )
 
-type CompanyInput struct {
-	Name         string              `json:"name"`
-	Website      string              `json:"website"`
-	Description  string              `json:"description"`
-	Location     string              `json:"location"`
-	SocialMedias []*SocialMediaInput `json:"socialMedias"`
-}
-
 type Domain struct {
-	ID                    uuid.UUID                `json:"id"`
-	Name                  string                   `json:"name"`
-	URL                   string                   `json:"url"`
-	Company               *database_models.Company `json:"company"`
-	Platform              *Platform                `json:"platform,omitempty"`
-	DNSStatus             database_enums.DNSStatus `json:"dnsStatus"`
-	State                 StatusState              `json:"state"`
-	Links                 []*Link                  `json:"links,omitempty"`
-	Analytics             *DomainAnalytics         `json:"analytics"`
-	LastDNSVerificationAt *time.Time               `json:"lastDNSVerificationAt,omitempty"`
-	CreatedAt             time.Time                `json:"createdAt"`
-	UpdatedAt             *time.Time               `json:"updatedAt,omitempty"`
-	DeletedAt             *time.Time               `json:"deletedAt,omitempty"`
+	ID                    uuid.UUID                     `json:"id"`
+	Name                  string                        `json:"name"`
+	URL                   string                        `json:"url"`
+	Organization          *database_models.Organization `json:"organization"`
+	Platform              *Platform                     `json:"platform,omitempty"`
+	DNSStatus             database_enums.DNSStatus      `json:"dnsStatus"`
+	State                 StatusState                   `json:"state"`
+	Links                 []*Link                       `json:"links,omitempty"`
+	Analytics             *DomainAnalytics              `json:"analytics"`
+	LastDNSVerificationAt *time.Time                    `json:"lastDNSVerificationAt,omitempty"`
+	CreatedAt             time.Time                     `json:"createdAt"`
+	UpdatedAt             *time.Time                    `json:"updatedAt,omitempty"`
+	DeletedAt             *time.Time                    `json:"deletedAt,omitempty"`
 }
 
 type DomainAnalytics struct {
@@ -168,6 +161,14 @@ type OpenGraphXInput struct {
 	Creator     string `json:"creator"`
 }
 
+type OrganizationInput struct {
+	Name         string              `json:"name"`
+	Website      string              `json:"website"`
+	Description  string              `json:"description"`
+	Location     string              `json:"location"`
+	SocialMedias []*SocialMediaInput `json:"socialMedias"`
+}
+
 type PasswordReset struct {
 	ID        uuid.UUID             `json:"id"`
 	User      *database_models.User `json:"user"`
@@ -193,38 +194,36 @@ type PasswordResetUpdateInput struct {
 }
 
 type Payment struct {
-	ID      uuid.UUID                `json:"id"`
-	User    *database_models.User    `json:"user"`
-	Company *database_models.Company `json:"company"`
-	Amount  float64                  `json:"amount"`
-	Date    string                   `json:"date"`
-	Status  PaymentStatus            `json:"status"`
+	ID           uuid.UUID                     `json:"id"`
+	User         *database_models.User         `json:"user"`
+	Organization *database_models.Organization `json:"organization"`
+	Amount       float64                       `json:"amount"`
+	Date         string                        `json:"date"`
+	Status       PaymentStatus                 `json:"status"`
 }
 
 type Permission struct {
-	ID          uuid.UUID                  `json:"id"`
-	Name        string                     `json:"name"`
-	Description string                     `json:"description"`
-	Companies   []*database_models.Company `json:"companies"`
-	Domains     []*Domain                  `json:"domains"`
-	Platforms   []*Platform                `json:"platforms"`
-	Users       []*database_models.User    `json:"users"`
-	Links       []*Link                    `json:"links"`
+	ID            uuid.UUID                       `json:"id"`
+	Name          string                          `json:"name"`
+	Description   string                          `json:"description"`
+	Organizations []*database_models.Organization `json:"organizations"`
+	Domains       []*Domain                       `json:"domains"`
+	Platforms     []*Platform                     `json:"platforms"`
 }
 
 type Platform struct {
-	ID                uuid.UUID                         `json:"id"`
-	Name              string                            `json:"name"`
-	OpenGraph         *OpenGraph                        `json:"openGraph"`
-	RedirectionChoice database_enums.RedirectionOptions `json:"redirectionChoice"`
-	Company           *database_models.Company          `json:"company"`
-	Domains           []*Domain                         `json:"domains"`
-	Permissions       []*Permission                     `json:"permissions"`
-	Links             []*Link                           `json:"links"`
-	Analytics         *PlatformAnalytics                `json:"analytics"`
-	Status            StatusState                       `json:"status"`
-	Templates         []*Template                       `json:"templates"`
-	PinnedLinks       []*Link                           `json:"pinnedLinks"`
+	ID                uuid.UUID                           `json:"id"`
+	Name              string                              `json:"name"`
+	OpenGraph         *OpenGraph                          `json:"openGraph"`
+	RedirectionChoice database_enums.RedirectionOptions   `json:"redirectionChoice"`
+	Organization      *database_models.Organization       `json:"organization"`
+	Domains           []*Domain                           `json:"domains"`
+	Permissions       []database_enums.PlatformPermission `json:"permissions"`
+	Links             []*Link                             `json:"links"`
+	Analytics         *PlatformAnalytics                  `json:"analytics"`
+	Status            StatusState                         `json:"status"`
+	Templates         []*Template                         `json:"templates"`
+	PinnedLinks       []*Link                             `json:"pinnedLinks"`
 }
 
 type PlatformAnalytics struct {
@@ -240,10 +239,6 @@ type PlatformInput struct {
 	RedirectionChoice database_enums.RedirectionOptions `json:"redirectionChoice"`
 	State             StatusState                       `json:"state"`
 	Templates         []*TemplateInput                  `json:"templates"`
-}
-
-type PlatformPinInput struct {
-	LinkID uuid.UUID `json:"linkId"`
 }
 
 type RefreshTokenInput struct {
@@ -279,18 +274,18 @@ type TemplateInput struct {
 }
 
 type Ticket struct {
-	ID          uuid.UUID                   `json:"id"`
-	User        *database_models.User       `json:"user"`
-	Company     *database_models.Company    `json:"company"`
-	Title       string                      `json:"title"`
-	Category    string                      `json:"category"`
-	Description string                      `json:"description"`
-	Messages    []*TicketMessage            `json:"messages"`
-	Attachments []string                    `json:"attachments,omitempty"`
-	Status      database_enums.TicketStatus `json:"status"`
-	CreatedAt   time.Time                   `json:"createdAt"`
-	UpdatedAt   *time.Time                  `json:"updatedAt,omitempty"`
-	DeletedAt   *time.Time                  `json:"deletedAt,omitempty"`
+	ID           uuid.UUID                     `json:"id"`
+	User         *database_models.User         `json:"user"`
+	Organization *database_models.Organization `json:"organization"`
+	Title        string                        `json:"title"`
+	Category     string                        `json:"category"`
+	Description  string                        `json:"description"`
+	Messages     []*TicketMessage              `json:"messages"`
+	Attachments  []string                      `json:"attachments,omitempty"`
+	Status       database_enums.TicketStatus   `json:"status"`
+	CreatedAt    time.Time                     `json:"createdAt"`
+	UpdatedAt    *time.Time                    `json:"updatedAt,omitempty"`
+	DeletedAt    *time.Time                    `json:"deletedAt,omitempty"`
 }
 
 type TicketInput struct {
@@ -315,6 +310,12 @@ type TicketMessageInput struct {
 	Content string `json:"content"`
 }
 
+type UpdateUserInviteInput struct {
+	Code   string                          `json:"code"`
+	Status database_enums.InvitationStatus `json:"status"`
+	User   *UserInput                      `json:"user"`
+}
+
 type UserInput struct {
 	Email           string `json:"email"`
 	Password        string `json:"password"`
@@ -324,6 +325,12 @@ type UserInput struct {
 	CountryCode     string `json:"countryCode"`
 	Useragent       string `json:"useragent"`
 	IP              string `json:"ip"`
+}
+
+type UserInviteInput struct {
+	Email                    string                                             `json:"email"`
+	OrganizationsPermissions []*database_relations.OrganizationsWithPermissions `json:"organizationsPermissions"`
+	PlatformsWithPermissions []*database_relations.PlatformsWithPermissions     `json:"platformsWithPermissions"`
 }
 
 type UserUpdatePasswordInput struct {

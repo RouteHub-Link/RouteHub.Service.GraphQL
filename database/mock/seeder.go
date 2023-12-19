@@ -2,6 +2,7 @@ package database_mock
 
 import (
 	"github.com/RouteHub-Link/routehub-service-graphql/database"
+	database_enums "github.com/RouteHub-Link/routehub-service-graphql/database/enums"
 	database_models "github.com/RouteHub-Link/routehub-service-graphql/database/models"
 	database_relations "github.com/RouteHub-Link/routehub-service-graphql/database/relations"
 	database_types "github.com/RouteHub-Link/routehub-service-graphql/database/types"
@@ -30,15 +31,15 @@ func Seed() {
 		database.DB.Create(user)
 	}
 
-	var company_count int64
-	database.DB.Model(&database_models.Company{}).Count(&company_count)
+	var organization_count int64
+	database.DB.Model(&database_models.Organization{}).Count(&organization_count)
 
-	if company_count == 0 {
-		company := &database_models.Company{
+	if organization_count == 0 {
+		Organization := &database_models.Organization{
 			ID:          uuid.New(),
 			Name:        "RouteHub",
 			Website:     "https://routehub.link",
-			Description: "RouteHub is a platform that connects companies and talents in the tech industry.",
+			Description: "RouteHub is a platform that connects Organizations and talents in the tech industry.",
 			Location:    "Jakarta, Indonesia",
 			Industry: []*database_types.Industry{
 				{Name: "Software Development"}, {Name: "Information Technology"},
@@ -46,24 +47,25 @@ func Seed() {
 			SocialMedias: []*database_types.SocialMedia{{Name: "LinkedIn", URL: "https://www.linkedin.com/test", Icon: "LinkedIn"}},
 		}
 
-		database.DB.Create(company)
+		database.DB.Create(Organization)
 	}
 
-	var user_company_count int64
-	database.DB.Model(&database_relations.UserCompany{}).Count(&user_company_count)
+	var user_organization_count int64
+	database.DB.Model(&database_relations.UserOrganization{}).Count(&user_organization_count)
 
-	if user_company_count == 0 {
+	if user_organization_count == 0 {
 		var user database_models.User
-		var company database_models.Company
+		var organization database_models.Organization
 
 		database.DB.First(&user)
-		database.DB.First(&company)
+		database.DB.First(&organization)
 
-		user_company := &database_relations.UserCompany{
-			UserID:    user.ID,
-			CompanyID: company.ID,
+		user_Organization := &database_relations.UserOrganization{
+			UserID:         user.ID,
+			OrganizationID: organization.ID,
+			Permissions:    database_enums.AllOrganizationPermission,
 		}
 
-		database.DB.Create(user_company)
+		database.DB.Create(user_Organization)
 	}
 }

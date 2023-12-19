@@ -1,7 +1,3 @@
-# GraphQL schema example
-#
-# https://gqlgen.com/getting-started/
-
 scalar UUID
 scalar DateTime
 
@@ -55,12 +51,12 @@ enum PlatformPermission {
   PLATFORM_DELETE
 }
 
-enum CompanyPermission {
+enum OrganizationPermission {
   DOMAIN_CREATE
   DOMAIN_UPDATE
   DOMAIN_DELETE
-  COMPANY_UPDATE
-  COMPANY_DELETE
+  Organization_UPDATE
+  Organization_DELETE
   PLATFORM_CREATE
   PLATFORM_UPDATE
   PLATFORM_DELETE
@@ -70,11 +66,19 @@ enum CompanyPermission {
   PLATFORM_USER_UPDATE
 }
 
+enum InvitationStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+}
+
 directive @auth on FIELD_DEFINITION
 
 type Query {
   me: User! @auth
   users: [User!]!
+  organizations: [Organization!]!
+  platforms: [Platform!]!
   refreshToken(input: RefreshTokenInput!): String!
 }
 
@@ -85,16 +89,51 @@ type User {
   fullname: String!
   verified: Boolean!
   phone: AccountPhone!
-  companies: [Company!]!
+  organizations: [Organization!]!
   platforms: [Platform!]!
   permissions: [Permission!]!
   payments: [Payment!]!
+  userInvites: [UserInvite!]!
 
   createdAt: DateTime!
   updatedAt: DateTime
   deletedAt: DateTime
 }
 
+type UserInvite {
+  id: UUID!
+  email: String!
+  code: String!
+  organization: Organization!
+  platforms: [Platform!]!
+  user: User!
+  status: InvitationStatus!
+  createdAt: DateTime!
+  updatedAt: DateTime
+  deletedAt: DateTime
+}
+
+input UserInviteInput {
+  email: String!
+  organizationsPermissions: [OrganizationsWithPermissionsInput!]!
+  platformsWithPermissions: [PlatformsWithPermissionsInput!]!
+}
+
+input UpdateUserInviteInput {
+  code: String!
+  status: InvitationStatus!
+  user: UserInput!
+}
+
+input OrganizationsWithPermissionsInput {
+  organizationId: UUID!
+  permissions: [OrganizationPermission!]!
+}
+
+input PlatformsWithPermissionsInput {
+  platformId: UUID!
+  permissions: [PlatformPermission!]!
+}
 
 type PasswordReset {
   id: UUID!
@@ -115,10 +154,11 @@ type AccountPhone {
   updatedAt: DateTime
 }
 
-type Company {
+type Organization {
   id: UUID!
   name: String!
   website: String!
+  permissions: [OrganizationPermission!]!
   platforms: [Platform!]!
   industry: [Industry!]
   description: String!
@@ -126,7 +166,6 @@ type Company {
   socialMedias: [SocialMedia!]!
   users: [User!]!
   domains: [Domain!]!
-  permissions: [Permission!]!
   paymentPlan: PaymentPlan!
   payments: [Payment!]!
 }
@@ -139,14 +178,14 @@ type SocialMedia {
 
 type Industry {
   name: String!
-  companies: [Company!]!
+  organizations: [Organization!]!
 }
 
 type Domain {
   id: UUID!
   name: String!
   url: String!
-  company: Company!
+  organization: Organization!
   platform: Platform
   dnsStatus: DNSStatus!
   state: StatusState!
@@ -163,9 +202,9 @@ type Platform {
   name: String!
   openGraph: OpenGraph!
   redirectionChoice: RedirectionOptions!
-  company: Company!
+  organization: Organization!
   domains: [Domain!]!
-  permissions: [Permission!]!
+  permissions: [PlatformPermission!]!
   links: [Link!]!
   analytics: PlatformAnalytics!
   status: StatusState!
@@ -215,11 +254,9 @@ type Permission {
   id: UUID!
   name: String!
   description: String!
-  companies: [Company!]!
+  organizations: [Organization!]!
   domains: [Domain!]!
   platforms: [Platform!]!
-  users: [User!]!
-  links: [Link!]!
 }
 
 type Link {
@@ -242,7 +279,7 @@ type Link {
 type Ticket {
   id: UUID!
   user: User!
-  company: Company!
+  organization: Organization!
   title: String!
   category: String!
   description: String!
@@ -277,7 +314,7 @@ input TicketMessageInput {
 type Payment {
   id: UUID!
   user: User!
-  company: Company!
+  organization: Organization!
   amount: Float!
   date: String!
   status: PaymentStatus!
@@ -437,12 +474,7 @@ input PlatformInput {
   templates: [TemplateInput!]!
 }
 
-input PlatformPinInput {
-  linkId: UUID!
-}
-
-
-input CompanyInput {
+input OrganizationInput {
   name: String!
   website: String!
   description: String!
@@ -460,6 +492,8 @@ input SocialMediaInput {
 type Mutation {
   createUser(input: UserInput!): User!
   loginUser(input: LoginInput!): LoginPayload!
+  inviteUser(input: UserInviteInput!): UserInvite! @auth
+  updateUserInvitation(input: UpdateUserInviteInput!): InvitationStatus!
   updateUserPassword(userId: ID!, input: UserUpdatePasswordInput!): User!
   requestPasswordReset(input: PasswordResetCreateInput!): PasswordReset!
   resetPassword(input: PasswordResetUpdateInput!): User!
