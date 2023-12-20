@@ -70,6 +70,7 @@ autobind:
   - "github.com/RouteHub-Link/routehub-service-graphql/database/enums"
   - "github.com/RouteHub-Link/routehub-service-graphql/database/types"
   - "github.com/RouteHub-Link/routehub-service-graphql/database/relations"
+  - "github.com/RouteHub-Link/routehub-service-graphql/graph/model/inputs"
 
 # This section declares type mapping between the GraphQL and go type systems
 #

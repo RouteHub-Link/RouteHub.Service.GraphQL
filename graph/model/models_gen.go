@@ -10,9 +10,13 @@ import (
 
 	database_enums "github.com/RouteHub-Link/routehub-service-graphql/database/enums"
 	database_models "github.com/RouteHub-Link/routehub-service-graphql/database/models"
-	database_relations "github.com/RouteHub-Link/routehub-service-graphql/database/relations"
 	"github.com/google/uuid"
 )
+
+type AccountPhoneInput struct {
+	Number      string `json:"number"`
+	CountryCode string `json:"countryCode"`
+}
 
 type Domain struct {
 	ID                    uuid.UUID                     `json:"id"`
@@ -317,20 +321,13 @@ type UpdateUserInviteInput struct {
 }
 
 type UserInput struct {
-	Email           string `json:"email"`
-	Password        string `json:"password"`
-	ConfirmPassword string `json:"confirmPassword"`
-	Fullname        string `json:"fullname"`
-	Phone           string `json:"phone"`
-	CountryCode     string `json:"countryCode"`
-	Useragent       string `json:"useragent"`
-	IP              string `json:"ip"`
-}
-
-type UserInviteInput struct {
-	Email                    string                                             `json:"email"`
-	OrganizationsPermissions []*database_relations.OrganizationsWithPermissions `json:"organizationsPermissions"`
-	PlatformsWithPermissions []*database_relations.PlatformsWithPermissions     `json:"platformsWithPermissions"`
+	Email           string             `json:"email"`
+	Password        string             `json:"password"`
+	ConfirmPassword string             `json:"confirmPassword"`
+	Fullname        string             `json:"fullname"`
+	Phone           *AccountPhoneInput `json:"phone"`
+	Useragent       string             `json:"useragent"`
+	IP              string             `json:"ip"`
 }
 
 type UserUpdatePasswordInput struct {

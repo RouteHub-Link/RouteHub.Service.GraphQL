@@ -12,7 +12,6 @@ enum StatusState {
   ACTIVE
 }
 
-
 enum TicketStatus {
   OPEN
   CLOSED
@@ -22,7 +21,6 @@ enum TicketSender {
   USER
   Admin
 }
-
 
 enum PaymentStatus {
   PENDING
@@ -145,6 +143,10 @@ type PasswordReset {
   deletedAt: DateTime
 }
 
+input AccountPhoneInput {
+  number: String!
+  countryCode: String!
+}
 
 type AccountPhone {
   number: String!
@@ -346,7 +348,6 @@ type DomainAnalytics {
   observations: [ObservationAnalytic!]!
 }
 
-
 type ObservationAnalytic {
   id: UUID!
   link: Link!
@@ -368,12 +369,14 @@ input LinkInput {
   redirectionOptions: RedirectionOptions!
   openGraph: OpenGraphInput!
 }
+
 input TicketInput {
   title: String!
   category: String!
   description: String!
   attachments: [String!]
 }
+
 input ObservationInput {
   linkId: UUID!
   domainId: UUID!
@@ -401,8 +404,7 @@ input UserInput {
   password: String!
   confirmPassword: String!
   fullname: String!
-  phone: String!
-  countryCode: String!
+  phone: AccountPhoneInput!
   useragent: String!
   ip: String!
 }
@@ -413,7 +415,6 @@ input UserUpdatePasswordInput {
   useragent: String!
   ip: String!
 }
-
 
 input PasswordResetCreateInput {
   email: String!
@@ -428,7 +429,6 @@ input PasswordResetUpdateInput {
   useragent: String!
   ip: String!
 }
-
 
 input DomainInput {
   name: String!

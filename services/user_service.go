@@ -5,6 +5,7 @@ import (
 
 	database_models "github.com/RouteHub-Link/routehub-service-graphql/database/models"
 	database_relations "github.com/RouteHub-Link/routehub-service-graphql/database/relations"
+	"github.com/RouteHub-Link/routehub-service-graphql/graph/model"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
@@ -39,13 +40,13 @@ func (u UserService) UserOrganization(userId uuid.UUID) (Organization []*databas
 	return
 }
 
-func (u UserService) Login(email string, password string) (user *database_models.User, err error) {
-	err = u.DB.Where("email = ?", email).First(&user).Error
+func (u UserService) Login(input model.LoginInput) (user *database_models.User, err error) {
+	err = u.DB.Where("email = ?", input.Email).First(&user).Error
 	if err != nil {
 		return
 	}
 
-	if !CheckPasswordHash(password, user.PasswordHash) {
+	if !CheckPasswordHash(input.Password, user.PasswordHash) {
 		return nil, errors.New("invalid password")
 	}
 

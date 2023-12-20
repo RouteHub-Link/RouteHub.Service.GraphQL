@@ -20,6 +20,7 @@ import (
 	database_relations "github.com/RouteHub-Link/routehub-service-graphql/database/relations"
 	database_types "github.com/RouteHub-Link/routehub-service-graphql/database/types"
 	"github.com/RouteHub-Link/routehub-service-graphql/graph/model"
+	graph_inputs "github.com/RouteHub-Link/routehub-service-graphql/graph/model/inputs"
 	"github.com/google/uuid"
 	gqlparser "github.com/vektah/gqlparser/v2"
 	"github.com/vektah/gqlparser/v2/ast"
@@ -131,7 +132,7 @@ type ComplexityRoot struct {
 
 	Mutation struct {
 		CreateUser           func(childComplexity int, input model.UserInput) int
-		InviteUser           func(childComplexity int, input model.UserInviteInput) int
+		InviteUser           func(childComplexity int, input graph_inputs.UserInviteInput) int
 		LoginUser            func(childComplexity int, input model.LoginInput) int
 		RequestPasswordReset func(childComplexity int, input model.PasswordResetCreateInput) int
 		ResetPassword        func(childComplexity int, input model.PasswordResetUpdateInput) int
@@ -339,7 +340,7 @@ type IndustryResolver interface {
 type MutationResolver interface {
 	CreateUser(ctx context.Context, input model.UserInput) (*database_models.User, error)
 	LoginUser(ctx context.Context, input model.LoginInput) (*model.LoginPayload, error)
-	InviteUser(ctx context.Context, input model.UserInviteInput) (*database_relations.UserInvite, error)
+	InviteUser(ctx context.Context, input graph_inputs.UserInviteInput) (*database_relations.UserInvite, error)
 	UpdateUserInvitation(ctx context.Context, input model.UpdateUserInviteInput) (database_enums.InvitationStatus, error)
 	UpdateUserPassword(ctx context.Context, userID string, input model.UserUpdatePasswordInput) (*database_models.User, error)
 	RequestPasswordReset(ctx context.Context, input model.PasswordResetCreateInput) (*model.PasswordReset, error)
@@ -753,7 +754,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.InviteUser(childComplexity, args["input"].(model.UserInviteInput)), true
+		return e.complexity.Mutation.InviteUser(childComplexity, args["input"].(graph_inputs.UserInviteInput)), true
 
 	case "Mutation.loginUser":
 		if e.complexity.Mutation.LoginUser == nil {
@@ -1815,6 +1816,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	rc := graphql.GetOperationContext(ctx)
 	ec := executionContext{rc, e, 0, 0, make(chan graphql.DeferredResult)}
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
+		ec.unmarshalInputAccountPhoneInput,
 		ec.unmarshalInputDomainInput,
 		ec.unmarshalInputLinkInput,
 		ec.unmarshalInputLoginInput,
@@ -1970,10 +1972,10 @@ func (ec *executionContext) field_Mutation_createUser_args(ctx context.Context, 
 func (ec *executionContext) field_Mutation_inviteUser_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 model.UserInviteInput
+	var arg0 graph_inputs.UserInviteInput
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNUserInviteInput2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐUserInviteInput(ctx, tmp)
+		arg0, err = ec.unmarshalNUserInviteInput2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚋinputsᚐUserInviteInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -4632,7 +4634,7 @@ func (ec *executionContext) _Mutation_inviteUser(ctx context.Context, field grap
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		directive0 := func(rctx context.Context) (interface{}, error) {
 			ctx = rctx // use context from middleware stack in children
-			return ec.resolvers.Mutation().InviteUser(rctx, fc.Args["input"].(model.UserInviteInput))
+			return ec.resolvers.Mutation().InviteUser(rctx, fc.Args["input"].(graph_inputs.UserInviteInput))
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
 			if ec.directives.Auth == nil {
@@ -12346,9 +12348,9 @@ func (ec *executionContext) _UserInvite_updatedAt(ctx context.Context, field gra
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(time.Time)
+	res := resTmp.(*time.Time)
 	fc.Result = res
-	return ec.marshalODateTime2timeᚐTime(ctx, field.Selections, res)
+	return ec.marshalODateTime2ᚖtimeᚐTime(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_UserInvite_updatedAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -14178,6 +14180,40 @@ func (ec *executionContext) fieldContext___Type_specifiedByURL(ctx context.Conte
 
 // region    **************************** input.gotpl *****************************
 
+func (ec *executionContext) unmarshalInputAccountPhoneInput(ctx context.Context, obj interface{}) (model.AccountPhoneInput, error) {
+	var it model.AccountPhoneInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"number", "countryCode"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "number":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("number"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Number = data
+		case "countryCode":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("countryCode"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CountryCode = data
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputDomainInput(ctx context.Context, obj interface{}) (model.DomainInput, error) {
 	var it model.DomainInput
 	asMap := map[string]interface{}{}
@@ -15067,7 +15103,7 @@ func (ec *executionContext) unmarshalInputUserInput(ctx context.Context, obj int
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"email", "password", "confirmPassword", "fullname", "phone", "countryCode", "useragent", "ip"}
+	fieldsInOrder := [...]string{"email", "password", "confirmPassword", "fullname", "phone", "useragent", "ip"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -15104,18 +15140,11 @@ func (ec *executionContext) unmarshalInputUserInput(ctx context.Context, obj int
 			it.Fullname = data
 		case "phone":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("phone"))
-			data, err := ec.unmarshalNString2string(ctx, v)
+			data, err := ec.unmarshalNAccountPhoneInput2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐAccountPhoneInput(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.Phone = data
-		case "countryCode":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("countryCode"))
-			data, err := ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.CountryCode = data
 		case "useragent":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("useragent"))
 			data, err := ec.unmarshalNString2string(ctx, v)
@@ -15136,8 +15165,8 @@ func (ec *executionContext) unmarshalInputUserInput(ctx context.Context, obj int
 	return it, nil
 }
 
-func (ec *executionContext) unmarshalInputUserInviteInput(ctx context.Context, obj interface{}) (model.UserInviteInput, error) {
-	var it model.UserInviteInput
+func (ec *executionContext) unmarshalInputUserInviteInput(ctx context.Context, obj interface{}) (graph_inputs.UserInviteInput, error) {
+	var it graph_inputs.UserInviteInput
 	asMap := map[string]interface{}{}
 	for k, v := range obj.(map[string]interface{}) {
 		asMap[k] = v
@@ -15159,14 +15188,14 @@ func (ec *executionContext) unmarshalInputUserInviteInput(ctx context.Context, o
 			it.Email = data
 		case "organizationsPermissions":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("organizationsPermissions"))
-			data, err := ec.unmarshalNOrganizationsWithPermissionsInput2ᚕᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋrelationsᚐOrganizationsWithPermissionsᚄ(ctx, v)
+			data, err := ec.unmarshalNOrganizationsWithPermissionsInput2ᚕgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋrelationsᚐOrganizationsWithPermissionsᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.OrganizationsPermissions = data
 		case "platformsWithPermissions":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("platformsWithPermissions"))
-			data, err := ec.unmarshalNPlatformsWithPermissionsInput2ᚕᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋrelationsᚐPlatformsWithPermissionsᚄ(ctx, v)
+			data, err := ec.unmarshalNPlatformsWithPermissionsInput2ᚕgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋrelationsᚐPlatformsWithPermissionsᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -17915,6 +17944,11 @@ func (ec *executionContext) marshalNAccountPhone2ᚖgithubᚗcomᚋRouteHubᚑLi
 	return ec._AccountPhone(ctx, sel, v)
 }
 
+func (ec *executionContext) unmarshalNAccountPhoneInput2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐAccountPhoneInput(ctx context.Context, v interface{}) (*model.AccountPhoneInput, error) {
+	res, err := ec.unmarshalInputAccountPhoneInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalNBoolean2bool(ctx context.Context, v interface{}) (bool, error) {
 	res, err := graphql.UnmarshalBoolean(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -18391,26 +18425,26 @@ func (ec *executionContext) marshalNOrganizationPermission2ᚕgithubᚗcomᚋRou
 	return ret
 }
 
-func (ec *executionContext) unmarshalNOrganizationsWithPermissionsInput2ᚕᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋrelationsᚐOrganizationsWithPermissionsᚄ(ctx context.Context, v interface{}) ([]*database_relations.OrganizationsWithPermissions, error) {
+func (ec *executionContext) unmarshalNOrganizationsWithPermissionsInput2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋrelationsᚐOrganizationsWithPermissions(ctx context.Context, v interface{}) (database_relations.OrganizationsWithPermissions, error) {
+	res, err := ec.unmarshalInputOrganizationsWithPermissionsInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNOrganizationsWithPermissionsInput2ᚕgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋrelationsᚐOrganizationsWithPermissionsᚄ(ctx context.Context, v interface{}) ([]database_relations.OrganizationsWithPermissions, error) {
 	var vSlice []interface{}
 	if v != nil {
 		vSlice = graphql.CoerceList(v)
 	}
 	var err error
-	res := make([]*database_relations.OrganizationsWithPermissions, len(vSlice))
+	res := make([]database_relations.OrganizationsWithPermissions, len(vSlice))
 	for i := range vSlice {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
-		res[i], err = ec.unmarshalNOrganizationsWithPermissionsInput2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋrelationsᚐOrganizationsWithPermissions(ctx, vSlice[i])
+		res[i], err = ec.unmarshalNOrganizationsWithPermissionsInput2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋrelationsᚐOrganizationsWithPermissions(ctx, vSlice[i])
 		if err != nil {
 			return nil, err
 		}
 	}
 	return res, nil
-}
-
-func (ec *executionContext) unmarshalNOrganizationsWithPermissionsInput2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋrelationsᚐOrganizationsWithPermissions(ctx context.Context, v interface{}) (*database_relations.OrganizationsWithPermissions, error) {
-	res, err := ec.unmarshalInputOrganizationsWithPermissionsInput(ctx, v)
-	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) marshalNPasswordReset2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐPasswordReset(ctx context.Context, sel ast.SelectionSet, v model.PasswordReset) graphql.Marshaler {
@@ -18700,26 +18734,26 @@ func (ec *executionContext) marshalNPlatformPermission2ᚕgithubᚗcomᚋRouteHu
 	return ret
 }
 
-func (ec *executionContext) unmarshalNPlatformsWithPermissionsInput2ᚕᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋrelationsᚐPlatformsWithPermissionsᚄ(ctx context.Context, v interface{}) ([]*database_relations.PlatformsWithPermissions, error) {
+func (ec *executionContext) unmarshalNPlatformsWithPermissionsInput2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋrelationsᚐPlatformsWithPermissions(ctx context.Context, v interface{}) (database_relations.PlatformsWithPermissions, error) {
+	res, err := ec.unmarshalInputPlatformsWithPermissionsInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNPlatformsWithPermissionsInput2ᚕgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋrelationsᚐPlatformsWithPermissionsᚄ(ctx context.Context, v interface{}) ([]database_relations.PlatformsWithPermissions, error) {
 	var vSlice []interface{}
 	if v != nil {
 		vSlice = graphql.CoerceList(v)
 	}
 	var err error
-	res := make([]*database_relations.PlatformsWithPermissions, len(vSlice))
+	res := make([]database_relations.PlatformsWithPermissions, len(vSlice))
 	for i := range vSlice {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
-		res[i], err = ec.unmarshalNPlatformsWithPermissionsInput2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋrelationsᚐPlatformsWithPermissions(ctx, vSlice[i])
+		res[i], err = ec.unmarshalNPlatformsWithPermissionsInput2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋrelationsᚐPlatformsWithPermissions(ctx, vSlice[i])
 		if err != nil {
 			return nil, err
 		}
 	}
 	return res, nil
-}
-
-func (ec *executionContext) unmarshalNPlatformsWithPermissionsInput2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋrelationsᚐPlatformsWithPermissions(ctx context.Context, v interface{}) (*database_relations.PlatformsWithPermissions, error) {
-	res, err := ec.unmarshalInputPlatformsWithPermissionsInput(ctx, v)
-	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalNRedirectionOptions2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐRedirectionOptions(ctx context.Context, v interface{}) (database_enums.RedirectionOptions, error) {
@@ -19144,7 +19178,7 @@ func (ec *executionContext) marshalNUserInvite2ᚖgithubᚗcomᚋRouteHubᚑLink
 	return ec._UserInvite(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNUserInviteInput2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐUserInviteInput(ctx context.Context, v interface{}) (model.UserInviteInput, error) {
+func (ec *executionContext) unmarshalNUserInviteInput2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚋinputsᚐUserInviteInput(ctx context.Context, v interface{}) (graph_inputs.UserInviteInput, error) {
 	res, err := ec.unmarshalInputUserInviteInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
@@ -19430,16 +19464,6 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 		return graphql.Null
 	}
 	res := graphql.MarshalBoolean(*v)
-	return res
-}
-
-func (ec *executionContext) unmarshalODateTime2timeᚐTime(ctx context.Context, v interface{}) (time.Time, error) {
-	res, err := graphql.UnmarshalTime(v)
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalODateTime2timeᚐTime(ctx context.Context, sel ast.SelectionSet, v time.Time) graphql.Marshaler {
-	res := graphql.MarshalTime(v)
 	return res
 }
 

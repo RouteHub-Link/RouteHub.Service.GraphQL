@@ -15,6 +15,7 @@ import (
 	database_relations "github.com/RouteHub-Link/routehub-service-graphql/database/relations"
 	database_types "github.com/RouteHub-Link/routehub-service-graphql/database/types"
 	"github.com/RouteHub-Link/routehub-service-graphql/graph/model"
+	graph_inputs "github.com/RouteHub-Link/routehub-service-graphql/graph/model/inputs"
 	"github.com/vektah/gqlparser/v2/gqlerror"
 )
 
@@ -40,7 +41,7 @@ func (r *mutationResolver) CreateUser(ctx context.Context, input model.UserInput
 
 // LoginUser is the resolver for the loginUser field.
 func (r *mutationResolver) LoginUser(ctx context.Context, input model.LoginInput) (*model.LoginPayload, error) {
-	user, err := r.UserService.Login(input.Email, input.Password)
+	user, err := r.UserService.Login(input)
 	if err != nil {
 		return nil, err
 	}
@@ -61,37 +62,22 @@ func (r *mutationResolver) LoginUser(ctx context.Context, input model.LoginInput
 }
 
 // InviteUser is the resolver for the inviteUser field.
-func (r *mutationResolver) InviteUser(ctx context.Context, input model.UserInviteInput) (*database_relations.UserInvite, error) {
+func (r *mutationResolver) InviteUser(ctx context.Context, input graph_inputs.UserInviteInput) (*database_relations.UserInvite, error) {
 	userSession := auth.ForContext(ctx)
 
-	organizationWithPermissions := []database_relations.OrganizationsWithPermissions{}
-	for _, organization := range input.OrganizationsPermissions {
-		organizationWithPermissions = append(organizationWithPermissions, database_relations.OrganizationsWithPermissions{
-			OrganizationID:          organization.OrganizationID,
-			OrganizationPermissions: organization.OrganizationPermissions,
-		})
-	}
-
-	platformWithPermissions := []database_relations.PlatformsWithPermissions{}
-	for _, platform := range input.PlatformsWithPermissions {
-		platformWithPermissions = append(platformWithPermissions, database_relations.PlatformsWithPermissions{
-			PlatformID:          platform.PlatformID,
-			PlatformPermissions: platform.PlatformPermissions,
-		})
-	}
-
-	invite, err := r.UserService.InviteUser(
-		input.Email,
-		userSession.ID,
-		organizationWithPermissions,
-		platformWithPermissions)
+	invite, err := r.UserService.InviteUser(input, userSession.ID)
 
 	return invite, err
 }
 
 // UpdateUserInvitation is the resolver for the updateUserInvitation field.
 func (r *mutationResolver) UpdateUserInvitation(ctx context.Context, input model.UpdateUserInviteInput) (database_enums.InvitationStatus, error) {
-	panic(fmt.Errorf("not implemented: UpdateUserInvitation - updateUserInvitation"))
+	invitation, err := r.UserService.UpdateInvitation(input)
+	if err != nil {
+		return "", err
+	}
+
+	return invitation.Status, nil
 }
 
 // UpdateUserPassword is the resolver for the updateUserPassword field.

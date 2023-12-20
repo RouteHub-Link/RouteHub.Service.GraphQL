@@ -61,6 +61,7 @@ func Seed() {
 		database.DB.First(&organization)
 
 		user_Organization := &database_relations.UserOrganization{
+			ID:             uuid.New(),
 			UserID:         user.ID,
 			OrganizationID: organization.ID,
 			Permissions:    database_enums.AllOrganizationPermission,
