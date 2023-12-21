@@ -69,4 +69,22 @@ func Seed() {
 
 		database.DB.Create(user_Organization)
 	}
+
+	var domain_count int64
+	database.DB.Model(&database_models.Domain{}).Count(&domain_count)
+
+	if domain_count == 0 {
+		var organization database_models.Organization
+
+		database.DB.First(&organization)
+
+		domain := &database_models.Domain{
+			ID:             uuid.New(),
+			Name:           "RouteHub Public Shortener",
+			OrganizationId: organization.ID,
+			URL:            "https://s.r4l.cc",
+		}
+
+		database.DB.Create(domain)
+	}
 }

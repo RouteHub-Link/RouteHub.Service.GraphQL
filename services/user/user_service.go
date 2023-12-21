@@ -1,4 +1,4 @@
-package services
+package services_user
 
 import (
 	"errors"
@@ -6,6 +6,7 @@ import (
 	database_models "github.com/RouteHub-Link/routehub-service-graphql/database/models"
 	database_relations "github.com/RouteHub-Link/routehub-service-graphql/database/relations"
 	"github.com/RouteHub-Link/routehub-service-graphql/graph/model"
+	services_utils "github.com/RouteHub-Link/routehub-service-graphql/services/utils"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
@@ -46,7 +47,7 @@ func (u UserService) Login(input model.LoginInput) (user *database_models.User, 
 		return
 	}
 
-	if !CheckPasswordHash(input.Password, user.PasswordHash) {
+	if !services_utils.CheckPasswordHash(input.Password, user.PasswordHash) {
 		return nil, errors.New("invalid password")
 	}
 

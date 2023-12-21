@@ -47,9 +47,11 @@ type Config struct {
 
 type ResolverRoot interface {
 	AccountPhone() AccountPhoneResolver
+	Domain() DomainResolver
 	Industry() IndustryResolver
 	Mutation() MutationResolver
 	Organization() OrganizationResolver
+	Platform() PlatformResolver
 	Query() QueryResolver
 	User() UserResolver
 	UserInvite() UserInviteResolver
@@ -70,10 +72,30 @@ type ComplexityRoot struct {
 		Verified    func(childComplexity int) int
 	}
 
+	AnalyticReport struct {
+		Domain       func(childComplexity int) int
+		Link         func(childComplexity int) int
+		Locations    func(childComplexity int) int
+		Referers     func(childComplexity int) int
+		TotalFailed  func(childComplexity int) int
+		TotalHits    func(childComplexity int) int
+		TotalSuccess func(childComplexity int) int
+		Useragents   func(childComplexity int) int
+	}
+
+	AnalyticReports struct {
+		AllTimeObservations   func(childComplexity int) int
+		LastMonthObservations func(childComplexity int) int
+		LastWeekObservations  func(childComplexity int) int
+		LastYearObservations  func(childComplexity int) int
+		TodayObservations     func(childComplexity int) int
+		YesterdayObservations func(childComplexity int) int
+	}
+
 	Domain struct {
+		AnalyticReports       func(childComplexity int) int
 		Analytics             func(childComplexity int) int
 		CreatedAt             func(childComplexity int) int
-		DNSStatus             func(childComplexity int) int
 		DeletedAt             func(childComplexity int) int
 		ID                    func(childComplexity int) int
 		LastDNSVerificationAt func(childComplexity int) int
@@ -84,14 +106,17 @@ type ComplexityRoot struct {
 		State                 func(childComplexity int) int
 		URL                   func(childComplexity int) int
 		UpdatedAt             func(childComplexity int) int
+		Verification          func(childComplexity int) int
 	}
 
-	DomainAnalytics struct {
-		ID             func(childComplexity int) int
-		Observations   func(childComplexity int) int
-		TotalLinks     func(childComplexity int) int
-		TotalPlatforms func(childComplexity int) int
-		TotalUsers     func(childComplexity int) int
+	DomainVerification struct {
+		CreatedAt func(childComplexity int) int
+		DeletedAt func(childComplexity int) int
+		Domain    func(childComplexity int) int
+		ID        func(childComplexity int) int
+		Logs      func(childComplexity int) int
+		Status    func(childComplexity int) int
+		UpdatedAt func(childComplexity int) int
 	}
 
 	Industry struct {
@@ -115,14 +140,10 @@ type ComplexityRoot struct {
 		UpdatedAt          func(childComplexity int) int
 	}
 
-	LinkAnalytics struct {
-		ID                        func(childComplexity int) int
-		IP                        func(childComplexity int) int
-		Location                  func(childComplexity int) int
-		Observations              func(childComplexity int) int
-		PlatformRedirectionChoice func(childComplexity int) int
-		Referrer                  func(childComplexity int) int
-		Useragent                 func(childComplexity int) int
+	Log struct {
+		CreatedAt func(childComplexity int) int
+		ID        func(childComplexity int) int
+		Message   func(childComplexity int) int
 	}
 
 	LoginPayload struct {
@@ -130,7 +151,17 @@ type ComplexityRoot struct {
 		Token        func(childComplexity int) int
 	}
 
+	MetricAnalytics struct {
+		EndAt        func(childComplexity int) int
+		Feeder       func(childComplexity int) int
+		StartAt      func(childComplexity int) int
+		TotalFailed  func(childComplexity int) int
+		TotalHits    func(childComplexity int) int
+		TotalSuccess func(childComplexity int) int
+	}
+
 	Mutation struct {
+		CreateDomain         func(childComplexity int, input model.DomainCreateInput) int
 		CreateUser           func(childComplexity int, input model.UserInput) int
 		InviteUser           func(childComplexity int, input graph_inputs.UserInviteInput) int
 		LoginUser            func(childComplexity int, input model.LoginInput) int
@@ -224,8 +255,10 @@ type ComplexityRoot struct {
 	}
 
 	Platform struct {
+		AnalyticReports   func(childComplexity int) int
 		Analytics         func(childComplexity int) int
-		Domains           func(childComplexity int) int
+		Deployments       func(childComplexity int) int
+		Domain            func(childComplexity int) int
 		ID                func(childComplexity int) int
 		Links             func(childComplexity int) int
 		Name              func(childComplexity int) int
@@ -238,11 +271,15 @@ type ComplexityRoot struct {
 		Templates         func(childComplexity int) int
 	}
 
-	PlatformAnalytics struct {
-		ID           func(childComplexity int) int
-		Observations func(childComplexity int) int
-		TotalLinks   func(childComplexity int) int
-		TotalUsers   func(childComplexity int) int
+	PlatformDeployment struct {
+		CreatedAt func(childComplexity int) int
+		DeletedAt func(childComplexity int) int
+		Domain    func(childComplexity int) int
+		ID        func(childComplexity int) int
+		Logs      func(childComplexity int) int
+		Platform  func(childComplexity int) int
+		Status    func(childComplexity int) int
+		UpdatedAt func(childComplexity int) int
 	}
 
 	Query struct {
@@ -334,6 +371,16 @@ type AccountPhoneResolver interface {
 	CreatedAt(ctx context.Context, obj *database_types.AccountPhone) (*time.Time, error)
 	UpdatedAt(ctx context.Context, obj *database_types.AccountPhone) (*time.Time, error)
 }
+type DomainResolver interface {
+	Organization(ctx context.Context, obj *database_models.Domain) (*database_models.Organization, error)
+	Platform(ctx context.Context, obj *database_models.Domain) (*database_models.Platform, error)
+	Verification(ctx context.Context, obj *database_models.Domain) ([]*model.DomainVerification, error)
+	State(ctx context.Context, obj *database_models.Domain) (model.StatusState, error)
+	Links(ctx context.Context, obj *database_models.Domain) ([]*model.Link, error)
+	Analytics(ctx context.Context, obj *database_models.Domain) ([]*model.MetricAnalytics, error)
+	AnalyticReports(ctx context.Context, obj *database_models.Domain) (*model.AnalyticReports, error)
+	LastDNSVerificationAt(ctx context.Context, obj *database_models.Domain) (*time.Time, error)
+}
 type IndustryResolver interface {
 	Organizations(ctx context.Context, obj *database_types.Industry) ([]*database_models.Organization, error)
 }
@@ -345,33 +392,47 @@ type MutationResolver interface {
 	UpdateUserPassword(ctx context.Context, userID string, input model.UserUpdatePasswordInput) (*database_models.User, error)
 	RequestPasswordReset(ctx context.Context, input model.PasswordResetCreateInput) (*model.PasswordReset, error)
 	ResetPassword(ctx context.Context, input model.PasswordResetUpdateInput) (*database_models.User, error)
+	CreateDomain(ctx context.Context, input model.DomainCreateInput) (*database_models.Domain, error)
 }
 type OrganizationResolver interface {
 	Permissions(ctx context.Context, obj *database_models.Organization) ([]database_enums.OrganizationPermission, error)
-	Platforms(ctx context.Context, obj *database_models.Organization) ([]*model.Platform, error)
+	Platforms(ctx context.Context, obj *database_models.Organization) ([]*database_models.Platform, error)
 
 	Users(ctx context.Context, obj *database_models.Organization) ([]*database_models.User, error)
-	Domains(ctx context.Context, obj *database_models.Organization) ([]*model.Domain, error)
+	Domains(ctx context.Context, obj *database_models.Organization) ([]*database_models.Domain, error)
 	PaymentPlan(ctx context.Context, obj *database_models.Organization) (model.PaymentPlan, error)
 	Payments(ctx context.Context, obj *database_models.Organization) ([]*model.Payment, error)
+}
+type PlatformResolver interface {
+	RedirectionChoice(ctx context.Context, obj *database_models.Platform) (database_enums.RedirectionOptions, error)
+	Organization(ctx context.Context, obj *database_models.Platform) (*database_models.Organization, error)
+	Domain(ctx context.Context, obj *database_models.Platform) (*database_models.Domain, error)
+	Permissions(ctx context.Context, obj *database_models.Platform) ([]database_enums.PlatformPermission, error)
+	Deployments(ctx context.Context, obj *database_models.Platform) ([]*model.PlatformDeployment, error)
+	Links(ctx context.Context, obj *database_models.Platform) ([]*model.Link, error)
+	Analytics(ctx context.Context, obj *database_models.Platform) ([]*model.AnalyticReport, error)
+	AnalyticReports(ctx context.Context, obj *database_models.Platform) (*model.AnalyticReports, error)
+	Status(ctx context.Context, obj *database_models.Platform) (model.StatusState, error)
+	Templates(ctx context.Context, obj *database_models.Platform) ([]*model.Template, error)
+	PinnedLinks(ctx context.Context, obj *database_models.Platform) ([]*model.Link, error)
 }
 type QueryResolver interface {
 	Me(ctx context.Context) (*database_models.User, error)
 	Users(ctx context.Context) ([]*database_models.User, error)
 	Organizations(ctx context.Context) ([]*database_models.Organization, error)
-	Platforms(ctx context.Context) ([]*model.Platform, error)
+	Platforms(ctx context.Context) ([]*database_models.Platform, error)
 	RefreshToken(ctx context.Context, input model.RefreshTokenInput) (string, error)
 }
 type UserResolver interface {
 	Organizations(ctx context.Context, obj *database_models.User) ([]*database_models.Organization, error)
-	Platforms(ctx context.Context, obj *database_models.User) ([]*model.Platform, error)
+	Platforms(ctx context.Context, obj *database_models.User) ([]*database_models.Platform, error)
 	Permissions(ctx context.Context, obj *database_models.User) ([]*model.Permission, error)
 	Payments(ctx context.Context, obj *database_models.User) ([]*model.Payment, error)
 	UserInvites(ctx context.Context, obj *database_models.User) ([]*database_relations.UserInvite, error)
 }
 type UserInviteResolver interface {
 	Organization(ctx context.Context, obj *database_relations.UserInvite) (*database_models.Organization, error)
-	Platforms(ctx context.Context, obj *database_relations.UserInvite) ([]*model.Platform, error)
+	Platforms(ctx context.Context, obj *database_relations.UserInvite) ([]*database_models.Platform, error)
 	User(ctx context.Context, obj *database_relations.UserInvite) (*database_models.User, error)
 
 	DeletedAt(ctx context.Context, obj *database_relations.UserInvite) (*time.Time, error)
@@ -438,6 +499,111 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.AccountPhone.Verified(childComplexity), true
 
+	case "AnalyticReport.domain":
+		if e.complexity.AnalyticReport.Domain == nil {
+			break
+		}
+
+		return e.complexity.AnalyticReport.Domain(childComplexity), true
+
+	case "AnalyticReport.link":
+		if e.complexity.AnalyticReport.Link == nil {
+			break
+		}
+
+		return e.complexity.AnalyticReport.Link(childComplexity), true
+
+	case "AnalyticReport.locations":
+		if e.complexity.AnalyticReport.Locations == nil {
+			break
+		}
+
+		return e.complexity.AnalyticReport.Locations(childComplexity), true
+
+	case "AnalyticReport.referers":
+		if e.complexity.AnalyticReport.Referers == nil {
+			break
+		}
+
+		return e.complexity.AnalyticReport.Referers(childComplexity), true
+
+	case "AnalyticReport.totalFailed":
+		if e.complexity.AnalyticReport.TotalFailed == nil {
+			break
+		}
+
+		return e.complexity.AnalyticReport.TotalFailed(childComplexity), true
+
+	case "AnalyticReport.totalHits":
+		if e.complexity.AnalyticReport.TotalHits == nil {
+			break
+		}
+
+		return e.complexity.AnalyticReport.TotalHits(childComplexity), true
+
+	case "AnalyticReport.totalSuccess":
+		if e.complexity.AnalyticReport.TotalSuccess == nil {
+			break
+		}
+
+		return e.complexity.AnalyticReport.TotalSuccess(childComplexity), true
+
+	case "AnalyticReport.useragents":
+		if e.complexity.AnalyticReport.Useragents == nil {
+			break
+		}
+
+		return e.complexity.AnalyticReport.Useragents(childComplexity), true
+
+	case "AnalyticReports.allTimeObservations":
+		if e.complexity.AnalyticReports.AllTimeObservations == nil {
+			break
+		}
+
+		return e.complexity.AnalyticReports.AllTimeObservations(childComplexity), true
+
+	case "AnalyticReports.lastMonthObservations":
+		if e.complexity.AnalyticReports.LastMonthObservations == nil {
+			break
+		}
+
+		return e.complexity.AnalyticReports.LastMonthObservations(childComplexity), true
+
+	case "AnalyticReports.lastWeekObservations":
+		if e.complexity.AnalyticReports.LastWeekObservations == nil {
+			break
+		}
+
+		return e.complexity.AnalyticReports.LastWeekObservations(childComplexity), true
+
+	case "AnalyticReports.lastYearObservations":
+		if e.complexity.AnalyticReports.LastYearObservations == nil {
+			break
+		}
+
+		return e.complexity.AnalyticReports.LastYearObservations(childComplexity), true
+
+	case "AnalyticReports.todayObservations":
+		if e.complexity.AnalyticReports.TodayObservations == nil {
+			break
+		}
+
+		return e.complexity.AnalyticReports.TodayObservations(childComplexity), true
+
+	case "AnalyticReports.yesterdayObservations":
+		if e.complexity.AnalyticReports.YesterdayObservations == nil {
+			break
+		}
+
+		return e.complexity.AnalyticReports.YesterdayObservations(childComplexity), true
+
+	case "Domain.analyticReports":
+		if e.complexity.Domain.AnalyticReports == nil {
+			break
+		}
+
+		return e.complexity.Domain.AnalyticReports(childComplexity), true
+
 	case "Domain.analytics":
 		if e.complexity.Domain.Analytics == nil {
 			break
@@ -451,13 +617,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Domain.CreatedAt(childComplexity), true
-
-	case "Domain.dnsStatus":
-		if e.complexity.Domain.DNSStatus == nil {
-			break
-		}
-
-		return e.complexity.Domain.DNSStatus(childComplexity), true
 
 	case "Domain.deletedAt":
 		if e.complexity.Domain.DeletedAt == nil {
@@ -529,40 +688,61 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Domain.UpdatedAt(childComplexity), true
 
-	case "DomainAnalytics.id":
-		if e.complexity.DomainAnalytics.ID == nil {
+	case "Domain.verification":
+		if e.complexity.Domain.Verification == nil {
 			break
 		}
 
-		return e.complexity.DomainAnalytics.ID(childComplexity), true
+		return e.complexity.Domain.Verification(childComplexity), true
 
-	case "DomainAnalytics.observations":
-		if e.complexity.DomainAnalytics.Observations == nil {
+	case "DomainVerification.createdAt":
+		if e.complexity.DomainVerification.CreatedAt == nil {
 			break
 		}
 
-		return e.complexity.DomainAnalytics.Observations(childComplexity), true
+		return e.complexity.DomainVerification.CreatedAt(childComplexity), true
 
-	case "DomainAnalytics.totalLinks":
-		if e.complexity.DomainAnalytics.TotalLinks == nil {
+	case "DomainVerification.deletedAt":
+		if e.complexity.DomainVerification.DeletedAt == nil {
 			break
 		}
 
-		return e.complexity.DomainAnalytics.TotalLinks(childComplexity), true
+		return e.complexity.DomainVerification.DeletedAt(childComplexity), true
 
-	case "DomainAnalytics.totalPlatforms":
-		if e.complexity.DomainAnalytics.TotalPlatforms == nil {
+	case "DomainVerification.domain":
+		if e.complexity.DomainVerification.Domain == nil {
 			break
 		}
 
-		return e.complexity.DomainAnalytics.TotalPlatforms(childComplexity), true
+		return e.complexity.DomainVerification.Domain(childComplexity), true
 
-	case "DomainAnalytics.totalUsers":
-		if e.complexity.DomainAnalytics.TotalUsers == nil {
+	case "DomainVerification.id":
+		if e.complexity.DomainVerification.ID == nil {
 			break
 		}
 
-		return e.complexity.DomainAnalytics.TotalUsers(childComplexity), true
+		return e.complexity.DomainVerification.ID(childComplexity), true
+
+	case "DomainVerification.logs":
+		if e.complexity.DomainVerification.Logs == nil {
+			break
+		}
+
+		return e.complexity.DomainVerification.Logs(childComplexity), true
+
+	case "DomainVerification.status":
+		if e.complexity.DomainVerification.Status == nil {
+			break
+		}
+
+		return e.complexity.DomainVerification.Status(childComplexity), true
+
+	case "DomainVerification.updatedAt":
+		if e.complexity.DomainVerification.UpdatedAt == nil {
+			break
+		}
+
+		return e.complexity.DomainVerification.UpdatedAt(childComplexity), true
 
 	case "Industry.name":
 		if e.complexity.Industry.Name == nil {
@@ -669,54 +849,26 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Link.UpdatedAt(childComplexity), true
 
-	case "LinkAnalytics.id":
-		if e.complexity.LinkAnalytics.ID == nil {
+	case "Log.createdAt":
+		if e.complexity.Log.CreatedAt == nil {
 			break
 		}
 
-		return e.complexity.LinkAnalytics.ID(childComplexity), true
+		return e.complexity.Log.CreatedAt(childComplexity), true
 
-	case "LinkAnalytics.ip":
-		if e.complexity.LinkAnalytics.IP == nil {
+	case "Log.id":
+		if e.complexity.Log.ID == nil {
 			break
 		}
 
-		return e.complexity.LinkAnalytics.IP(childComplexity), true
+		return e.complexity.Log.ID(childComplexity), true
 
-	case "LinkAnalytics.location":
-		if e.complexity.LinkAnalytics.Location == nil {
+	case "Log.message":
+		if e.complexity.Log.Message == nil {
 			break
 		}
 
-		return e.complexity.LinkAnalytics.Location(childComplexity), true
-
-	case "LinkAnalytics.observations":
-		if e.complexity.LinkAnalytics.Observations == nil {
-			break
-		}
-
-		return e.complexity.LinkAnalytics.Observations(childComplexity), true
-
-	case "LinkAnalytics.platformRedirectionChoice":
-		if e.complexity.LinkAnalytics.PlatformRedirectionChoice == nil {
-			break
-		}
-
-		return e.complexity.LinkAnalytics.PlatformRedirectionChoice(childComplexity), true
-
-	case "LinkAnalytics.referrer":
-		if e.complexity.LinkAnalytics.Referrer == nil {
-			break
-		}
-
-		return e.complexity.LinkAnalytics.Referrer(childComplexity), true
-
-	case "LinkAnalytics.useragent":
-		if e.complexity.LinkAnalytics.Useragent == nil {
-			break
-		}
-
-		return e.complexity.LinkAnalytics.Useragent(childComplexity), true
+		return e.complexity.Log.Message(childComplexity), true
 
 	case "LoginPayload.refreshToken":
 		if e.complexity.LoginPayload.RefreshToken == nil {
@@ -731,6 +883,60 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.LoginPayload.Token(childComplexity), true
+
+	case "MetricAnalytics.endAt":
+		if e.complexity.MetricAnalytics.EndAt == nil {
+			break
+		}
+
+		return e.complexity.MetricAnalytics.EndAt(childComplexity), true
+
+	case "MetricAnalytics.feeder":
+		if e.complexity.MetricAnalytics.Feeder == nil {
+			break
+		}
+
+		return e.complexity.MetricAnalytics.Feeder(childComplexity), true
+
+	case "MetricAnalytics.startAt":
+		if e.complexity.MetricAnalytics.StartAt == nil {
+			break
+		}
+
+		return e.complexity.MetricAnalytics.StartAt(childComplexity), true
+
+	case "MetricAnalytics.totalFailed":
+		if e.complexity.MetricAnalytics.TotalFailed == nil {
+			break
+		}
+
+		return e.complexity.MetricAnalytics.TotalFailed(childComplexity), true
+
+	case "MetricAnalytics.totalHits":
+		if e.complexity.MetricAnalytics.TotalHits == nil {
+			break
+		}
+
+		return e.complexity.MetricAnalytics.TotalHits(childComplexity), true
+
+	case "MetricAnalytics.totalSuccess":
+		if e.complexity.MetricAnalytics.TotalSuccess == nil {
+			break
+		}
+
+		return e.complexity.MetricAnalytics.TotalSuccess(childComplexity), true
+
+	case "Mutation.createDomain":
+		if e.complexity.Mutation.CreateDomain == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_createDomain_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.CreateDomain(childComplexity, args["input"].(model.DomainCreateInput)), true
 
 	case "Mutation.createUser":
 		if e.complexity.Mutation.CreateUser == nil {
@@ -1250,6 +1456,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Permission.Platforms(childComplexity), true
 
+	case "Platform.analyticReports":
+		if e.complexity.Platform.AnalyticReports == nil {
+			break
+		}
+
+		return e.complexity.Platform.AnalyticReports(childComplexity), true
+
 	case "Platform.analytics":
 		if e.complexity.Platform.Analytics == nil {
 			break
@@ -1257,12 +1470,19 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Platform.Analytics(childComplexity), true
 
-	case "Platform.domains":
-		if e.complexity.Platform.Domains == nil {
+	case "Platform.deployments":
+		if e.complexity.Platform.Deployments == nil {
 			break
 		}
 
-		return e.complexity.Platform.Domains(childComplexity), true
+		return e.complexity.Platform.Deployments(childComplexity), true
+
+	case "Platform.domain":
+		if e.complexity.Platform.Domain == nil {
+			break
+		}
+
+		return e.complexity.Platform.Domain(childComplexity), true
 
 	case "Platform.id":
 		if e.complexity.Platform.ID == nil {
@@ -1334,33 +1554,61 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Platform.Templates(childComplexity), true
 
-	case "PlatformAnalytics.id":
-		if e.complexity.PlatformAnalytics.ID == nil {
+	case "PlatformDeployment.createdAt":
+		if e.complexity.PlatformDeployment.CreatedAt == nil {
 			break
 		}
 
-		return e.complexity.PlatformAnalytics.ID(childComplexity), true
+		return e.complexity.PlatformDeployment.CreatedAt(childComplexity), true
 
-	case "PlatformAnalytics.observations":
-		if e.complexity.PlatformAnalytics.Observations == nil {
+	case "PlatformDeployment.deletedAt":
+		if e.complexity.PlatformDeployment.DeletedAt == nil {
 			break
 		}
 
-		return e.complexity.PlatformAnalytics.Observations(childComplexity), true
+		return e.complexity.PlatformDeployment.DeletedAt(childComplexity), true
 
-	case "PlatformAnalytics.totalLinks":
-		if e.complexity.PlatformAnalytics.TotalLinks == nil {
+	case "PlatformDeployment.domain":
+		if e.complexity.PlatformDeployment.Domain == nil {
 			break
 		}
 
-		return e.complexity.PlatformAnalytics.TotalLinks(childComplexity), true
+		return e.complexity.PlatformDeployment.Domain(childComplexity), true
 
-	case "PlatformAnalytics.totalUsers":
-		if e.complexity.PlatformAnalytics.TotalUsers == nil {
+	case "PlatformDeployment.id":
+		if e.complexity.PlatformDeployment.ID == nil {
 			break
 		}
 
-		return e.complexity.PlatformAnalytics.TotalUsers(childComplexity), true
+		return e.complexity.PlatformDeployment.ID(childComplexity), true
+
+	case "PlatformDeployment.logs":
+		if e.complexity.PlatformDeployment.Logs == nil {
+			break
+		}
+
+		return e.complexity.PlatformDeployment.Logs(childComplexity), true
+
+	case "PlatformDeployment.platform":
+		if e.complexity.PlatformDeployment.Platform == nil {
+			break
+		}
+
+		return e.complexity.PlatformDeployment.Platform(childComplexity), true
+
+	case "PlatformDeployment.status":
+		if e.complexity.PlatformDeployment.Status == nil {
+			break
+		}
+
+		return e.complexity.PlatformDeployment.Status(childComplexity), true
+
+	case "PlatformDeployment.updatedAt":
+		if e.complexity.PlatformDeployment.UpdatedAt == nil {
+			break
+		}
+
+		return e.complexity.PlatformDeployment.UpdatedAt(childComplexity), true
 
 	case "Query.me":
 		if e.complexity.Query.Me == nil {
@@ -1817,7 +2065,8 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	ec := executionContext{rc, e, 0, 0, make(chan graphql.DeferredResult)}
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
 		ec.unmarshalInputAccountPhoneInput,
-		ec.unmarshalInputDomainInput,
+		ec.unmarshalInputClientInformationInput,
+		ec.unmarshalInputDomainCreateInput,
 		ec.unmarshalInputLinkInput,
 		ec.unmarshalInputLoginInput,
 		ec.unmarshalInputObservationInput,
@@ -1953,6 +2202,21 @@ var parsedSchema = gqlparser.MustLoadSchema(sources...)
 // endregion ************************** generated!.gotpl **************************
 
 // region    ***************************** args.gotpl *****************************
+
+func (ec *executionContext) field_Mutation_createDomain_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.DomainCreateInput
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalNDomainCreateInput2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐDomainCreateInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
 
 func (ec *executionContext) field_Mutation_createUser_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
@@ -2353,7 +2617,775 @@ func (ec *executionContext) fieldContext_AccountPhone_updatedAt(ctx context.Cont
 	return fc, nil
 }
 
-func (ec *executionContext) _Domain_id(ctx context.Context, field graphql.CollectedField, obj *model.Domain) (ret graphql.Marshaler) {
+func (ec *executionContext) _AnalyticReport_link(ctx context.Context, field graphql.CollectedField, obj *model.AnalyticReport) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_AnalyticReport_link(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Link, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.Link)
+	fc.Result = res
+	return ec.marshalNLink2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐLink(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_AnalyticReport_link(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "AnalyticReport",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Link_id(ctx, field)
+			case "url":
+				return ec.fieldContext_Link_url(ctx, field)
+			case "key":
+				return ec.fieldContext_Link_key(ctx, field)
+			case "creator":
+				return ec.fieldContext_Link_creator(ctx, field)
+			case "platform":
+				return ec.fieldContext_Link_platform(ctx, field)
+			case "domain":
+				return ec.fieldContext_Link_domain(ctx, field)
+			case "analytics":
+				return ec.fieldContext_Link_analytics(ctx, field)
+			case "openGraph":
+				return ec.fieldContext_Link_openGraph(ctx, field)
+			case "redirectionOptions":
+				return ec.fieldContext_Link_redirectionOptions(ctx, field)
+			case "state":
+				return ec.fieldContext_Link_state(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Link_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Link_updatedAt(ctx, field)
+			case "deletedAt":
+				return ec.fieldContext_Link_deletedAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Link", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _AnalyticReport_domain(ctx context.Context, field graphql.CollectedField, obj *model.AnalyticReport) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_AnalyticReport_domain(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Domain, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*database_models.Domain)
+	fc.Result = res
+	return ec.marshalNDomain2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋmodelsᚐDomain(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_AnalyticReport_domain(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "AnalyticReport",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Domain_id(ctx, field)
+			case "name":
+				return ec.fieldContext_Domain_name(ctx, field)
+			case "url":
+				return ec.fieldContext_Domain_url(ctx, field)
+			case "organization":
+				return ec.fieldContext_Domain_organization(ctx, field)
+			case "platform":
+				return ec.fieldContext_Domain_platform(ctx, field)
+			case "verification":
+				return ec.fieldContext_Domain_verification(ctx, field)
+			case "state":
+				return ec.fieldContext_Domain_state(ctx, field)
+			case "links":
+				return ec.fieldContext_Domain_links(ctx, field)
+			case "analytics":
+				return ec.fieldContext_Domain_analytics(ctx, field)
+			case "analyticReports":
+				return ec.fieldContext_Domain_analyticReports(ctx, field)
+			case "lastDNSVerificationAt":
+				return ec.fieldContext_Domain_lastDNSVerificationAt(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Domain_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Domain_updatedAt(ctx, field)
+			case "deletedAt":
+				return ec.fieldContext_Domain_deletedAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Domain", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _AnalyticReport_totalHits(ctx context.Context, field graphql.CollectedField, obj *model.AnalyticReport) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_AnalyticReport_totalHits(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TotalHits, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_AnalyticReport_totalHits(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "AnalyticReport",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _AnalyticReport_totalSuccess(ctx context.Context, field graphql.CollectedField, obj *model.AnalyticReport) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_AnalyticReport_totalSuccess(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TotalSuccess, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_AnalyticReport_totalSuccess(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "AnalyticReport",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _AnalyticReport_totalFailed(ctx context.Context, field graphql.CollectedField, obj *model.AnalyticReport) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_AnalyticReport_totalFailed(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TotalFailed, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_AnalyticReport_totalFailed(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "AnalyticReport",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _AnalyticReport_referers(ctx context.Context, field graphql.CollectedField, obj *model.AnalyticReport) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_AnalyticReport_referers(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Referers, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.MetricAnalytics)
+	fc.Result = res
+	return ec.marshalNMetricAnalytics2ᚕᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐMetricAnalyticsᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_AnalyticReport_referers(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "AnalyticReport",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "feeder":
+				return ec.fieldContext_MetricAnalytics_feeder(ctx, field)
+			case "totalHits":
+				return ec.fieldContext_MetricAnalytics_totalHits(ctx, field)
+			case "totalSuccess":
+				return ec.fieldContext_MetricAnalytics_totalSuccess(ctx, field)
+			case "totalFailed":
+				return ec.fieldContext_MetricAnalytics_totalFailed(ctx, field)
+			case "startAt":
+				return ec.fieldContext_MetricAnalytics_startAt(ctx, field)
+			case "endAt":
+				return ec.fieldContext_MetricAnalytics_endAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type MetricAnalytics", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _AnalyticReport_locations(ctx context.Context, field graphql.CollectedField, obj *model.AnalyticReport) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_AnalyticReport_locations(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Locations, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.MetricAnalytics)
+	fc.Result = res
+	return ec.marshalNMetricAnalytics2ᚕᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐMetricAnalyticsᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_AnalyticReport_locations(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "AnalyticReport",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "feeder":
+				return ec.fieldContext_MetricAnalytics_feeder(ctx, field)
+			case "totalHits":
+				return ec.fieldContext_MetricAnalytics_totalHits(ctx, field)
+			case "totalSuccess":
+				return ec.fieldContext_MetricAnalytics_totalSuccess(ctx, field)
+			case "totalFailed":
+				return ec.fieldContext_MetricAnalytics_totalFailed(ctx, field)
+			case "startAt":
+				return ec.fieldContext_MetricAnalytics_startAt(ctx, field)
+			case "endAt":
+				return ec.fieldContext_MetricAnalytics_endAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type MetricAnalytics", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _AnalyticReport_useragents(ctx context.Context, field graphql.CollectedField, obj *model.AnalyticReport) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_AnalyticReport_useragents(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Useragents, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.MetricAnalytics)
+	fc.Result = res
+	return ec.marshalNMetricAnalytics2ᚕᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐMetricAnalyticsᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_AnalyticReport_useragents(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "AnalyticReport",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "feeder":
+				return ec.fieldContext_MetricAnalytics_feeder(ctx, field)
+			case "totalHits":
+				return ec.fieldContext_MetricAnalytics_totalHits(ctx, field)
+			case "totalSuccess":
+				return ec.fieldContext_MetricAnalytics_totalSuccess(ctx, field)
+			case "totalFailed":
+				return ec.fieldContext_MetricAnalytics_totalFailed(ctx, field)
+			case "startAt":
+				return ec.fieldContext_MetricAnalytics_startAt(ctx, field)
+			case "endAt":
+				return ec.fieldContext_MetricAnalytics_endAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type MetricAnalytics", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _AnalyticReports_todayObservations(ctx context.Context, field graphql.CollectedField, obj *model.AnalyticReports) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_AnalyticReports_todayObservations(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TodayObservations, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.ObservationAnalytic)
+	fc.Result = res
+	return ec.marshalNObservationAnalytic2ᚕᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐObservationAnalyticᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_AnalyticReports_todayObservations(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "AnalyticReports",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_ObservationAnalytic_id(ctx, field)
+			case "link":
+				return ec.fieldContext_ObservationAnalytic_link(ctx, field)
+			case "domain":
+				return ec.fieldContext_ObservationAnalytic_domain(ctx, field)
+			case "platform":
+				return ec.fieldContext_ObservationAnalytic_platform(ctx, field)
+			case "useragent":
+				return ec.fieldContext_ObservationAnalytic_useragent(ctx, field)
+			case "ip":
+				return ec.fieldContext_ObservationAnalytic_ip(ctx, field)
+			case "referrer":
+				return ec.fieldContext_ObservationAnalytic_referrer(ctx, field)
+			case "location":
+				return ec.fieldContext_ObservationAnalytic_location(ctx, field)
+			case "redirectionChoice":
+				return ec.fieldContext_ObservationAnalytic_redirectionChoice(ctx, field)
+			case "success":
+				return ec.fieldContext_ObservationAnalytic_success(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_ObservationAnalytic_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_ObservationAnalytic_updatedAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ObservationAnalytic", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _AnalyticReports_yesterdayObservations(ctx context.Context, field graphql.CollectedField, obj *model.AnalyticReports) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_AnalyticReports_yesterdayObservations(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.YesterdayObservations, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.ObservationAnalytic)
+	fc.Result = res
+	return ec.marshalNObservationAnalytic2ᚕᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐObservationAnalyticᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_AnalyticReports_yesterdayObservations(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "AnalyticReports",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_ObservationAnalytic_id(ctx, field)
+			case "link":
+				return ec.fieldContext_ObservationAnalytic_link(ctx, field)
+			case "domain":
+				return ec.fieldContext_ObservationAnalytic_domain(ctx, field)
+			case "platform":
+				return ec.fieldContext_ObservationAnalytic_platform(ctx, field)
+			case "useragent":
+				return ec.fieldContext_ObservationAnalytic_useragent(ctx, field)
+			case "ip":
+				return ec.fieldContext_ObservationAnalytic_ip(ctx, field)
+			case "referrer":
+				return ec.fieldContext_ObservationAnalytic_referrer(ctx, field)
+			case "location":
+				return ec.fieldContext_ObservationAnalytic_location(ctx, field)
+			case "redirectionChoice":
+				return ec.fieldContext_ObservationAnalytic_redirectionChoice(ctx, field)
+			case "success":
+				return ec.fieldContext_ObservationAnalytic_success(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_ObservationAnalytic_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_ObservationAnalytic_updatedAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ObservationAnalytic", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _AnalyticReports_lastWeekObservations(ctx context.Context, field graphql.CollectedField, obj *model.AnalyticReports) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_AnalyticReports_lastWeekObservations(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.LastWeekObservations, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_AnalyticReports_lastWeekObservations(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "AnalyticReports",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _AnalyticReports_lastMonthObservations(ctx context.Context, field graphql.CollectedField, obj *model.AnalyticReports) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_AnalyticReports_lastMonthObservations(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.LastMonthObservations, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_AnalyticReports_lastMonthObservations(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "AnalyticReports",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _AnalyticReports_lastYearObservations(ctx context.Context, field graphql.CollectedField, obj *model.AnalyticReports) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_AnalyticReports_lastYearObservations(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.LastYearObservations, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_AnalyticReports_lastYearObservations(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "AnalyticReports",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _AnalyticReports_allTimeObservations(ctx context.Context, field graphql.CollectedField, obj *model.AnalyticReports) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_AnalyticReports_allTimeObservations(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.AllTimeObservations, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_AnalyticReports_allTimeObservations(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "AnalyticReports",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Domain_id(ctx context.Context, field graphql.CollectedField, obj *database_models.Domain) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Domain_id(ctx, field)
 	if err != nil {
 		return graphql.Null
@@ -2397,7 +3429,7 @@ func (ec *executionContext) fieldContext_Domain_id(ctx context.Context, field gr
 	return fc, nil
 }
 
-func (ec *executionContext) _Domain_name(ctx context.Context, field graphql.CollectedField, obj *model.Domain) (ret graphql.Marshaler) {
+func (ec *executionContext) _Domain_name(ctx context.Context, field graphql.CollectedField, obj *database_models.Domain) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Domain_name(ctx, field)
 	if err != nil {
 		return graphql.Null
@@ -2441,7 +3473,7 @@ func (ec *executionContext) fieldContext_Domain_name(ctx context.Context, field 
 	return fc, nil
 }
 
-func (ec *executionContext) _Domain_url(ctx context.Context, field graphql.CollectedField, obj *model.Domain) (ret graphql.Marshaler) {
+func (ec *executionContext) _Domain_url(ctx context.Context, field graphql.CollectedField, obj *database_models.Domain) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Domain_url(ctx, field)
 	if err != nil {
 		return graphql.Null
@@ -2485,7 +3517,7 @@ func (ec *executionContext) fieldContext_Domain_url(ctx context.Context, field g
 	return fc, nil
 }
 
-func (ec *executionContext) _Domain_organization(ctx context.Context, field graphql.CollectedField, obj *model.Domain) (ret graphql.Marshaler) {
+func (ec *executionContext) _Domain_organization(ctx context.Context, field graphql.CollectedField, obj *database_models.Domain) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Domain_organization(ctx, field)
 	if err != nil {
 		return graphql.Null
@@ -2499,7 +3531,7 @@ func (ec *executionContext) _Domain_organization(ctx context.Context, field grap
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Organization, nil
+		return ec.resolvers.Domain().Organization(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2520,8 +3552,8 @@ func (ec *executionContext) fieldContext_Domain_organization(ctx context.Context
 	fc = &graphql.FieldContext{
 		Object:     "Domain",
 		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "id":
@@ -2557,7 +3589,7 @@ func (ec *executionContext) fieldContext_Domain_organization(ctx context.Context
 	return fc, nil
 }
 
-func (ec *executionContext) _Domain_platform(ctx context.Context, field graphql.CollectedField, obj *model.Domain) (ret graphql.Marshaler) {
+func (ec *executionContext) _Domain_platform(ctx context.Context, field graphql.CollectedField, obj *database_models.Domain) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Domain_platform(ctx, field)
 	if err != nil {
 		return graphql.Null
@@ -2571,7 +3603,7 @@ func (ec *executionContext) _Domain_platform(ctx context.Context, field graphql.
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Platform, nil
+		return ec.resolvers.Domain().Platform(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2580,17 +3612,17 @@ func (ec *executionContext) _Domain_platform(ctx context.Context, field graphql.
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*model.Platform)
+	res := resTmp.(*database_models.Platform)
 	fc.Result = res
-	return ec.marshalOPlatform2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐPlatform(ctx, field.Selections, res)
+	return ec.marshalOPlatform2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋmodelsᚐPlatform(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Domain_platform(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Domain",
 		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "id":
@@ -2603,14 +3635,18 @@ func (ec *executionContext) fieldContext_Domain_platform(ctx context.Context, fi
 				return ec.fieldContext_Platform_redirectionChoice(ctx, field)
 			case "organization":
 				return ec.fieldContext_Platform_organization(ctx, field)
-			case "domains":
-				return ec.fieldContext_Platform_domains(ctx, field)
+			case "domain":
+				return ec.fieldContext_Platform_domain(ctx, field)
 			case "permissions":
 				return ec.fieldContext_Platform_permissions(ctx, field)
+			case "deployments":
+				return ec.fieldContext_Platform_deployments(ctx, field)
 			case "links":
 				return ec.fieldContext_Platform_links(ctx, field)
 			case "analytics":
 				return ec.fieldContext_Platform_analytics(ctx, field)
+			case "analyticReports":
+				return ec.fieldContext_Platform_analyticReports(ctx, field)
 			case "status":
 				return ec.fieldContext_Platform_status(ctx, field)
 			case "templates":
@@ -2624,8 +3660,8 @@ func (ec *executionContext) fieldContext_Domain_platform(ctx context.Context, fi
 	return fc, nil
 }
 
-func (ec *executionContext) _Domain_dnsStatus(ctx context.Context, field graphql.CollectedField, obj *model.Domain) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Domain_dnsStatus(ctx, field)
+func (ec *executionContext) _Domain_verification(ctx context.Context, field graphql.CollectedField, obj *database_models.Domain) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Domain_verification(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -2638,7 +3674,7 @@ func (ec *executionContext) _Domain_dnsStatus(ctx context.Context, field graphql
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.DNSStatus, nil
+		return ec.resolvers.Domain().Verification(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2650,25 +3686,41 @@ func (ec *executionContext) _Domain_dnsStatus(ctx context.Context, field graphql
 		}
 		return graphql.Null
 	}
-	res := resTmp.(database_enums.DNSStatus)
+	res := resTmp.([]*model.DomainVerification)
 	fc.Result = res
-	return ec.marshalNDNSStatus2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐDNSStatus(ctx, field.Selections, res)
+	return ec.marshalNDomainVerification2ᚕᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐDomainVerification(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Domain_dnsStatus(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Domain_verification(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Domain",
 		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type DNSStatus does not have child fields")
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_DomainVerification_id(ctx, field)
+			case "domain":
+				return ec.fieldContext_DomainVerification_domain(ctx, field)
+			case "status":
+				return ec.fieldContext_DomainVerification_status(ctx, field)
+			case "logs":
+				return ec.fieldContext_DomainVerification_logs(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_DomainVerification_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_DomainVerification_updatedAt(ctx, field)
+			case "deletedAt":
+				return ec.fieldContext_DomainVerification_deletedAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type DomainVerification", field.Name)
 		},
 	}
 	return fc, nil
 }
 
-func (ec *executionContext) _Domain_state(ctx context.Context, field graphql.CollectedField, obj *model.Domain) (ret graphql.Marshaler) {
+func (ec *executionContext) _Domain_state(ctx context.Context, field graphql.CollectedField, obj *database_models.Domain) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Domain_state(ctx, field)
 	if err != nil {
 		return graphql.Null
@@ -2682,7 +3734,7 @@ func (ec *executionContext) _Domain_state(ctx context.Context, field graphql.Col
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.State, nil
+		return ec.resolvers.Domain().State(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2703,8 +3755,8 @@ func (ec *executionContext) fieldContext_Domain_state(ctx context.Context, field
 	fc = &graphql.FieldContext{
 		Object:     "Domain",
 		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type StatusState does not have child fields")
 		},
@@ -2712,7 +3764,7 @@ func (ec *executionContext) fieldContext_Domain_state(ctx context.Context, field
 	return fc, nil
 }
 
-func (ec *executionContext) _Domain_links(ctx context.Context, field graphql.CollectedField, obj *model.Domain) (ret graphql.Marshaler) {
+func (ec *executionContext) _Domain_links(ctx context.Context, field graphql.CollectedField, obj *database_models.Domain) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Domain_links(ctx, field)
 	if err != nil {
 		return graphql.Null
@@ -2726,7 +3778,7 @@ func (ec *executionContext) _Domain_links(ctx context.Context, field graphql.Col
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Links, nil
+		return ec.resolvers.Domain().Links(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2744,8 +3796,8 @@ func (ec *executionContext) fieldContext_Domain_links(ctx context.Context, field
 	fc = &graphql.FieldContext{
 		Object:     "Domain",
 		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "id":
@@ -2781,7 +3833,7 @@ func (ec *executionContext) fieldContext_Domain_links(ctx context.Context, field
 	return fc, nil
 }
 
-func (ec *executionContext) _Domain_analytics(ctx context.Context, field graphql.CollectedField, obj *model.Domain) (ret graphql.Marshaler) {
+func (ec *executionContext) _Domain_analytics(ctx context.Context, field graphql.CollectedField, obj *database_models.Domain) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Domain_analytics(ctx, field)
 	if err != nil {
 		return graphql.Null
@@ -2795,7 +3847,7 @@ func (ec *executionContext) _Domain_analytics(ctx context.Context, field graphql
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Analytics, nil
+		return ec.resolvers.Domain().Analytics(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2807,37 +3859,97 @@ func (ec *executionContext) _Domain_analytics(ctx context.Context, field graphql
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.DomainAnalytics)
+	res := resTmp.([]*model.MetricAnalytics)
 	fc.Result = res
-	return ec.marshalNDomainAnalytics2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐDomainAnalytics(ctx, field.Selections, res)
+	return ec.marshalNMetricAnalytics2ᚕᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐMetricAnalyticsᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Domain_analytics(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Domain",
 		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
-			case "id":
-				return ec.fieldContext_DomainAnalytics_id(ctx, field)
-			case "totalLinks":
-				return ec.fieldContext_DomainAnalytics_totalLinks(ctx, field)
-			case "totalPlatforms":
-				return ec.fieldContext_DomainAnalytics_totalPlatforms(ctx, field)
-			case "totalUsers":
-				return ec.fieldContext_DomainAnalytics_totalUsers(ctx, field)
-			case "observations":
-				return ec.fieldContext_DomainAnalytics_observations(ctx, field)
+			case "feeder":
+				return ec.fieldContext_MetricAnalytics_feeder(ctx, field)
+			case "totalHits":
+				return ec.fieldContext_MetricAnalytics_totalHits(ctx, field)
+			case "totalSuccess":
+				return ec.fieldContext_MetricAnalytics_totalSuccess(ctx, field)
+			case "totalFailed":
+				return ec.fieldContext_MetricAnalytics_totalFailed(ctx, field)
+			case "startAt":
+				return ec.fieldContext_MetricAnalytics_startAt(ctx, field)
+			case "endAt":
+				return ec.fieldContext_MetricAnalytics_endAt(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type DomainAnalytics", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type MetricAnalytics", field.Name)
 		},
 	}
 	return fc, nil
 }
 
-func (ec *executionContext) _Domain_lastDNSVerificationAt(ctx context.Context, field graphql.CollectedField, obj *model.Domain) (ret graphql.Marshaler) {
+func (ec *executionContext) _Domain_analyticReports(ctx context.Context, field graphql.CollectedField, obj *database_models.Domain) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Domain_analyticReports(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Domain().AnalyticReports(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.AnalyticReports)
+	fc.Result = res
+	return ec.marshalNAnalyticReports2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐAnalyticReports(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Domain_analyticReports(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Domain",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "todayObservations":
+				return ec.fieldContext_AnalyticReports_todayObservations(ctx, field)
+			case "yesterdayObservations":
+				return ec.fieldContext_AnalyticReports_yesterdayObservations(ctx, field)
+			case "lastWeekObservations":
+				return ec.fieldContext_AnalyticReports_lastWeekObservations(ctx, field)
+			case "lastMonthObservations":
+				return ec.fieldContext_AnalyticReports_lastMonthObservations(ctx, field)
+			case "lastYearObservations":
+				return ec.fieldContext_AnalyticReports_lastYearObservations(ctx, field)
+			case "allTimeObservations":
+				return ec.fieldContext_AnalyticReports_allTimeObservations(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type AnalyticReports", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Domain_lastDNSVerificationAt(ctx context.Context, field graphql.CollectedField, obj *database_models.Domain) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Domain_lastDNSVerificationAt(ctx, field)
 	if err != nil {
 		return graphql.Null
@@ -2851,7 +3963,7 @@ func (ec *executionContext) _Domain_lastDNSVerificationAt(ctx context.Context, f
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.LastDNSVerificationAt, nil
+		return ec.resolvers.Domain().LastDNSVerificationAt(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2869,8 +3981,8 @@ func (ec *executionContext) fieldContext_Domain_lastDNSVerificationAt(ctx contex
 	fc = &graphql.FieldContext{
 		Object:     "Domain",
 		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type DateTime does not have child fields")
 		},
@@ -2878,7 +3990,7 @@ func (ec *executionContext) fieldContext_Domain_lastDNSVerificationAt(ctx contex
 	return fc, nil
 }
 
-func (ec *executionContext) _Domain_createdAt(ctx context.Context, field graphql.CollectedField, obj *model.Domain) (ret graphql.Marshaler) {
+func (ec *executionContext) _Domain_createdAt(ctx context.Context, field graphql.CollectedField, obj *database_models.Domain) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Domain_createdAt(ctx, field)
 	if err != nil {
 		return graphql.Null
@@ -2922,7 +4034,7 @@ func (ec *executionContext) fieldContext_Domain_createdAt(ctx context.Context, f
 	return fc, nil
 }
 
-func (ec *executionContext) _Domain_updatedAt(ctx context.Context, field graphql.CollectedField, obj *model.Domain) (ret graphql.Marshaler) {
+func (ec *executionContext) _Domain_updatedAt(ctx context.Context, field graphql.CollectedField, obj *database_models.Domain) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Domain_updatedAt(ctx, field)
 	if err != nil {
 		return graphql.Null
@@ -2963,7 +4075,7 @@ func (ec *executionContext) fieldContext_Domain_updatedAt(ctx context.Context, f
 	return fc, nil
 }
 
-func (ec *executionContext) _Domain_deletedAt(ctx context.Context, field graphql.CollectedField, obj *model.Domain) (ret graphql.Marshaler) {
+func (ec *executionContext) _Domain_deletedAt(ctx context.Context, field graphql.CollectedField, obj *database_models.Domain) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Domain_deletedAt(ctx, field)
 	if err != nil {
 		return graphql.Null
@@ -3004,8 +4116,8 @@ func (ec *executionContext) fieldContext_Domain_deletedAt(ctx context.Context, f
 	return fc, nil
 }
 
-func (ec *executionContext) _DomainAnalytics_id(ctx context.Context, field graphql.CollectedField, obj *model.DomainAnalytics) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_DomainAnalytics_id(ctx, field)
+func (ec *executionContext) _DomainVerification_id(ctx context.Context, field graphql.CollectedField, obj *model.DomainVerification) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_DomainVerification_id(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -3035,9 +4147,9 @@ func (ec *executionContext) _DomainAnalytics_id(ctx context.Context, field graph
 	return ec.marshalNUUID2githubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_DomainAnalytics_id(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_DomainVerification_id(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
-		Object:     "DomainAnalytics",
+		Object:     "DomainVerification",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -3048,8 +4160,8 @@ func (ec *executionContext) fieldContext_DomainAnalytics_id(ctx context.Context,
 	return fc, nil
 }
 
-func (ec *executionContext) _DomainAnalytics_totalLinks(ctx context.Context, field graphql.CollectedField, obj *model.DomainAnalytics) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_DomainAnalytics_totalLinks(ctx, field)
+func (ec *executionContext) _DomainVerification_domain(ctx context.Context, field graphql.CollectedField, obj *model.DomainVerification) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_DomainVerification_domain(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -3062,7 +4174,7 @@ func (ec *executionContext) _DomainAnalytics_totalLinks(ctx context.Context, fie
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.TotalLinks, nil
+		return obj.Domain, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3074,177 +4186,271 @@ func (ec *executionContext) _DomainAnalytics_totalLinks(ctx context.Context, fie
 		}
 		return graphql.Null
 	}
-	res := resTmp.(int)
+	res := resTmp.(*database_models.Domain)
 	fc.Result = res
-	return ec.marshalNInt2int(ctx, field.Selections, res)
+	return ec.marshalNDomain2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋmodelsᚐDomain(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_DomainAnalytics_totalLinks(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_DomainVerification_domain(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
-		Object:     "DomainAnalytics",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Int does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _DomainAnalytics_totalPlatforms(ctx context.Context, field graphql.CollectedField, obj *model.DomainAnalytics) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_DomainAnalytics_totalPlatforms(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.TotalPlatforms, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(int)
-	fc.Result = res
-	return ec.marshalNInt2int(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_DomainAnalytics_totalPlatforms(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "DomainAnalytics",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Int does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _DomainAnalytics_totalUsers(ctx context.Context, field graphql.CollectedField, obj *model.DomainAnalytics) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_DomainAnalytics_totalUsers(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.TotalUsers, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(int)
-	fc.Result = res
-	return ec.marshalNInt2int(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_DomainAnalytics_totalUsers(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "DomainAnalytics",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Int does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _DomainAnalytics_observations(ctx context.Context, field graphql.CollectedField, obj *model.DomainAnalytics) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_DomainAnalytics_observations(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Observations, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.([]*model.ObservationAnalytic)
-	fc.Result = res
-	return ec.marshalNObservationAnalytic2ᚕᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐObservationAnalyticᚄ(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_DomainAnalytics_observations(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "DomainAnalytics",
+		Object:     "DomainVerification",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "id":
-				return ec.fieldContext_ObservationAnalytic_id(ctx, field)
-			case "link":
-				return ec.fieldContext_ObservationAnalytic_link(ctx, field)
-			case "domain":
-				return ec.fieldContext_ObservationAnalytic_domain(ctx, field)
+				return ec.fieldContext_Domain_id(ctx, field)
+			case "name":
+				return ec.fieldContext_Domain_name(ctx, field)
+			case "url":
+				return ec.fieldContext_Domain_url(ctx, field)
+			case "organization":
+				return ec.fieldContext_Domain_organization(ctx, field)
 			case "platform":
-				return ec.fieldContext_ObservationAnalytic_platform(ctx, field)
-			case "useragent":
-				return ec.fieldContext_ObservationAnalytic_useragent(ctx, field)
-			case "ip":
-				return ec.fieldContext_ObservationAnalytic_ip(ctx, field)
-			case "referrer":
-				return ec.fieldContext_ObservationAnalytic_referrer(ctx, field)
-			case "location":
-				return ec.fieldContext_ObservationAnalytic_location(ctx, field)
-			case "redirectionChoice":
-				return ec.fieldContext_ObservationAnalytic_redirectionChoice(ctx, field)
-			case "success":
-				return ec.fieldContext_ObservationAnalytic_success(ctx, field)
+				return ec.fieldContext_Domain_platform(ctx, field)
+			case "verification":
+				return ec.fieldContext_Domain_verification(ctx, field)
+			case "state":
+				return ec.fieldContext_Domain_state(ctx, field)
+			case "links":
+				return ec.fieldContext_Domain_links(ctx, field)
+			case "analytics":
+				return ec.fieldContext_Domain_analytics(ctx, field)
+			case "analyticReports":
+				return ec.fieldContext_Domain_analyticReports(ctx, field)
+			case "lastDNSVerificationAt":
+				return ec.fieldContext_Domain_lastDNSVerificationAt(ctx, field)
 			case "createdAt":
-				return ec.fieldContext_ObservationAnalytic_createdAt(ctx, field)
+				return ec.fieldContext_Domain_createdAt(ctx, field)
 			case "updatedAt":
-				return ec.fieldContext_ObservationAnalytic_updatedAt(ctx, field)
+				return ec.fieldContext_Domain_updatedAt(ctx, field)
+			case "deletedAt":
+				return ec.fieldContext_Domain_deletedAt(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type ObservationAnalytic", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type Domain", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _DomainVerification_status(ctx context.Context, field graphql.CollectedField, obj *model.DomainVerification) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_DomainVerification_status(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Status, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(database_enums.DNSStatus)
+	fc.Result = res
+	return ec.marshalNDNSStatus2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐDNSStatus(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_DomainVerification_status(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "DomainVerification",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type DNSStatus does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _DomainVerification_logs(ctx context.Context, field graphql.CollectedField, obj *model.DomainVerification) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_DomainVerification_logs(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Logs, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Log)
+	fc.Result = res
+	return ec.marshalNLog2ᚕᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐLogᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_DomainVerification_logs(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "DomainVerification",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Log_id(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Log_createdAt(ctx, field)
+			case "message":
+				return ec.fieldContext_Log_message(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Log", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _DomainVerification_createdAt(ctx context.Context, field graphql.CollectedField, obj *model.DomainVerification) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_DomainVerification_createdAt(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CreatedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(time.Time)
+	fc.Result = res
+	return ec.marshalNDateTime2timeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_DomainVerification_createdAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "DomainVerification",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type DateTime does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _DomainVerification_updatedAt(ctx context.Context, field graphql.CollectedField, obj *model.DomainVerification) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_DomainVerification_updatedAt(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.UpdatedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*time.Time)
+	fc.Result = res
+	return ec.marshalODateTime2ᚖtimeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_DomainVerification_updatedAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "DomainVerification",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type DateTime does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _DomainVerification_deletedAt(ctx context.Context, field graphql.CollectedField, obj *model.DomainVerification) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_DomainVerification_deletedAt(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.DeletedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*time.Time)
+	fc.Result = res
+	return ec.marshalODateTime2ᚖtimeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_DomainVerification_deletedAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "DomainVerification",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type DateTime does not have child fields")
 		},
 	}
 	return fc, nil
@@ -3598,9 +4804,9 @@ func (ec *executionContext) _Link_platform(ctx context.Context, field graphql.Co
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.Platform)
+	res := resTmp.(*database_models.Platform)
 	fc.Result = res
-	return ec.marshalNPlatform2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐPlatform(ctx, field.Selections, res)
+	return ec.marshalNPlatform2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋmodelsᚐPlatform(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Link_platform(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -3621,14 +4827,18 @@ func (ec *executionContext) fieldContext_Link_platform(ctx context.Context, fiel
 				return ec.fieldContext_Platform_redirectionChoice(ctx, field)
 			case "organization":
 				return ec.fieldContext_Platform_organization(ctx, field)
-			case "domains":
-				return ec.fieldContext_Platform_domains(ctx, field)
+			case "domain":
+				return ec.fieldContext_Platform_domain(ctx, field)
 			case "permissions":
 				return ec.fieldContext_Platform_permissions(ctx, field)
+			case "deployments":
+				return ec.fieldContext_Platform_deployments(ctx, field)
 			case "links":
 				return ec.fieldContext_Platform_links(ctx, field)
 			case "analytics":
 				return ec.fieldContext_Platform_analytics(ctx, field)
+			case "analyticReports":
+				return ec.fieldContext_Platform_analyticReports(ctx, field)
 			case "status":
 				return ec.fieldContext_Platform_status(ctx, field)
 			case "templates":
@@ -3668,9 +4878,9 @@ func (ec *executionContext) _Link_domain(ctx context.Context, field graphql.Coll
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.Domain)
+	res := resTmp.(*database_models.Domain)
 	fc.Result = res
-	return ec.marshalNDomain2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐDomain(ctx, field.Selections, res)
+	return ec.marshalNDomain2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋmodelsᚐDomain(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Link_domain(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -3691,14 +4901,16 @@ func (ec *executionContext) fieldContext_Link_domain(ctx context.Context, field 
 				return ec.fieldContext_Domain_organization(ctx, field)
 			case "platform":
 				return ec.fieldContext_Domain_platform(ctx, field)
-			case "dnsStatus":
-				return ec.fieldContext_Domain_dnsStatus(ctx, field)
+			case "verification":
+				return ec.fieldContext_Domain_verification(ctx, field)
 			case "state":
 				return ec.fieldContext_Domain_state(ctx, field)
 			case "links":
 				return ec.fieldContext_Domain_links(ctx, field)
 			case "analytics":
 				return ec.fieldContext_Domain_analytics(ctx, field)
+			case "analyticReports":
+				return ec.fieldContext_Domain_analyticReports(ctx, field)
 			case "lastDNSVerificationAt":
 				return ec.fieldContext_Domain_lastDNSVerificationAt(ctx, field)
 			case "createdAt":
@@ -3740,9 +4952,9 @@ func (ec *executionContext) _Link_analytics(ctx context.Context, field graphql.C
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.LinkAnalytics)
+	res := resTmp.([]*model.MetricAnalytics)
 	fc.Result = res
-	return ec.marshalNLinkAnalytics2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐLinkAnalytics(ctx, field.Selections, res)
+	return ec.marshalNMetricAnalytics2ᚕᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐMetricAnalyticsᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Link_analytics(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -3753,22 +4965,20 @@ func (ec *executionContext) fieldContext_Link_analytics(ctx context.Context, fie
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
-			case "id":
-				return ec.fieldContext_LinkAnalytics_id(ctx, field)
-			case "useragent":
-				return ec.fieldContext_LinkAnalytics_useragent(ctx, field)
-			case "platformRedirectionChoice":
-				return ec.fieldContext_LinkAnalytics_platformRedirectionChoice(ctx, field)
-			case "ip":
-				return ec.fieldContext_LinkAnalytics_ip(ctx, field)
-			case "location":
-				return ec.fieldContext_LinkAnalytics_location(ctx, field)
-			case "referrer":
-				return ec.fieldContext_LinkAnalytics_referrer(ctx, field)
-			case "observations":
-				return ec.fieldContext_LinkAnalytics_observations(ctx, field)
+			case "feeder":
+				return ec.fieldContext_MetricAnalytics_feeder(ctx, field)
+			case "totalHits":
+				return ec.fieldContext_MetricAnalytics_totalHits(ctx, field)
+			case "totalSuccess":
+				return ec.fieldContext_MetricAnalytics_totalSuccess(ctx, field)
+			case "totalFailed":
+				return ec.fieldContext_MetricAnalytics_totalFailed(ctx, field)
+			case "startAt":
+				return ec.fieldContext_MetricAnalytics_startAt(ctx, field)
+			case "endAt":
+				return ec.fieldContext_MetricAnalytics_endAt(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type LinkAnalytics", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type MetricAnalytics", field.Name)
 		},
 	}
 	return fc, nil
@@ -3797,9 +5007,9 @@ func (ec *executionContext) _Link_openGraph(ctx context.Context, field graphql.C
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.([]*model.OpenGraph)
+	res := resTmp.([]*database_types.OpenGraph)
 	fc.Result = res
-	return ec.marshalOOpenGraph2ᚕᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐOpenGraphᚄ(ctx, field.Selections, res)
+	return ec.marshalOOpenGraph2ᚕᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐOpenGraphᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Link_openGraph(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -4051,8 +5261,8 @@ func (ec *executionContext) fieldContext_Link_deletedAt(ctx context.Context, fie
 	return fc, nil
 }
 
-func (ec *executionContext) _LinkAnalytics_id(ctx context.Context, field graphql.CollectedField, obj *model.LinkAnalytics) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_LinkAnalytics_id(ctx, field)
+func (ec *executionContext) _Log_id(ctx context.Context, field graphql.CollectedField, obj *model.Log) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Log_id(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -4082,9 +5292,9 @@ func (ec *executionContext) _LinkAnalytics_id(ctx context.Context, field graphql
 	return ec.marshalNUUID2githubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_LinkAnalytics_id(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Log_id(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
-		Object:     "LinkAnalytics",
+		Object:     "Log",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -4095,8 +5305,8 @@ func (ec *executionContext) fieldContext_LinkAnalytics_id(ctx context.Context, f
 	return fc, nil
 }
 
-func (ec *executionContext) _LinkAnalytics_useragent(ctx context.Context, field graphql.CollectedField, obj *model.LinkAnalytics) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_LinkAnalytics_useragent(ctx, field)
+func (ec *executionContext) _Log_createdAt(ctx context.Context, field graphql.CollectedField, obj *model.Log) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Log_createdAt(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -4109,7 +5319,51 @@ func (ec *executionContext) _LinkAnalytics_useragent(ctx context.Context, field 
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Useragent, nil
+		return obj.CreatedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(time.Time)
+	fc.Result = res
+	return ec.marshalNDateTime2timeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Log_createdAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Log",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type DateTime does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Log_message(ctx context.Context, field graphql.CollectedField, obj *model.Log) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Log_message(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Message, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -4126,260 +5380,14 @@ func (ec *executionContext) _LinkAnalytics_useragent(ctx context.Context, field 
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_LinkAnalytics_useragent(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Log_message(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
-		Object:     "LinkAnalytics",
+		Object:     "Log",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _LinkAnalytics_platformRedirectionChoice(ctx context.Context, field graphql.CollectedField, obj *model.LinkAnalytics) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_LinkAnalytics_platformRedirectionChoice(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.PlatformRedirectionChoice, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(database_enums.RedirectionOptions)
-	fc.Result = res
-	return ec.marshalNRedirectionOptions2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐRedirectionOptions(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_LinkAnalytics_platformRedirectionChoice(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "LinkAnalytics",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type RedirectionOptions does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _LinkAnalytics_ip(ctx context.Context, field graphql.CollectedField, obj *model.LinkAnalytics) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_LinkAnalytics_ip(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.IP, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_LinkAnalytics_ip(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "LinkAnalytics",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _LinkAnalytics_location(ctx context.Context, field graphql.CollectedField, obj *model.LinkAnalytics) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_LinkAnalytics_location(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Location, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_LinkAnalytics_location(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "LinkAnalytics",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _LinkAnalytics_referrer(ctx context.Context, field graphql.CollectedField, obj *model.LinkAnalytics) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_LinkAnalytics_referrer(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Referrer, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_LinkAnalytics_referrer(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "LinkAnalytics",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _LinkAnalytics_observations(ctx context.Context, field graphql.CollectedField, obj *model.LinkAnalytics) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_LinkAnalytics_observations(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Observations, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.([]*model.ObservationAnalytic)
-	fc.Result = res
-	return ec.marshalNObservationAnalytic2ᚕᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐObservationAnalyticᚄ(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_LinkAnalytics_observations(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "LinkAnalytics",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_ObservationAnalytic_id(ctx, field)
-			case "link":
-				return ec.fieldContext_ObservationAnalytic_link(ctx, field)
-			case "domain":
-				return ec.fieldContext_ObservationAnalytic_domain(ctx, field)
-			case "platform":
-				return ec.fieldContext_ObservationAnalytic_platform(ctx, field)
-			case "useragent":
-				return ec.fieldContext_ObservationAnalytic_useragent(ctx, field)
-			case "ip":
-				return ec.fieldContext_ObservationAnalytic_ip(ctx, field)
-			case "referrer":
-				return ec.fieldContext_ObservationAnalytic_referrer(ctx, field)
-			case "location":
-				return ec.fieldContext_ObservationAnalytic_location(ctx, field)
-			case "redirectionChoice":
-				return ec.fieldContext_ObservationAnalytic_redirectionChoice(ctx, field)
-			case "success":
-				return ec.fieldContext_ObservationAnalytic_success(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_ObservationAnalytic_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_ObservationAnalytic_updatedAt(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type ObservationAnalytic", field.Name)
 		},
 	}
 	return fc, nil
@@ -4468,6 +5476,270 @@ func (ec *executionContext) fieldContext_LoginPayload_refreshToken(ctx context.C
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _MetricAnalytics_feeder(ctx context.Context, field graphql.CollectedField, obj *model.MetricAnalytics) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_MetricAnalytics_feeder(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Feeder, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNJSON2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_MetricAnalytics_feeder(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MetricAnalytics",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type JSON does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _MetricAnalytics_totalHits(ctx context.Context, field graphql.CollectedField, obj *model.MetricAnalytics) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_MetricAnalytics_totalHits(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TotalHits, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_MetricAnalytics_totalHits(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MetricAnalytics",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _MetricAnalytics_totalSuccess(ctx context.Context, field graphql.CollectedField, obj *model.MetricAnalytics) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_MetricAnalytics_totalSuccess(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TotalSuccess, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_MetricAnalytics_totalSuccess(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MetricAnalytics",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _MetricAnalytics_totalFailed(ctx context.Context, field graphql.CollectedField, obj *model.MetricAnalytics) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_MetricAnalytics_totalFailed(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TotalFailed, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_MetricAnalytics_totalFailed(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MetricAnalytics",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _MetricAnalytics_startAt(ctx context.Context, field graphql.CollectedField, obj *model.MetricAnalytics) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_MetricAnalytics_startAt(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.StartAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(time.Time)
+	fc.Result = res
+	return ec.marshalNDateTime2timeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_MetricAnalytics_startAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MetricAnalytics",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type DateTime does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _MetricAnalytics_endAt(ctx context.Context, field graphql.CollectedField, obj *model.MetricAnalytics) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_MetricAnalytics_endAt(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.EndAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(time.Time)
+	fc.Result = res
+	return ec.marshalNDateTime2timeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_MetricAnalytics_endAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MetricAnalytics",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type DateTime does not have child fields")
 		},
 	}
 	return fc, nil
@@ -5012,6 +6284,91 @@ func (ec *executionContext) fieldContext_Mutation_resetPassword(ctx context.Cont
 	return fc, nil
 }
 
+func (ec *executionContext) _Mutation_createDomain(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_createDomain(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().CreateDomain(rctx, fc.Args["input"].(model.DomainCreateInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*database_models.Domain)
+	fc.Result = res
+	return ec.marshalNDomain2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋmodelsᚐDomain(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_createDomain(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Domain_id(ctx, field)
+			case "name":
+				return ec.fieldContext_Domain_name(ctx, field)
+			case "url":
+				return ec.fieldContext_Domain_url(ctx, field)
+			case "organization":
+				return ec.fieldContext_Domain_organization(ctx, field)
+			case "platform":
+				return ec.fieldContext_Domain_platform(ctx, field)
+			case "verification":
+				return ec.fieldContext_Domain_verification(ctx, field)
+			case "state":
+				return ec.fieldContext_Domain_state(ctx, field)
+			case "links":
+				return ec.fieldContext_Domain_links(ctx, field)
+			case "analytics":
+				return ec.fieldContext_Domain_analytics(ctx, field)
+			case "analyticReports":
+				return ec.fieldContext_Domain_analyticReports(ctx, field)
+			case "lastDNSVerificationAt":
+				return ec.fieldContext_Domain_lastDNSVerificationAt(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Domain_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Domain_updatedAt(ctx, field)
+			case "deletedAt":
+				return ec.fieldContext_Domain_deletedAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Domain", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_createDomain_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _ObservationAnalytic_id(ctx context.Context, field graphql.CollectedField, obj *model.ObservationAnalytic) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_ObservationAnalytic_id(ctx, field)
 	if err != nil {
@@ -5154,9 +6511,9 @@ func (ec *executionContext) _ObservationAnalytic_domain(ctx context.Context, fie
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.Domain)
+	res := resTmp.(*database_models.Domain)
 	fc.Result = res
-	return ec.marshalNDomain2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐDomain(ctx, field.Selections, res)
+	return ec.marshalNDomain2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋmodelsᚐDomain(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_ObservationAnalytic_domain(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -5177,14 +6534,16 @@ func (ec *executionContext) fieldContext_ObservationAnalytic_domain(ctx context.
 				return ec.fieldContext_Domain_organization(ctx, field)
 			case "platform":
 				return ec.fieldContext_Domain_platform(ctx, field)
-			case "dnsStatus":
-				return ec.fieldContext_Domain_dnsStatus(ctx, field)
+			case "verification":
+				return ec.fieldContext_Domain_verification(ctx, field)
 			case "state":
 				return ec.fieldContext_Domain_state(ctx, field)
 			case "links":
 				return ec.fieldContext_Domain_links(ctx, field)
 			case "analytics":
 				return ec.fieldContext_Domain_analytics(ctx, field)
+			case "analyticReports":
+				return ec.fieldContext_Domain_analyticReports(ctx, field)
 			case "lastDNSVerificationAt":
 				return ec.fieldContext_Domain_lastDNSVerificationAt(ctx, field)
 			case "createdAt":
@@ -5226,9 +6585,9 @@ func (ec *executionContext) _ObservationAnalytic_platform(ctx context.Context, f
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.Platform)
+	res := resTmp.(*database_models.Platform)
 	fc.Result = res
-	return ec.marshalNPlatform2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐPlatform(ctx, field.Selections, res)
+	return ec.marshalNPlatform2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋmodelsᚐPlatform(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_ObservationAnalytic_platform(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -5249,14 +6608,18 @@ func (ec *executionContext) fieldContext_ObservationAnalytic_platform(ctx contex
 				return ec.fieldContext_Platform_redirectionChoice(ctx, field)
 			case "organization":
 				return ec.fieldContext_Platform_organization(ctx, field)
-			case "domains":
-				return ec.fieldContext_Platform_domains(ctx, field)
+			case "domain":
+				return ec.fieldContext_Platform_domain(ctx, field)
 			case "permissions":
 				return ec.fieldContext_Platform_permissions(ctx, field)
+			case "deployments":
+				return ec.fieldContext_Platform_deployments(ctx, field)
 			case "links":
 				return ec.fieldContext_Platform_links(ctx, field)
 			case "analytics":
 				return ec.fieldContext_Platform_analytics(ctx, field)
+			case "analyticReports":
+				return ec.fieldContext_Platform_analyticReports(ctx, field)
 			case "status":
 				return ec.fieldContext_Platform_status(ctx, field)
 			case "templates":
@@ -5619,7 +6982,7 @@ func (ec *executionContext) fieldContext_ObservationAnalytic_updatedAt(ctx conte
 	return fc, nil
 }
 
-func (ec *executionContext) _OpenGraph_title(ctx context.Context, field graphql.CollectedField, obj *model.OpenGraph) (ret graphql.Marshaler) {
+func (ec *executionContext) _OpenGraph_title(ctx context.Context, field graphql.CollectedField, obj *database_types.OpenGraph) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_OpenGraph_title(ctx, field)
 	if err != nil {
 		return graphql.Null
@@ -5660,7 +7023,7 @@ func (ec *executionContext) fieldContext_OpenGraph_title(ctx context.Context, fi
 	return fc, nil
 }
 
-func (ec *executionContext) _OpenGraph_description(ctx context.Context, field graphql.CollectedField, obj *model.OpenGraph) (ret graphql.Marshaler) {
+func (ec *executionContext) _OpenGraph_description(ctx context.Context, field graphql.CollectedField, obj *database_types.OpenGraph) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_OpenGraph_description(ctx, field)
 	if err != nil {
 		return graphql.Null
@@ -5701,7 +7064,7 @@ func (ec *executionContext) fieldContext_OpenGraph_description(ctx context.Conte
 	return fc, nil
 }
 
-func (ec *executionContext) _OpenGraph_favIcon(ctx context.Context, field graphql.CollectedField, obj *model.OpenGraph) (ret graphql.Marshaler) {
+func (ec *executionContext) _OpenGraph_favIcon(ctx context.Context, field graphql.CollectedField, obj *database_types.OpenGraph) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_OpenGraph_favIcon(ctx, field)
 	if err != nil {
 		return graphql.Null
@@ -5742,7 +7105,7 @@ func (ec *executionContext) fieldContext_OpenGraph_favIcon(ctx context.Context, 
 	return fc, nil
 }
 
-func (ec *executionContext) _OpenGraph_image(ctx context.Context, field graphql.CollectedField, obj *model.OpenGraph) (ret graphql.Marshaler) {
+func (ec *executionContext) _OpenGraph_image(ctx context.Context, field graphql.CollectedField, obj *database_types.OpenGraph) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_OpenGraph_image(ctx, field)
 	if err != nil {
 		return graphql.Null
@@ -5783,7 +7146,7 @@ func (ec *executionContext) fieldContext_OpenGraph_image(ctx context.Context, fi
 	return fc, nil
 }
 
-func (ec *executionContext) _OpenGraph_alternateImage(ctx context.Context, field graphql.CollectedField, obj *model.OpenGraph) (ret graphql.Marshaler) {
+func (ec *executionContext) _OpenGraph_alternateImage(ctx context.Context, field graphql.CollectedField, obj *database_types.OpenGraph) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_OpenGraph_alternateImage(ctx, field)
 	if err != nil {
 		return graphql.Null
@@ -5824,7 +7187,7 @@ func (ec *executionContext) fieldContext_OpenGraph_alternateImage(ctx context.Co
 	return fc, nil
 }
 
-func (ec *executionContext) _OpenGraph_url(ctx context.Context, field graphql.CollectedField, obj *model.OpenGraph) (ret graphql.Marshaler) {
+func (ec *executionContext) _OpenGraph_url(ctx context.Context, field graphql.CollectedField, obj *database_types.OpenGraph) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_OpenGraph_url(ctx, field)
 	if err != nil {
 		return graphql.Null
@@ -5865,7 +7228,7 @@ func (ec *executionContext) fieldContext_OpenGraph_url(ctx context.Context, fiel
 	return fc, nil
 }
 
-func (ec *executionContext) _OpenGraph_siteName(ctx context.Context, field graphql.CollectedField, obj *model.OpenGraph) (ret graphql.Marshaler) {
+func (ec *executionContext) _OpenGraph_siteName(ctx context.Context, field graphql.CollectedField, obj *database_types.OpenGraph) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_OpenGraph_siteName(ctx, field)
 	if err != nil {
 		return graphql.Null
@@ -5906,7 +7269,7 @@ func (ec *executionContext) fieldContext_OpenGraph_siteName(ctx context.Context,
 	return fc, nil
 }
 
-func (ec *executionContext) _OpenGraph_type(ctx context.Context, field graphql.CollectedField, obj *model.OpenGraph) (ret graphql.Marshaler) {
+func (ec *executionContext) _OpenGraph_type(ctx context.Context, field graphql.CollectedField, obj *database_types.OpenGraph) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_OpenGraph_type(ctx, field)
 	if err != nil {
 		return graphql.Null
@@ -5947,7 +7310,7 @@ func (ec *executionContext) fieldContext_OpenGraph_type(ctx context.Context, fie
 	return fc, nil
 }
 
-func (ec *executionContext) _OpenGraph_locale(ctx context.Context, field graphql.CollectedField, obj *model.OpenGraph) (ret graphql.Marshaler) {
+func (ec *executionContext) _OpenGraph_locale(ctx context.Context, field graphql.CollectedField, obj *database_types.OpenGraph) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_OpenGraph_locale(ctx, field)
 	if err != nil {
 		return graphql.Null
@@ -5988,7 +7351,7 @@ func (ec *executionContext) fieldContext_OpenGraph_locale(ctx context.Context, f
 	return fc, nil
 }
 
-func (ec *executionContext) _OpenGraph_x(ctx context.Context, field graphql.CollectedField, obj *model.OpenGraph) (ret graphql.Marshaler) {
+func (ec *executionContext) _OpenGraph_x(ctx context.Context, field graphql.CollectedField, obj *database_types.OpenGraph) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_OpenGraph_x(ctx, field)
 	if err != nil {
 		return graphql.Null
@@ -6011,9 +7374,9 @@ func (ec *executionContext) _OpenGraph_x(ctx context.Context, field graphql.Coll
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*model.OpenGraphX)
+	res := resTmp.(*database_types.OpenGraphX)
 	fc.Result = res
-	return ec.marshalOOpenGraphX2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐOpenGraphX(ctx, field.Selections, res)
+	return ec.marshalOOpenGraphX2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐOpenGraphX(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_OpenGraph_x(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -6047,7 +7410,7 @@ func (ec *executionContext) fieldContext_OpenGraph_x(ctx context.Context, field 
 	return fc, nil
 }
 
-func (ec *executionContext) _OpenGraphX_card(ctx context.Context, field graphql.CollectedField, obj *model.OpenGraphX) (ret graphql.Marshaler) {
+func (ec *executionContext) _OpenGraphX_card(ctx context.Context, field graphql.CollectedField, obj *database_types.OpenGraphX) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_OpenGraphX_card(ctx, field)
 	if err != nil {
 		return graphql.Null
@@ -6088,7 +7451,7 @@ func (ec *executionContext) fieldContext_OpenGraphX_card(ctx context.Context, fi
 	return fc, nil
 }
 
-func (ec *executionContext) _OpenGraphX_site(ctx context.Context, field graphql.CollectedField, obj *model.OpenGraphX) (ret graphql.Marshaler) {
+func (ec *executionContext) _OpenGraphX_site(ctx context.Context, field graphql.CollectedField, obj *database_types.OpenGraphX) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_OpenGraphX_site(ctx, field)
 	if err != nil {
 		return graphql.Null
@@ -6129,7 +7492,7 @@ func (ec *executionContext) fieldContext_OpenGraphX_site(ctx context.Context, fi
 	return fc, nil
 }
 
-func (ec *executionContext) _OpenGraphX_title(ctx context.Context, field graphql.CollectedField, obj *model.OpenGraphX) (ret graphql.Marshaler) {
+func (ec *executionContext) _OpenGraphX_title(ctx context.Context, field graphql.CollectedField, obj *database_types.OpenGraphX) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_OpenGraphX_title(ctx, field)
 	if err != nil {
 		return graphql.Null
@@ -6170,7 +7533,7 @@ func (ec *executionContext) fieldContext_OpenGraphX_title(ctx context.Context, f
 	return fc, nil
 }
 
-func (ec *executionContext) _OpenGraphX_description(ctx context.Context, field graphql.CollectedField, obj *model.OpenGraphX) (ret graphql.Marshaler) {
+func (ec *executionContext) _OpenGraphX_description(ctx context.Context, field graphql.CollectedField, obj *database_types.OpenGraphX) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_OpenGraphX_description(ctx, field)
 	if err != nil {
 		return graphql.Null
@@ -6211,7 +7574,7 @@ func (ec *executionContext) fieldContext_OpenGraphX_description(ctx context.Cont
 	return fc, nil
 }
 
-func (ec *executionContext) _OpenGraphX_image(ctx context.Context, field graphql.CollectedField, obj *model.OpenGraphX) (ret graphql.Marshaler) {
+func (ec *executionContext) _OpenGraphX_image(ctx context.Context, field graphql.CollectedField, obj *database_types.OpenGraphX) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_OpenGraphX_image(ctx, field)
 	if err != nil {
 		return graphql.Null
@@ -6252,7 +7615,7 @@ func (ec *executionContext) fieldContext_OpenGraphX_image(ctx context.Context, f
 	return fc, nil
 }
 
-func (ec *executionContext) _OpenGraphX_url(ctx context.Context, field graphql.CollectedField, obj *model.OpenGraphX) (ret graphql.Marshaler) {
+func (ec *executionContext) _OpenGraphX_url(ctx context.Context, field graphql.CollectedField, obj *database_types.OpenGraphX) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_OpenGraphX_url(ctx, field)
 	if err != nil {
 		return graphql.Null
@@ -6293,7 +7656,7 @@ func (ec *executionContext) fieldContext_OpenGraphX_url(ctx context.Context, fie
 	return fc, nil
 }
 
-func (ec *executionContext) _OpenGraphX_type(ctx context.Context, field graphql.CollectedField, obj *model.OpenGraphX) (ret graphql.Marshaler) {
+func (ec *executionContext) _OpenGraphX_type(ctx context.Context, field graphql.CollectedField, obj *database_types.OpenGraphX) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_OpenGraphX_type(ctx, field)
 	if err != nil {
 		return graphql.Null
@@ -6334,7 +7697,7 @@ func (ec *executionContext) fieldContext_OpenGraphX_type(ctx context.Context, fi
 	return fc, nil
 }
 
-func (ec *executionContext) _OpenGraphX_creator(ctx context.Context, field graphql.CollectedField, obj *model.OpenGraphX) (ret graphql.Marshaler) {
+func (ec *executionContext) _OpenGraphX_creator(ctx context.Context, field graphql.CollectedField, obj *database_types.OpenGraphX) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_OpenGraphX_creator(ctx, field)
 	if err != nil {
 		return graphql.Null
@@ -6577,9 +7940,9 @@ func (ec *executionContext) _Organization_platforms(ctx context.Context, field g
 		}
 		return graphql.Null
 	}
-	res := resTmp.([]*model.Platform)
+	res := resTmp.([]*database_models.Platform)
 	fc.Result = res
-	return ec.marshalNPlatform2ᚕᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐPlatformᚄ(ctx, field.Selections, res)
+	return ec.marshalNPlatform2ᚕᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋmodelsᚐPlatformᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Organization_platforms(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -6600,14 +7963,18 @@ func (ec *executionContext) fieldContext_Organization_platforms(ctx context.Cont
 				return ec.fieldContext_Platform_redirectionChoice(ctx, field)
 			case "organization":
 				return ec.fieldContext_Platform_organization(ctx, field)
-			case "domains":
-				return ec.fieldContext_Platform_domains(ctx, field)
+			case "domain":
+				return ec.fieldContext_Platform_domain(ctx, field)
 			case "permissions":
 				return ec.fieldContext_Platform_permissions(ctx, field)
+			case "deployments":
+				return ec.fieldContext_Platform_deployments(ctx, field)
 			case "links":
 				return ec.fieldContext_Platform_links(ctx, field)
 			case "analytics":
 				return ec.fieldContext_Platform_analytics(ctx, field)
+			case "analyticReports":
+				return ec.fieldContext_Platform_analyticReports(ctx, field)
 			case "status":
 				return ec.fieldContext_Platform_status(ctx, field)
 			case "templates":
@@ -6908,9 +8275,9 @@ func (ec *executionContext) _Organization_domains(ctx context.Context, field gra
 		}
 		return graphql.Null
 	}
-	res := resTmp.([]*model.Domain)
+	res := resTmp.([]*database_models.Domain)
 	fc.Result = res
-	return ec.marshalNDomain2ᚕᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐDomainᚄ(ctx, field.Selections, res)
+	return ec.marshalNDomain2ᚕᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋmodelsᚐDomainᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Organization_domains(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -6931,14 +8298,16 @@ func (ec *executionContext) fieldContext_Organization_domains(ctx context.Contex
 				return ec.fieldContext_Domain_organization(ctx, field)
 			case "platform":
 				return ec.fieldContext_Domain_platform(ctx, field)
-			case "dnsStatus":
-				return ec.fieldContext_Domain_dnsStatus(ctx, field)
+			case "verification":
+				return ec.fieldContext_Domain_verification(ctx, field)
 			case "state":
 				return ec.fieldContext_Domain_state(ctx, field)
 			case "links":
 				return ec.fieldContext_Domain_links(ctx, field)
 			case "analytics":
 				return ec.fieldContext_Domain_analytics(ctx, field)
+			case "analyticReports":
+				return ec.fieldContext_Domain_analyticReports(ctx, field)
 			case "lastDNSVerificationAt":
 				return ec.fieldContext_Domain_lastDNSVerificationAt(ctx, field)
 			case "createdAt":
@@ -7940,9 +9309,9 @@ func (ec *executionContext) _Permission_domains(ctx context.Context, field graph
 		}
 		return graphql.Null
 	}
-	res := resTmp.([]*model.Domain)
+	res := resTmp.([]*database_models.Domain)
 	fc.Result = res
-	return ec.marshalNDomain2ᚕᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐDomainᚄ(ctx, field.Selections, res)
+	return ec.marshalNDomain2ᚕᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋmodelsᚐDomainᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Permission_domains(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -7963,14 +9332,16 @@ func (ec *executionContext) fieldContext_Permission_domains(ctx context.Context,
 				return ec.fieldContext_Domain_organization(ctx, field)
 			case "platform":
 				return ec.fieldContext_Domain_platform(ctx, field)
-			case "dnsStatus":
-				return ec.fieldContext_Domain_dnsStatus(ctx, field)
+			case "verification":
+				return ec.fieldContext_Domain_verification(ctx, field)
 			case "state":
 				return ec.fieldContext_Domain_state(ctx, field)
 			case "links":
 				return ec.fieldContext_Domain_links(ctx, field)
 			case "analytics":
 				return ec.fieldContext_Domain_analytics(ctx, field)
+			case "analyticReports":
+				return ec.fieldContext_Domain_analyticReports(ctx, field)
 			case "lastDNSVerificationAt":
 				return ec.fieldContext_Domain_lastDNSVerificationAt(ctx, field)
 			case "createdAt":
@@ -8012,9 +9383,9 @@ func (ec *executionContext) _Permission_platforms(ctx context.Context, field gra
 		}
 		return graphql.Null
 	}
-	res := resTmp.([]*model.Platform)
+	res := resTmp.([]*database_models.Platform)
 	fc.Result = res
-	return ec.marshalNPlatform2ᚕᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐPlatformᚄ(ctx, field.Selections, res)
+	return ec.marshalNPlatform2ᚕᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋmodelsᚐPlatformᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Permission_platforms(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -8035,14 +9406,18 @@ func (ec *executionContext) fieldContext_Permission_platforms(ctx context.Contex
 				return ec.fieldContext_Platform_redirectionChoice(ctx, field)
 			case "organization":
 				return ec.fieldContext_Platform_organization(ctx, field)
-			case "domains":
-				return ec.fieldContext_Platform_domains(ctx, field)
+			case "domain":
+				return ec.fieldContext_Platform_domain(ctx, field)
 			case "permissions":
 				return ec.fieldContext_Platform_permissions(ctx, field)
+			case "deployments":
+				return ec.fieldContext_Platform_deployments(ctx, field)
 			case "links":
 				return ec.fieldContext_Platform_links(ctx, field)
 			case "analytics":
 				return ec.fieldContext_Platform_analytics(ctx, field)
+			case "analyticReports":
+				return ec.fieldContext_Platform_analyticReports(ctx, field)
 			case "status":
 				return ec.fieldContext_Platform_status(ctx, field)
 			case "templates":
@@ -8056,7 +9431,7 @@ func (ec *executionContext) fieldContext_Permission_platforms(ctx context.Contex
 	return fc, nil
 }
 
-func (ec *executionContext) _Platform_id(ctx context.Context, field graphql.CollectedField, obj *model.Platform) (ret graphql.Marshaler) {
+func (ec *executionContext) _Platform_id(ctx context.Context, field graphql.CollectedField, obj *database_models.Platform) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Platform_id(ctx, field)
 	if err != nil {
 		return graphql.Null
@@ -8100,7 +9475,7 @@ func (ec *executionContext) fieldContext_Platform_id(ctx context.Context, field 
 	return fc, nil
 }
 
-func (ec *executionContext) _Platform_name(ctx context.Context, field graphql.CollectedField, obj *model.Platform) (ret graphql.Marshaler) {
+func (ec *executionContext) _Platform_name(ctx context.Context, field graphql.CollectedField, obj *database_models.Platform) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Platform_name(ctx, field)
 	if err != nil {
 		return graphql.Null
@@ -8144,7 +9519,7 @@ func (ec *executionContext) fieldContext_Platform_name(ctx context.Context, fiel
 	return fc, nil
 }
 
-func (ec *executionContext) _Platform_openGraph(ctx context.Context, field graphql.CollectedField, obj *model.Platform) (ret graphql.Marshaler) {
+func (ec *executionContext) _Platform_openGraph(ctx context.Context, field graphql.CollectedField, obj *database_models.Platform) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Platform_openGraph(ctx, field)
 	if err != nil {
 		return graphql.Null
@@ -8170,9 +9545,9 @@ func (ec *executionContext) _Platform_openGraph(ctx context.Context, field graph
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.OpenGraph)
+	res := resTmp.(*database_types.OpenGraph)
 	fc.Result = res
-	return ec.marshalNOpenGraph2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐOpenGraph(ctx, field.Selections, res)
+	return ec.marshalNOpenGraph2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐOpenGraph(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Platform_openGraph(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -8210,7 +9585,7 @@ func (ec *executionContext) fieldContext_Platform_openGraph(ctx context.Context,
 	return fc, nil
 }
 
-func (ec *executionContext) _Platform_redirectionChoice(ctx context.Context, field graphql.CollectedField, obj *model.Platform) (ret graphql.Marshaler) {
+func (ec *executionContext) _Platform_redirectionChoice(ctx context.Context, field graphql.CollectedField, obj *database_models.Platform) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Platform_redirectionChoice(ctx, field)
 	if err != nil {
 		return graphql.Null
@@ -8224,7 +9599,7 @@ func (ec *executionContext) _Platform_redirectionChoice(ctx context.Context, fie
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.RedirectionChoice, nil
+		return ec.resolvers.Platform().RedirectionChoice(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -8245,8 +9620,8 @@ func (ec *executionContext) fieldContext_Platform_redirectionChoice(ctx context.
 	fc = &graphql.FieldContext{
 		Object:     "Platform",
 		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type RedirectionOptions does not have child fields")
 		},
@@ -8254,7 +9629,7 @@ func (ec *executionContext) fieldContext_Platform_redirectionChoice(ctx context.
 	return fc, nil
 }
 
-func (ec *executionContext) _Platform_organization(ctx context.Context, field graphql.CollectedField, obj *model.Platform) (ret graphql.Marshaler) {
+func (ec *executionContext) _Platform_organization(ctx context.Context, field graphql.CollectedField, obj *database_models.Platform) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Platform_organization(ctx, field)
 	if err != nil {
 		return graphql.Null
@@ -8268,7 +9643,7 @@ func (ec *executionContext) _Platform_organization(ctx context.Context, field gr
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Organization, nil
+		return ec.resolvers.Platform().Organization(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -8289,8 +9664,8 @@ func (ec *executionContext) fieldContext_Platform_organization(ctx context.Conte
 	fc = &graphql.FieldContext{
 		Object:     "Platform",
 		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "id":
@@ -8326,8 +9701,8 @@ func (ec *executionContext) fieldContext_Platform_organization(ctx context.Conte
 	return fc, nil
 }
 
-func (ec *executionContext) _Platform_domains(ctx context.Context, field graphql.CollectedField, obj *model.Platform) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Platform_domains(ctx, field)
+func (ec *executionContext) _Platform_domain(ctx context.Context, field graphql.CollectedField, obj *database_models.Platform) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Platform_domain(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -8340,7 +9715,7 @@ func (ec *executionContext) _Platform_domains(ctx context.Context, field graphql
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Domains, nil
+		return ec.resolvers.Platform().Domain(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -8352,17 +9727,17 @@ func (ec *executionContext) _Platform_domains(ctx context.Context, field graphql
 		}
 		return graphql.Null
 	}
-	res := resTmp.([]*model.Domain)
+	res := resTmp.(*database_models.Domain)
 	fc.Result = res
-	return ec.marshalNDomain2ᚕᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐDomainᚄ(ctx, field.Selections, res)
+	return ec.marshalNDomain2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋmodelsᚐDomain(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Platform_domains(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Platform_domain(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Platform",
 		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "id":
@@ -8375,14 +9750,16 @@ func (ec *executionContext) fieldContext_Platform_domains(ctx context.Context, f
 				return ec.fieldContext_Domain_organization(ctx, field)
 			case "platform":
 				return ec.fieldContext_Domain_platform(ctx, field)
-			case "dnsStatus":
-				return ec.fieldContext_Domain_dnsStatus(ctx, field)
+			case "verification":
+				return ec.fieldContext_Domain_verification(ctx, field)
 			case "state":
 				return ec.fieldContext_Domain_state(ctx, field)
 			case "links":
 				return ec.fieldContext_Domain_links(ctx, field)
 			case "analytics":
 				return ec.fieldContext_Domain_analytics(ctx, field)
+			case "analyticReports":
+				return ec.fieldContext_Domain_analyticReports(ctx, field)
 			case "lastDNSVerificationAt":
 				return ec.fieldContext_Domain_lastDNSVerificationAt(ctx, field)
 			case "createdAt":
@@ -8398,7 +9775,7 @@ func (ec *executionContext) fieldContext_Platform_domains(ctx context.Context, f
 	return fc, nil
 }
 
-func (ec *executionContext) _Platform_permissions(ctx context.Context, field graphql.CollectedField, obj *model.Platform) (ret graphql.Marshaler) {
+func (ec *executionContext) _Platform_permissions(ctx context.Context, field graphql.CollectedField, obj *database_models.Platform) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Platform_permissions(ctx, field)
 	if err != nil {
 		return graphql.Null
@@ -8412,7 +9789,7 @@ func (ec *executionContext) _Platform_permissions(ctx context.Context, field gra
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Permissions, nil
+		return ec.resolvers.Platform().Permissions(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -8433,8 +9810,8 @@ func (ec *executionContext) fieldContext_Platform_permissions(ctx context.Contex
 	fc = &graphql.FieldContext{
 		Object:     "Platform",
 		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type PlatformPermission does not have child fields")
 		},
@@ -8442,7 +9819,69 @@ func (ec *executionContext) fieldContext_Platform_permissions(ctx context.Contex
 	return fc, nil
 }
 
-func (ec *executionContext) _Platform_links(ctx context.Context, field graphql.CollectedField, obj *model.Platform) (ret graphql.Marshaler) {
+func (ec *executionContext) _Platform_deployments(ctx context.Context, field graphql.CollectedField, obj *database_models.Platform) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Platform_deployments(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Platform().Deployments(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.PlatformDeployment)
+	fc.Result = res
+	return ec.marshalNPlatformDeployment2ᚕᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐPlatformDeploymentᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Platform_deployments(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Platform",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_PlatformDeployment_id(ctx, field)
+			case "platform":
+				return ec.fieldContext_PlatformDeployment_platform(ctx, field)
+			case "domain":
+				return ec.fieldContext_PlatformDeployment_domain(ctx, field)
+			case "status":
+				return ec.fieldContext_PlatformDeployment_status(ctx, field)
+			case "logs":
+				return ec.fieldContext_PlatformDeployment_logs(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_PlatformDeployment_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_PlatformDeployment_updatedAt(ctx, field)
+			case "deletedAt":
+				return ec.fieldContext_PlatformDeployment_deletedAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type PlatformDeployment", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Platform_links(ctx context.Context, field graphql.CollectedField, obj *database_models.Platform) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Platform_links(ctx, field)
 	if err != nil {
 		return graphql.Null
@@ -8456,7 +9895,7 @@ func (ec *executionContext) _Platform_links(ctx context.Context, field graphql.C
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Links, nil
+		return ec.resolvers.Platform().Links(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -8477,8 +9916,8 @@ func (ec *executionContext) fieldContext_Platform_links(ctx context.Context, fie
 	fc = &graphql.FieldContext{
 		Object:     "Platform",
 		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "id":
@@ -8514,7 +9953,7 @@ func (ec *executionContext) fieldContext_Platform_links(ctx context.Context, fie
 	return fc, nil
 }
 
-func (ec *executionContext) _Platform_analytics(ctx context.Context, field graphql.CollectedField, obj *model.Platform) (ret graphql.Marshaler) {
+func (ec *executionContext) _Platform_analytics(ctx context.Context, field graphql.CollectedField, obj *database_models.Platform) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Platform_analytics(ctx, field)
 	if err != nil {
 		return graphql.Null
@@ -8528,7 +9967,7 @@ func (ec *executionContext) _Platform_analytics(ctx context.Context, field graph
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Analytics, nil
+		return ec.resolvers.Platform().Analytics(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -8540,35 +9979,101 @@ func (ec *executionContext) _Platform_analytics(ctx context.Context, field graph
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.PlatformAnalytics)
+	res := resTmp.([]*model.AnalyticReport)
 	fc.Result = res
-	return ec.marshalNPlatformAnalytics2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐPlatformAnalytics(ctx, field.Selections, res)
+	return ec.marshalNAnalyticReport2ᚕᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐAnalyticReport(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Platform_analytics(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Platform",
 		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
-			case "id":
-				return ec.fieldContext_PlatformAnalytics_id(ctx, field)
-			case "totalLinks":
-				return ec.fieldContext_PlatformAnalytics_totalLinks(ctx, field)
-			case "totalUsers":
-				return ec.fieldContext_PlatformAnalytics_totalUsers(ctx, field)
-			case "observations":
-				return ec.fieldContext_PlatformAnalytics_observations(ctx, field)
+			case "link":
+				return ec.fieldContext_AnalyticReport_link(ctx, field)
+			case "domain":
+				return ec.fieldContext_AnalyticReport_domain(ctx, field)
+			case "totalHits":
+				return ec.fieldContext_AnalyticReport_totalHits(ctx, field)
+			case "totalSuccess":
+				return ec.fieldContext_AnalyticReport_totalSuccess(ctx, field)
+			case "totalFailed":
+				return ec.fieldContext_AnalyticReport_totalFailed(ctx, field)
+			case "referers":
+				return ec.fieldContext_AnalyticReport_referers(ctx, field)
+			case "locations":
+				return ec.fieldContext_AnalyticReport_locations(ctx, field)
+			case "useragents":
+				return ec.fieldContext_AnalyticReport_useragents(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type PlatformAnalytics", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type AnalyticReport", field.Name)
 		},
 	}
 	return fc, nil
 }
 
-func (ec *executionContext) _Platform_status(ctx context.Context, field graphql.CollectedField, obj *model.Platform) (ret graphql.Marshaler) {
+func (ec *executionContext) _Platform_analyticReports(ctx context.Context, field graphql.CollectedField, obj *database_models.Platform) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Platform_analyticReports(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Platform().AnalyticReports(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.AnalyticReports)
+	fc.Result = res
+	return ec.marshalNAnalyticReports2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐAnalyticReports(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Platform_analyticReports(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Platform",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "todayObservations":
+				return ec.fieldContext_AnalyticReports_todayObservations(ctx, field)
+			case "yesterdayObservations":
+				return ec.fieldContext_AnalyticReports_yesterdayObservations(ctx, field)
+			case "lastWeekObservations":
+				return ec.fieldContext_AnalyticReports_lastWeekObservations(ctx, field)
+			case "lastMonthObservations":
+				return ec.fieldContext_AnalyticReports_lastMonthObservations(ctx, field)
+			case "lastYearObservations":
+				return ec.fieldContext_AnalyticReports_lastYearObservations(ctx, field)
+			case "allTimeObservations":
+				return ec.fieldContext_AnalyticReports_allTimeObservations(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type AnalyticReports", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Platform_status(ctx context.Context, field graphql.CollectedField, obj *database_models.Platform) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Platform_status(ctx, field)
 	if err != nil {
 		return graphql.Null
@@ -8582,7 +10087,7 @@ func (ec *executionContext) _Platform_status(ctx context.Context, field graphql.
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Status, nil
+		return ec.resolvers.Platform().Status(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -8603,8 +10108,8 @@ func (ec *executionContext) fieldContext_Platform_status(ctx context.Context, fi
 	fc = &graphql.FieldContext{
 		Object:     "Platform",
 		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type StatusState does not have child fields")
 		},
@@ -8612,7 +10117,7 @@ func (ec *executionContext) fieldContext_Platform_status(ctx context.Context, fi
 	return fc, nil
 }
 
-func (ec *executionContext) _Platform_templates(ctx context.Context, field graphql.CollectedField, obj *model.Platform) (ret graphql.Marshaler) {
+func (ec *executionContext) _Platform_templates(ctx context.Context, field graphql.CollectedField, obj *database_models.Platform) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Platform_templates(ctx, field)
 	if err != nil {
 		return graphql.Null
@@ -8626,7 +10131,7 @@ func (ec *executionContext) _Platform_templates(ctx context.Context, field graph
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Templates, nil
+		return ec.resolvers.Platform().Templates(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -8647,8 +10152,8 @@ func (ec *executionContext) fieldContext_Platform_templates(ctx context.Context,
 	fc = &graphql.FieldContext{
 		Object:     "Platform",
 		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "id":
@@ -8680,7 +10185,7 @@ func (ec *executionContext) fieldContext_Platform_templates(ctx context.Context,
 	return fc, nil
 }
 
-func (ec *executionContext) _Platform_pinnedLinks(ctx context.Context, field graphql.CollectedField, obj *model.Platform) (ret graphql.Marshaler) {
+func (ec *executionContext) _Platform_pinnedLinks(ctx context.Context, field graphql.CollectedField, obj *database_models.Platform) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Platform_pinnedLinks(ctx, field)
 	if err != nil {
 		return graphql.Null
@@ -8694,7 +10199,7 @@ func (ec *executionContext) _Platform_pinnedLinks(ctx context.Context, field gra
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.PinnedLinks, nil
+		return ec.resolvers.Platform().PinnedLinks(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -8715,8 +10220,8 @@ func (ec *executionContext) fieldContext_Platform_pinnedLinks(ctx context.Contex
 	fc = &graphql.FieldContext{
 		Object:     "Platform",
 		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "id":
@@ -8752,8 +10257,8 @@ func (ec *executionContext) fieldContext_Platform_pinnedLinks(ctx context.Contex
 	return fc, nil
 }
 
-func (ec *executionContext) _PlatformAnalytics_id(ctx context.Context, field graphql.CollectedField, obj *model.PlatformAnalytics) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_PlatformAnalytics_id(ctx, field)
+func (ec *executionContext) _PlatformDeployment_id(ctx context.Context, field graphql.CollectedField, obj *model.PlatformDeployment) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_PlatformDeployment_id(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -8783,9 +10288,9 @@ func (ec *executionContext) _PlatformAnalytics_id(ctx context.Context, field gra
 	return ec.marshalNUUID2githubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_PlatformAnalytics_id(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_PlatformDeployment_id(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
-		Object:     "PlatformAnalytics",
+		Object:     "PlatformDeployment",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -8796,8 +10301,8 @@ func (ec *executionContext) fieldContext_PlatformAnalytics_id(ctx context.Contex
 	return fc, nil
 }
 
-func (ec *executionContext) _PlatformAnalytics_totalLinks(ctx context.Context, field graphql.CollectedField, obj *model.PlatformAnalytics) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_PlatformAnalytics_totalLinks(ctx, field)
+func (ec *executionContext) _PlatformDeployment_platform(ctx context.Context, field graphql.CollectedField, obj *model.PlatformDeployment) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_PlatformDeployment_platform(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -8810,7 +10315,7 @@ func (ec *executionContext) _PlatformAnalytics_totalLinks(ctx context.Context, f
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.TotalLinks, nil
+		return obj.Platform, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -8822,133 +10327,345 @@ func (ec *executionContext) _PlatformAnalytics_totalLinks(ctx context.Context, f
 		}
 		return graphql.Null
 	}
-	res := resTmp.(int)
+	res := resTmp.(*database_models.Platform)
 	fc.Result = res
-	return ec.marshalNInt2int(ctx, field.Selections, res)
+	return ec.marshalNPlatform2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋmodelsᚐPlatform(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_PlatformAnalytics_totalLinks(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_PlatformDeployment_platform(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
-		Object:     "PlatformAnalytics",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Int does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _PlatformAnalytics_totalUsers(ctx context.Context, field graphql.CollectedField, obj *model.PlatformAnalytics) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_PlatformAnalytics_totalUsers(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.TotalUsers, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(int)
-	fc.Result = res
-	return ec.marshalNInt2int(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_PlatformAnalytics_totalUsers(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "PlatformAnalytics",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Int does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _PlatformAnalytics_observations(ctx context.Context, field graphql.CollectedField, obj *model.PlatformAnalytics) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_PlatformAnalytics_observations(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Observations, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.([]*model.ObservationAnalytic)
-	fc.Result = res
-	return ec.marshalNObservationAnalytic2ᚕᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐObservationAnalyticᚄ(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_PlatformAnalytics_observations(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "PlatformAnalytics",
+		Object:     "PlatformDeployment",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "id":
-				return ec.fieldContext_ObservationAnalytic_id(ctx, field)
-			case "link":
-				return ec.fieldContext_ObservationAnalytic_link(ctx, field)
-			case "domain":
-				return ec.fieldContext_ObservationAnalytic_domain(ctx, field)
-			case "platform":
-				return ec.fieldContext_ObservationAnalytic_platform(ctx, field)
-			case "useragent":
-				return ec.fieldContext_ObservationAnalytic_useragent(ctx, field)
-			case "ip":
-				return ec.fieldContext_ObservationAnalytic_ip(ctx, field)
-			case "referrer":
-				return ec.fieldContext_ObservationAnalytic_referrer(ctx, field)
-			case "location":
-				return ec.fieldContext_ObservationAnalytic_location(ctx, field)
+				return ec.fieldContext_Platform_id(ctx, field)
+			case "name":
+				return ec.fieldContext_Platform_name(ctx, field)
+			case "openGraph":
+				return ec.fieldContext_Platform_openGraph(ctx, field)
 			case "redirectionChoice":
-				return ec.fieldContext_ObservationAnalytic_redirectionChoice(ctx, field)
-			case "success":
-				return ec.fieldContext_ObservationAnalytic_success(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_ObservationAnalytic_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_ObservationAnalytic_updatedAt(ctx, field)
+				return ec.fieldContext_Platform_redirectionChoice(ctx, field)
+			case "organization":
+				return ec.fieldContext_Platform_organization(ctx, field)
+			case "domain":
+				return ec.fieldContext_Platform_domain(ctx, field)
+			case "permissions":
+				return ec.fieldContext_Platform_permissions(ctx, field)
+			case "deployments":
+				return ec.fieldContext_Platform_deployments(ctx, field)
+			case "links":
+				return ec.fieldContext_Platform_links(ctx, field)
+			case "analytics":
+				return ec.fieldContext_Platform_analytics(ctx, field)
+			case "analyticReports":
+				return ec.fieldContext_Platform_analyticReports(ctx, field)
+			case "status":
+				return ec.fieldContext_Platform_status(ctx, field)
+			case "templates":
+				return ec.fieldContext_Platform_templates(ctx, field)
+			case "pinnedLinks":
+				return ec.fieldContext_Platform_pinnedLinks(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type ObservationAnalytic", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type Platform", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _PlatformDeployment_domain(ctx context.Context, field graphql.CollectedField, obj *model.PlatformDeployment) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_PlatformDeployment_domain(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Domain, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*database_models.Domain)
+	fc.Result = res
+	return ec.marshalNDomain2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋmodelsᚐDomain(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_PlatformDeployment_domain(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "PlatformDeployment",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Domain_id(ctx, field)
+			case "name":
+				return ec.fieldContext_Domain_name(ctx, field)
+			case "url":
+				return ec.fieldContext_Domain_url(ctx, field)
+			case "organization":
+				return ec.fieldContext_Domain_organization(ctx, field)
+			case "platform":
+				return ec.fieldContext_Domain_platform(ctx, field)
+			case "verification":
+				return ec.fieldContext_Domain_verification(ctx, field)
+			case "state":
+				return ec.fieldContext_Domain_state(ctx, field)
+			case "links":
+				return ec.fieldContext_Domain_links(ctx, field)
+			case "analytics":
+				return ec.fieldContext_Domain_analytics(ctx, field)
+			case "analyticReports":
+				return ec.fieldContext_Domain_analyticReports(ctx, field)
+			case "lastDNSVerificationAt":
+				return ec.fieldContext_Domain_lastDNSVerificationAt(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Domain_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Domain_updatedAt(ctx, field)
+			case "deletedAt":
+				return ec.fieldContext_Domain_deletedAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Domain", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _PlatformDeployment_status(ctx context.Context, field graphql.CollectedField, obj *model.PlatformDeployment) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_PlatformDeployment_status(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Status, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(model.DeploymentStatus)
+	fc.Result = res
+	return ec.marshalNDeploymentStatus2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐDeploymentStatus(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_PlatformDeployment_status(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "PlatformDeployment",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type DeploymentStatus does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _PlatformDeployment_logs(ctx context.Context, field graphql.CollectedField, obj *model.PlatformDeployment) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_PlatformDeployment_logs(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Logs, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Log)
+	fc.Result = res
+	return ec.marshalNLog2ᚕᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐLogᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_PlatformDeployment_logs(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "PlatformDeployment",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Log_id(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Log_createdAt(ctx, field)
+			case "message":
+				return ec.fieldContext_Log_message(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Log", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _PlatformDeployment_createdAt(ctx context.Context, field graphql.CollectedField, obj *model.PlatformDeployment) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_PlatformDeployment_createdAt(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CreatedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(time.Time)
+	fc.Result = res
+	return ec.marshalNDateTime2timeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_PlatformDeployment_createdAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "PlatformDeployment",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type DateTime does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _PlatformDeployment_updatedAt(ctx context.Context, field graphql.CollectedField, obj *model.PlatformDeployment) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_PlatformDeployment_updatedAt(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.UpdatedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*time.Time)
+	fc.Result = res
+	return ec.marshalODateTime2ᚖtimeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_PlatformDeployment_updatedAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "PlatformDeployment",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type DateTime does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _PlatformDeployment_deletedAt(ctx context.Context, field graphql.CollectedField, obj *model.PlatformDeployment) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_PlatformDeployment_deletedAt(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.DeletedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*time.Time)
+	fc.Result = res
+	return ec.marshalODateTime2ᚖtimeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_PlatformDeployment_deletedAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "PlatformDeployment",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type DateTime does not have child fields")
 		},
 	}
 	return fc, nil
@@ -9220,9 +10937,9 @@ func (ec *executionContext) _Query_platforms(ctx context.Context, field graphql.
 		}
 		return graphql.Null
 	}
-	res := resTmp.([]*model.Platform)
+	res := resTmp.([]*database_models.Platform)
 	fc.Result = res
-	return ec.marshalNPlatform2ᚕᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐPlatformᚄ(ctx, field.Selections, res)
+	return ec.marshalNPlatform2ᚕᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋmodelsᚐPlatformᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_platforms(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -9243,14 +10960,18 @@ func (ec *executionContext) fieldContext_Query_platforms(ctx context.Context, fi
 				return ec.fieldContext_Platform_redirectionChoice(ctx, field)
 			case "organization":
 				return ec.fieldContext_Platform_organization(ctx, field)
-			case "domains":
-				return ec.fieldContext_Platform_domains(ctx, field)
+			case "domain":
+				return ec.fieldContext_Platform_domain(ctx, field)
 			case "permissions":
 				return ec.fieldContext_Platform_permissions(ctx, field)
+			case "deployments":
+				return ec.fieldContext_Platform_deployments(ctx, field)
 			case "links":
 				return ec.fieldContext_Platform_links(ctx, field)
 			case "analytics":
 				return ec.fieldContext_Platform_analytics(ctx, field)
+			case "analyticReports":
+				return ec.fieldContext_Platform_analyticReports(ctx, field)
 			case "status":
 				return ec.fieldContext_Platform_status(ctx, field)
 			case "templates":
@@ -9694,9 +11415,9 @@ func (ec *executionContext) _Template_platform(ctx context.Context, field graphq
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.Platform)
+	res := resTmp.(*database_models.Platform)
 	fc.Result = res
-	return ec.marshalNPlatform2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐPlatform(ctx, field.Selections, res)
+	return ec.marshalNPlatform2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋmodelsᚐPlatform(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Template_platform(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -9717,14 +11438,18 @@ func (ec *executionContext) fieldContext_Template_platform(ctx context.Context, 
 				return ec.fieldContext_Platform_redirectionChoice(ctx, field)
 			case "organization":
 				return ec.fieldContext_Platform_organization(ctx, field)
-			case "domains":
-				return ec.fieldContext_Platform_domains(ctx, field)
+			case "domain":
+				return ec.fieldContext_Platform_domain(ctx, field)
 			case "permissions":
 				return ec.fieldContext_Platform_permissions(ctx, field)
+			case "deployments":
+				return ec.fieldContext_Platform_deployments(ctx, field)
 			case "links":
 				return ec.fieldContext_Platform_links(ctx, field)
 			case "analytics":
 				return ec.fieldContext_Platform_analytics(ctx, field)
+			case "analyticReports":
+				return ec.fieldContext_Platform_analyticReports(ctx, field)
 			case "status":
 				return ec.fieldContext_Platform_status(ctx, field)
 			case "templates":
@@ -9764,9 +11489,9 @@ func (ec *executionContext) _Template_openGraph(ctx context.Context, field graph
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.OpenGraph)
+	res := resTmp.(*database_types.OpenGraph)
 	fc.Result = res
-	return ec.marshalNOpenGraph2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐOpenGraph(ctx, field.Selections, res)
+	return ec.marshalNOpenGraph2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐOpenGraph(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Template_openGraph(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -11537,9 +13262,9 @@ func (ec *executionContext) _User_platforms(ctx context.Context, field graphql.C
 		}
 		return graphql.Null
 	}
-	res := resTmp.([]*model.Platform)
+	res := resTmp.([]*database_models.Platform)
 	fc.Result = res
-	return ec.marshalNPlatform2ᚕᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐPlatformᚄ(ctx, field.Selections, res)
+	return ec.marshalNPlatform2ᚕᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋmodelsᚐPlatformᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_User_platforms(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -11560,14 +13285,18 @@ func (ec *executionContext) fieldContext_User_platforms(ctx context.Context, fie
 				return ec.fieldContext_Platform_redirectionChoice(ctx, field)
 			case "organization":
 				return ec.fieldContext_Platform_organization(ctx, field)
-			case "domains":
-				return ec.fieldContext_Platform_domains(ctx, field)
+			case "domain":
+				return ec.fieldContext_Platform_domain(ctx, field)
 			case "permissions":
 				return ec.fieldContext_Platform_permissions(ctx, field)
+			case "deployments":
+				return ec.fieldContext_Platform_deployments(ctx, field)
 			case "links":
 				return ec.fieldContext_Platform_links(ctx, field)
 			case "analytics":
 				return ec.fieldContext_Platform_analytics(ctx, field)
+			case "analyticReports":
+				return ec.fieldContext_Platform_analyticReports(ctx, field)
 			case "status":
 				return ec.fieldContext_Platform_status(ctx, field)
 			case "templates":
@@ -12119,9 +13848,9 @@ func (ec *executionContext) _UserInvite_platforms(ctx context.Context, field gra
 		}
 		return graphql.Null
 	}
-	res := resTmp.([]*model.Platform)
+	res := resTmp.([]*database_models.Platform)
 	fc.Result = res
-	return ec.marshalNPlatform2ᚕᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐPlatformᚄ(ctx, field.Selections, res)
+	return ec.marshalNPlatform2ᚕᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋmodelsᚐPlatformᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_UserInvite_platforms(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -12142,14 +13871,18 @@ func (ec *executionContext) fieldContext_UserInvite_platforms(ctx context.Contex
 				return ec.fieldContext_Platform_redirectionChoice(ctx, field)
 			case "organization":
 				return ec.fieldContext_Platform_organization(ctx, field)
-			case "domains":
-				return ec.fieldContext_Platform_domains(ctx, field)
+			case "domain":
+				return ec.fieldContext_Platform_domain(ctx, field)
 			case "permissions":
 				return ec.fieldContext_Platform_permissions(ctx, field)
+			case "deployments":
+				return ec.fieldContext_Platform_deployments(ctx, field)
 			case "links":
 				return ec.fieldContext_Platform_links(ctx, field)
 			case "analytics":
 				return ec.fieldContext_Platform_analytics(ctx, field)
+			case "analyticReports":
+				return ec.fieldContext_Platform_analyticReports(ctx, field)
 			case "status":
 				return ec.fieldContext_Platform_status(ctx, field)
 			case "templates":
@@ -14214,20 +15947,61 @@ func (ec *executionContext) unmarshalInputAccountPhoneInput(ctx context.Context,
 	return it, nil
 }
 
-func (ec *executionContext) unmarshalInputDomainInput(ctx context.Context, obj interface{}) (model.DomainInput, error) {
-	var it model.DomainInput
+func (ec *executionContext) unmarshalInputClientInformationInput(ctx context.Context, obj interface{}) (model.ClientInformationInput, error) {
+	var it model.ClientInformationInput
 	asMap := map[string]interface{}{}
 	for k, v := range obj.(map[string]interface{}) {
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"name", "url"}
+	fieldsInOrder := [...]string{"useragent", "ip"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
 			continue
 		}
 		switch k {
+		case "useragent":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("useragent"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Useragent = data
+		case "ip":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ip"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.IP = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputDomainCreateInput(ctx context.Context, obj interface{}) (model.DomainCreateInput, error) {
+	var it model.DomainCreateInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"organizationId", "name", "url", "clientInformation"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "organizationId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("organizationId"))
+			data, err := ec.unmarshalNUUID2githubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.OrganizationID = data
 		case "name":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
 			data, err := ec.unmarshalNString2string(ctx, v)
@@ -14242,6 +16016,13 @@ func (ec *executionContext) unmarshalInputDomainInput(ctx context.Context, obj i
 				return it, err
 			}
 			it.URL = data
+		case "clientInformation":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clientInformation"))
+			data, err := ec.unmarshalNClientInformationInput2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐClientInformationInput(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ClientInformation = data
 		}
 	}
 
@@ -14677,7 +16458,7 @@ func (ec *executionContext) unmarshalInputPasswordResetCreateInput(ctx context.C
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"email", "useragent", "ip"}
+	fieldsInOrder := [...]string{"email", "clientInformation"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -14691,20 +16472,13 @@ func (ec *executionContext) unmarshalInputPasswordResetCreateInput(ctx context.C
 				return it, err
 			}
 			it.Email = data
-		case "useragent":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("useragent"))
-			data, err := ec.unmarshalNString2string(ctx, v)
+		case "clientInformation":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clientInformation"))
+			data, err := ec.unmarshalNClientInformationInput2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐClientInformationInput(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.Useragent = data
-		case "ip":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ip"))
-			data, err := ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.IP = data
+			it.ClientInformation = data
 		}
 	}
 
@@ -14718,7 +16492,7 @@ func (ec *executionContext) unmarshalInputPasswordResetUpdateInput(ctx context.C
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"token", "password", "confirmPassword", "useragent", "ip"}
+	fieldsInOrder := [...]string{"token", "password", "confirmPassword", "clientInformation"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -14746,20 +16520,13 @@ func (ec *executionContext) unmarshalInputPasswordResetUpdateInput(ctx context.C
 				return it, err
 			}
 			it.ConfirmPassword = data
-		case "useragent":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("useragent"))
-			data, err := ec.unmarshalNString2string(ctx, v)
+		case "clientInformation":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clientInformation"))
+			data, err := ec.unmarshalNClientInformationInput2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐClientInformationInput(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.Useragent = data
-		case "ip":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ip"))
-			data, err := ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.IP = data
+			it.ClientInformation = data
 		}
 	}
 
@@ -15103,7 +16870,7 @@ func (ec *executionContext) unmarshalInputUserInput(ctx context.Context, obj int
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"email", "password", "confirmPassword", "fullname", "phone", "useragent", "ip"}
+	fieldsInOrder := [...]string{"email", "password", "confirmPassword", "fullname", "phone", "clientInformation"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -15145,20 +16912,13 @@ func (ec *executionContext) unmarshalInputUserInput(ctx context.Context, obj int
 				return it, err
 			}
 			it.Phone = data
-		case "useragent":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("useragent"))
-			data, err := ec.unmarshalNString2string(ctx, v)
+		case "clientInformation":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clientInformation"))
+			data, err := ec.unmarshalNClientInformationInput2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐClientInformationInput(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.Useragent = data
-		case "ip":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ip"))
-			data, err := ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.IP = data
+			it.ClientInformation = data
 		}
 	}
 
@@ -15213,7 +16973,7 @@ func (ec *executionContext) unmarshalInputUserUpdatePasswordInput(ctx context.Co
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"password", "confirmPassword", "useragent", "ip"}
+	fieldsInOrder := [...]string{"password", "confirmPassword", "clientInformation"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -15234,20 +16994,13 @@ func (ec *executionContext) unmarshalInputUserUpdatePasswordInput(ctx context.Co
 				return it, err
 			}
 			it.ConfirmPassword = data
-		case "useragent":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("useragent"))
-			data, err := ec.unmarshalNString2string(ctx, v)
+		case "clientInformation":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clientInformation"))
+			data, err := ec.unmarshalNClientInformationInput2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐClientInformationInput(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.Useragent = data
-		case "ip":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ip"))
-			data, err := ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.IP = data
+			it.ClientInformation = data
 		}
 	}
 
@@ -15380,9 +17133,147 @@ func (ec *executionContext) _AccountPhone(ctx context.Context, sel ast.Selection
 	return out
 }
 
+var analyticReportImplementors = []string{"AnalyticReport"}
+
+func (ec *executionContext) _AnalyticReport(ctx context.Context, sel ast.SelectionSet, obj *model.AnalyticReport) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, analyticReportImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("AnalyticReport")
+		case "link":
+			out.Values[i] = ec._AnalyticReport_link(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "domain":
+			out.Values[i] = ec._AnalyticReport_domain(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "totalHits":
+			out.Values[i] = ec._AnalyticReport_totalHits(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "totalSuccess":
+			out.Values[i] = ec._AnalyticReport_totalSuccess(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "totalFailed":
+			out.Values[i] = ec._AnalyticReport_totalFailed(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "referers":
+			out.Values[i] = ec._AnalyticReport_referers(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "locations":
+			out.Values[i] = ec._AnalyticReport_locations(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "useragents":
+			out.Values[i] = ec._AnalyticReport_useragents(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var analyticReportsImplementors = []string{"AnalyticReports"}
+
+func (ec *executionContext) _AnalyticReports(ctx context.Context, sel ast.SelectionSet, obj *model.AnalyticReports) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, analyticReportsImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("AnalyticReports")
+		case "todayObservations":
+			out.Values[i] = ec._AnalyticReports_todayObservations(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "yesterdayObservations":
+			out.Values[i] = ec._AnalyticReports_yesterdayObservations(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "lastWeekObservations":
+			out.Values[i] = ec._AnalyticReports_lastWeekObservations(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "lastMonthObservations":
+			out.Values[i] = ec._AnalyticReports_lastMonthObservations(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "lastYearObservations":
+			out.Values[i] = ec._AnalyticReports_lastYearObservations(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "allTimeObservations":
+			out.Values[i] = ec._AnalyticReports_allTimeObservations(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
 var domainImplementors = []string{"Domain"}
 
-func (ec *executionContext) _Domain(ctx context.Context, sel ast.SelectionSet, obj *model.Domain) graphql.Marshaler {
+func (ec *executionContext) _Domain(ctx context.Context, sel ast.SelectionSet, obj *database_models.Domain) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, domainImplementors)
 
 	out := graphql.NewFieldSet(fields)
@@ -15394,48 +17285,301 @@ func (ec *executionContext) _Domain(ctx context.Context, sel ast.SelectionSet, o
 		case "id":
 			out.Values[i] = ec._Domain_id(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "name":
 			out.Values[i] = ec._Domain_name(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "url":
 			out.Values[i] = ec._Domain_url(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "organization":
-			out.Values[i] = ec._Domain_organization(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Domain_organization(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
 			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "platform":
-			out.Values[i] = ec._Domain_platform(ctx, field, obj)
-		case "dnsStatus":
-			out.Values[i] = ec._Domain_dnsStatus(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Domain_platform(ctx, field, obj)
+				return res
 			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "verification":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Domain_verification(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "state":
-			out.Values[i] = ec._Domain_state(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Domain_state(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
 			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "links":
-			out.Values[i] = ec._Domain_links(ctx, field, obj)
-		case "analytics":
-			out.Values[i] = ec._Domain_analytics(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Domain_links(ctx, field, obj)
+				return res
 			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "analytics":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Domain_analytics(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "analyticReports":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Domain_analyticReports(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "lastDNSVerificationAt":
-			out.Values[i] = ec._Domain_lastDNSVerificationAt(ctx, field, obj)
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Domain_lastDNSVerificationAt(ctx, field, obj)
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "createdAt":
 			out.Values[i] = ec._Domain_createdAt(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "updatedAt":
 			out.Values[i] = ec._Domain_updatedAt(ctx, field, obj)
@@ -15464,42 +17608,46 @@ func (ec *executionContext) _Domain(ctx context.Context, sel ast.SelectionSet, o
 	return out
 }
 
-var domainAnalyticsImplementors = []string{"DomainAnalytics"}
+var domainVerificationImplementors = []string{"DomainVerification"}
 
-func (ec *executionContext) _DomainAnalytics(ctx context.Context, sel ast.SelectionSet, obj *model.DomainAnalytics) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, domainAnalyticsImplementors)
+func (ec *executionContext) _DomainVerification(ctx context.Context, sel ast.SelectionSet, obj *model.DomainVerification) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, domainVerificationImplementors)
 
 	out := graphql.NewFieldSet(fields)
 	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
-			out.Values[i] = graphql.MarshalString("DomainAnalytics")
+			out.Values[i] = graphql.MarshalString("DomainVerification")
 		case "id":
-			out.Values[i] = ec._DomainAnalytics_id(ctx, field, obj)
+			out.Values[i] = ec._DomainVerification_id(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
-		case "totalLinks":
-			out.Values[i] = ec._DomainAnalytics_totalLinks(ctx, field, obj)
+		case "domain":
+			out.Values[i] = ec._DomainVerification_domain(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
-		case "totalPlatforms":
-			out.Values[i] = ec._DomainAnalytics_totalPlatforms(ctx, field, obj)
+		case "status":
+			out.Values[i] = ec._DomainVerification_status(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
-		case "totalUsers":
-			out.Values[i] = ec._DomainAnalytics_totalUsers(ctx, field, obj)
+		case "logs":
+			out.Values[i] = ec._DomainVerification_logs(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
-		case "observations":
-			out.Values[i] = ec._DomainAnalytics_observations(ctx, field, obj)
+		case "createdAt":
+			out.Values[i] = ec._DomainVerification_createdAt(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
+		case "updatedAt":
+			out.Values[i] = ec._DomainVerification_updatedAt(ctx, field, obj)
+		case "deletedAt":
+			out.Values[i] = ec._DomainVerification_deletedAt(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -15688,49 +17836,29 @@ func (ec *executionContext) _Link(ctx context.Context, sel ast.SelectionSet, obj
 	return out
 }
 
-var linkAnalyticsImplementors = []string{"LinkAnalytics"}
+var logImplementors = []string{"Log"}
 
-func (ec *executionContext) _LinkAnalytics(ctx context.Context, sel ast.SelectionSet, obj *model.LinkAnalytics) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, linkAnalyticsImplementors)
+func (ec *executionContext) _Log(ctx context.Context, sel ast.SelectionSet, obj *model.Log) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, logImplementors)
 
 	out := graphql.NewFieldSet(fields)
 	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
-			out.Values[i] = graphql.MarshalString("LinkAnalytics")
+			out.Values[i] = graphql.MarshalString("Log")
 		case "id":
-			out.Values[i] = ec._LinkAnalytics_id(ctx, field, obj)
+			out.Values[i] = ec._Log_id(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
-		case "useragent":
-			out.Values[i] = ec._LinkAnalytics_useragent(ctx, field, obj)
+		case "createdAt":
+			out.Values[i] = ec._Log_createdAt(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
-		case "platformRedirectionChoice":
-			out.Values[i] = ec._LinkAnalytics_platformRedirectionChoice(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		case "ip":
-			out.Values[i] = ec._LinkAnalytics_ip(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		case "location":
-			out.Values[i] = ec._LinkAnalytics_location(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		case "referrer":
-			out.Values[i] = ec._LinkAnalytics_referrer(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		case "observations":
-			out.Values[i] = ec._LinkAnalytics_observations(ctx, field, obj)
+		case "message":
+			out.Values[i] = ec._Log_message(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -15775,6 +17903,70 @@ func (ec *executionContext) _LoginPayload(ctx context.Context, sel ast.Selection
 			}
 		case "refreshToken":
 			out.Values[i] = ec._LoginPayload_refreshToken(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var metricAnalyticsImplementors = []string{"MetricAnalytics"}
+
+func (ec *executionContext) _MetricAnalytics(ctx context.Context, sel ast.SelectionSet, obj *model.MetricAnalytics) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, metricAnalyticsImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("MetricAnalytics")
+		case "feeder":
+			out.Values[i] = ec._MetricAnalytics_feeder(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "totalHits":
+			out.Values[i] = ec._MetricAnalytics_totalHits(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "totalSuccess":
+			out.Values[i] = ec._MetricAnalytics_totalSuccess(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "totalFailed":
+			out.Values[i] = ec._MetricAnalytics_totalFailed(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "startAt":
+			out.Values[i] = ec._MetricAnalytics_startAt(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "endAt":
+			out.Values[i] = ec._MetricAnalytics_endAt(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -15865,6 +18057,13 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		case "resetPassword":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_resetPassword(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "createDomain":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_createDomain(ctx, field)
 			})
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
@@ -15985,7 +18184,7 @@ func (ec *executionContext) _ObservationAnalytic(ctx context.Context, sel ast.Se
 
 var openGraphImplementors = []string{"OpenGraph"}
 
-func (ec *executionContext) _OpenGraph(ctx context.Context, sel ast.SelectionSet, obj *model.OpenGraph) graphql.Marshaler {
+func (ec *executionContext) _OpenGraph(ctx context.Context, sel ast.SelectionSet, obj *database_types.OpenGraph) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, openGraphImplementors)
 
 	out := graphql.NewFieldSet(fields)
@@ -16039,7 +18238,7 @@ func (ec *executionContext) _OpenGraph(ctx context.Context, sel ast.SelectionSet
 
 var openGraphXImplementors = []string{"OpenGraphX"}
 
-func (ec *executionContext) _OpenGraphX(ctx context.Context, sel ast.SelectionSet, obj *model.OpenGraphX) graphql.Marshaler {
+func (ec *executionContext) _OpenGraphX(ctx context.Context, sel ast.SelectionSet, obj *database_types.OpenGraphX) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, openGraphXImplementors)
 
 	out := graphql.NewFieldSet(fields)
@@ -16562,7 +18761,7 @@ func (ec *executionContext) _Permission(ctx context.Context, sel ast.SelectionSe
 
 var platformImplementors = []string{"Platform"}
 
-func (ec *executionContext) _Platform(ctx context.Context, sel ast.SelectionSet, obj *model.Platform) graphql.Marshaler {
+func (ec *executionContext) _Platform(ctx context.Context, sel ast.SelectionSet, obj *database_models.Platform) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, platformImplementors)
 
 	out := graphql.NewFieldSet(fields)
@@ -16574,63 +18773,414 @@ func (ec *executionContext) _Platform(ctx context.Context, sel ast.SelectionSet,
 		case "id":
 			out.Values[i] = ec._Platform_id(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "name":
 			out.Values[i] = ec._Platform_name(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "openGraph":
 			out.Values[i] = ec._Platform_openGraph(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "redirectionChoice":
-			out.Values[i] = ec._Platform_redirectionChoice(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Platform_redirectionChoice(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
 			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "organization":
-			out.Values[i] = ec._Platform_organization(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Platform_organization(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
 			}
-		case "domains":
-			out.Values[i] = ec._Platform_domains(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
 			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "domain":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Platform_domain(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "permissions":
-			out.Values[i] = ec._Platform_permissions(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Platform_permissions(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
 			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "deployments":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Platform_deployments(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "links":
-			out.Values[i] = ec._Platform_links(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Platform_links(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
 			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "analytics":
-			out.Values[i] = ec._Platform_analytics(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Platform_analytics(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
 			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "analyticReports":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Platform_analyticReports(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "status":
-			out.Values[i] = ec._Platform_status(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Platform_status(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
 			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "templates":
-			out.Values[i] = ec._Platform_templates(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Platform_templates(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
 			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "pinnedLinks":
-			out.Values[i] = ec._Platform_pinnedLinks(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Platform_pinnedLinks(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
 			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -16654,37 +19204,51 @@ func (ec *executionContext) _Platform(ctx context.Context, sel ast.SelectionSet,
 	return out
 }
 
-var platformAnalyticsImplementors = []string{"PlatformAnalytics"}
+var platformDeploymentImplementors = []string{"PlatformDeployment"}
 
-func (ec *executionContext) _PlatformAnalytics(ctx context.Context, sel ast.SelectionSet, obj *model.PlatformAnalytics) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, platformAnalyticsImplementors)
+func (ec *executionContext) _PlatformDeployment(ctx context.Context, sel ast.SelectionSet, obj *model.PlatformDeployment) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, platformDeploymentImplementors)
 
 	out := graphql.NewFieldSet(fields)
 	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
-			out.Values[i] = graphql.MarshalString("PlatformAnalytics")
+			out.Values[i] = graphql.MarshalString("PlatformDeployment")
 		case "id":
-			out.Values[i] = ec._PlatformAnalytics_id(ctx, field, obj)
+			out.Values[i] = ec._PlatformDeployment_id(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
-		case "totalLinks":
-			out.Values[i] = ec._PlatformAnalytics_totalLinks(ctx, field, obj)
+		case "platform":
+			out.Values[i] = ec._PlatformDeployment_platform(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
-		case "totalUsers":
-			out.Values[i] = ec._PlatformAnalytics_totalUsers(ctx, field, obj)
+		case "domain":
+			out.Values[i] = ec._PlatformDeployment_domain(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
-		case "observations":
-			out.Values[i] = ec._PlatformAnalytics_observations(ctx, field, obj)
+		case "status":
+			out.Values[i] = ec._PlatformDeployment_status(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
+		case "logs":
+			out.Values[i] = ec._PlatformDeployment_logs(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "createdAt":
+			out.Values[i] = ec._PlatformDeployment_createdAt(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "updatedAt":
+			out.Values[i] = ec._PlatformDeployment_updatedAt(ctx, field, obj)
+		case "deletedAt":
+			out.Values[i] = ec._PlatformDeployment_deletedAt(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -17949,6 +20513,58 @@ func (ec *executionContext) unmarshalNAccountPhoneInput2ᚖgithubᚗcomᚋRouteH
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
+func (ec *executionContext) marshalNAnalyticReport2ᚕᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐAnalyticReport(ctx context.Context, sel ast.SelectionSet, v []*model.AnalyticReport) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalOAnalyticReport2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐAnalyticReport(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	return ret
+}
+
+func (ec *executionContext) marshalNAnalyticReports2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐAnalyticReports(ctx context.Context, sel ast.SelectionSet, v model.AnalyticReports) graphql.Marshaler {
+	return ec._AnalyticReports(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNAnalyticReports2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐAnalyticReports(ctx context.Context, sel ast.SelectionSet, v *model.AnalyticReports) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._AnalyticReports(ctx, sel, v)
+}
+
 func (ec *executionContext) unmarshalNBoolean2bool(ctx context.Context, v interface{}) (bool, error) {
 	res, err := graphql.UnmarshalBoolean(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -17962,6 +20578,11 @@ func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.Se
 		}
 	}
 	return res
+}
+
+func (ec *executionContext) unmarshalNClientInformationInput2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐClientInformationInput(ctx context.Context, v interface{}) (*model.ClientInformationInput, error) {
+	res, err := ec.unmarshalInputClientInformationInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalNDNSStatus2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐDNSStatus(ctx context.Context, v interface{}) (database_enums.DNSStatus, error) {
@@ -18010,7 +20631,21 @@ func (ec *executionContext) marshalNDateTime2ᚖtimeᚐTime(ctx context.Context,
 	return res
 }
 
-func (ec *executionContext) marshalNDomain2ᚕᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐDomainᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Domain) graphql.Marshaler {
+func (ec *executionContext) unmarshalNDeploymentStatus2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐDeploymentStatus(ctx context.Context, v interface{}) (model.DeploymentStatus, error) {
+	var res model.DeploymentStatus
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNDeploymentStatus2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐDeploymentStatus(ctx context.Context, sel ast.SelectionSet, v model.DeploymentStatus) graphql.Marshaler {
+	return v
+}
+
+func (ec *executionContext) marshalNDomain2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋmodelsᚐDomain(ctx context.Context, sel ast.SelectionSet, v database_models.Domain) graphql.Marshaler {
+	return ec._Domain(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNDomain2ᚕᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋmodelsᚐDomainᚄ(ctx context.Context, sel ast.SelectionSet, v []*database_models.Domain) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -18034,7 +20669,7 @@ func (ec *executionContext) marshalNDomain2ᚕᚖgithubᚗcomᚋRouteHubᚑLink�
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNDomain2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐDomain(ctx, sel, v[i])
+			ret[i] = ec.marshalNDomain2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋmodelsᚐDomain(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -18054,7 +20689,7 @@ func (ec *executionContext) marshalNDomain2ᚕᚖgithubᚗcomᚋRouteHubᚑLink�
 	return ret
 }
 
-func (ec *executionContext) marshalNDomain2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐDomain(ctx context.Context, sel ast.SelectionSet, v *model.Domain) graphql.Marshaler {
+func (ec *executionContext) marshalNDomain2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋmodelsᚐDomain(ctx context.Context, sel ast.SelectionSet, v *database_models.Domain) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -18064,14 +20699,47 @@ func (ec *executionContext) marshalNDomain2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋr
 	return ec._Domain(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNDomainAnalytics2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐDomainAnalytics(ctx context.Context, sel ast.SelectionSet, v *model.DomainAnalytics) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
+func (ec *executionContext) unmarshalNDomainCreateInput2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐDomainCreateInput(ctx context.Context, v interface{}) (model.DomainCreateInput, error) {
+	res, err := ec.unmarshalInputDomainCreateInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNDomainVerification2ᚕᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐDomainVerification(ctx context.Context, sel ast.SelectionSet, v []*model.DomainVerification) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
 	}
-	return ec._DomainAnalytics(ctx, sel, v)
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalODomainVerification2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐDomainVerification(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	return ret
 }
 
 func (ec *executionContext) unmarshalNFloat2float64(ctx context.Context, v interface{}) (float64, error) {
@@ -18139,6 +20807,21 @@ func (ec *executionContext) marshalNInvitationStatus2githubᚗcomᚋRouteHubᚑL
 	return v
 }
 
+func (ec *executionContext) unmarshalNJSON2string(ctx context.Context, v interface{}) (string, error) {
+	res, err := graphql.UnmarshalString(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNJSON2string(ctx context.Context, sel ast.SelectionSet, v string) graphql.Marshaler {
+	res := graphql.MarshalString(v)
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+	}
+	return res
+}
+
 func (ec *executionContext) marshalNLink2ᚕᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐLinkᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Link) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
@@ -18193,14 +20876,58 @@ func (ec *executionContext) marshalNLink2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋrou
 	return ec._Link(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNLinkAnalytics2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐLinkAnalytics(ctx context.Context, sel ast.SelectionSet, v *model.LinkAnalytics) graphql.Marshaler {
+func (ec *executionContext) marshalNLog2ᚕᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐLogᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Log) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNLog2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐLog(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalNLog2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐLog(ctx context.Context, sel ast.SelectionSet, v *model.Log) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
 		}
 		return graphql.Null
 	}
-	return ec._LinkAnalytics(ctx, sel, v)
+	return ec._Log(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNLoginInput2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐLoginInput(ctx context.Context, v interface{}) (model.LoginInput, error) {
@@ -18220,6 +20947,60 @@ func (ec *executionContext) marshalNLoginPayload2ᚖgithubᚗcomᚋRouteHubᚑLi
 		return graphql.Null
 	}
 	return ec._LoginPayload(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNMetricAnalytics2ᚕᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐMetricAnalyticsᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.MetricAnalytics) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNMetricAnalytics2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐMetricAnalytics(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalNMetricAnalytics2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐMetricAnalytics(ctx context.Context, sel ast.SelectionSet, v *model.MetricAnalytics) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._MetricAnalytics(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalNObservationAnalytic2ᚕᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐObservationAnalyticᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.ObservationAnalytic) graphql.Marshaler {
@@ -18276,7 +21057,7 @@ func (ec *executionContext) marshalNObservationAnalytic2ᚖgithubᚗcomᚋRouteH
 	return ec._ObservationAnalytic(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNOpenGraph2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐOpenGraph(ctx context.Context, sel ast.SelectionSet, v *model.OpenGraph) graphql.Marshaler {
+func (ec *executionContext) marshalNOpenGraph2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐOpenGraph(ctx context.Context, sel ast.SelectionSet, v *database_types.OpenGraph) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -18599,7 +21380,7 @@ func (ec *executionContext) marshalNPermission2ᚖgithubᚗcomᚋRouteHubᚑLink
 	return ec._Permission(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNPlatform2ᚕᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐPlatformᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Platform) graphql.Marshaler {
+func (ec *executionContext) marshalNPlatform2ᚕᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋmodelsᚐPlatformᚄ(ctx context.Context, sel ast.SelectionSet, v []*database_models.Platform) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -18623,7 +21404,7 @@ func (ec *executionContext) marshalNPlatform2ᚕᚖgithubᚗcomᚋRouteHubᚑLin
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNPlatform2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐPlatform(ctx, sel, v[i])
+			ret[i] = ec.marshalNPlatform2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋmodelsᚐPlatform(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -18643,7 +21424,7 @@ func (ec *executionContext) marshalNPlatform2ᚕᚖgithubᚗcomᚋRouteHubᚑLin
 	return ret
 }
 
-func (ec *executionContext) marshalNPlatform2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐPlatform(ctx context.Context, sel ast.SelectionSet, v *model.Platform) graphql.Marshaler {
+func (ec *executionContext) marshalNPlatform2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋmodelsᚐPlatform(ctx context.Context, sel ast.SelectionSet, v *database_models.Platform) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -18653,14 +21434,58 @@ func (ec *executionContext) marshalNPlatform2ᚖgithubᚗcomᚋRouteHubᚑLink�
 	return ec._Platform(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNPlatformAnalytics2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐPlatformAnalytics(ctx context.Context, sel ast.SelectionSet, v *model.PlatformAnalytics) graphql.Marshaler {
+func (ec *executionContext) marshalNPlatformDeployment2ᚕᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐPlatformDeploymentᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.PlatformDeployment) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNPlatformDeployment2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐPlatformDeployment(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalNPlatformDeployment2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐPlatformDeployment(ctx context.Context, sel ast.SelectionSet, v *model.PlatformDeployment) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
 		}
 		return graphql.Null
 	}
-	return ec._PlatformAnalytics(ctx, sel, v)
+	return ec._PlatformDeployment(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNPlatformPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐPlatformPermission(ctx context.Context, v interface{}) (database_enums.PlatformPermission, error) {
@@ -19441,6 +22266,13 @@ func (ec *executionContext) marshalN__TypeKind2string(ctx context.Context, sel a
 	return res
 }
 
+func (ec *executionContext) marshalOAnalyticReport2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐAnalyticReport(ctx context.Context, sel ast.SelectionSet, v *model.AnalyticReport) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._AnalyticReport(ctx, sel, v)
+}
+
 func (ec *executionContext) unmarshalOBoolean2bool(ctx context.Context, v interface{}) (bool, error) {
 	res, err := graphql.UnmarshalBoolean(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -19481,6 +22313,13 @@ func (ec *executionContext) marshalODateTime2ᚖtimeᚐTime(ctx context.Context,
 	}
 	res := graphql.MarshalTime(*v)
 	return res
+}
+
+func (ec *executionContext) marshalODomainVerification2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐDomainVerification(ctx context.Context, sel ast.SelectionSet, v *model.DomainVerification) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._DomainVerification(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalOIndustry2ᚕᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐIndustryᚄ(ctx context.Context, sel ast.SelectionSet, v []*database_types.Industry) graphql.Marshaler {
@@ -19577,7 +22416,7 @@ func (ec *executionContext) marshalOLink2ᚕᚖgithubᚗcomᚋRouteHubᚑLinkᚋ
 	return ret
 }
 
-func (ec *executionContext) marshalOOpenGraph2ᚕᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐOpenGraphᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.OpenGraph) graphql.Marshaler {
+func (ec *executionContext) marshalOOpenGraph2ᚕᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐOpenGraphᚄ(ctx context.Context, sel ast.SelectionSet, v []*database_types.OpenGraph) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
@@ -19604,7 +22443,7 @@ func (ec *executionContext) marshalOOpenGraph2ᚕᚖgithubᚗcomᚋRouteHubᚑLi
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNOpenGraph2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐOpenGraph(ctx, sel, v[i])
+			ret[i] = ec.marshalNOpenGraph2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐOpenGraph(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -19624,14 +22463,14 @@ func (ec *executionContext) marshalOOpenGraph2ᚕᚖgithubᚗcomᚋRouteHubᚑLi
 	return ret
 }
 
-func (ec *executionContext) marshalOOpenGraphX2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐOpenGraphX(ctx context.Context, sel ast.SelectionSet, v *model.OpenGraphX) graphql.Marshaler {
+func (ec *executionContext) marshalOOpenGraphX2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐOpenGraphX(ctx context.Context, sel ast.SelectionSet, v *database_types.OpenGraphX) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return ec._OpenGraphX(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalOPlatform2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐPlatform(ctx context.Context, sel ast.SelectionSet, v *model.Platform) graphql.Marshaler {
+func (ec *executionContext) marshalOPlatform2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋmodelsᚐPlatform(ctx context.Context, sel ast.SelectionSet, v *database_models.Platform) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}

@@ -10,6 +10,7 @@ import (
 
 	database_enums "github.com/RouteHub-Link/routehub-service-graphql/database/enums"
 	database_models "github.com/RouteHub-Link/routehub-service-graphql/database/models"
+	database_types "github.com/RouteHub-Link/routehub-service-graphql/database/types"
 	"github.com/google/uuid"
 )
 
@@ -18,33 +19,46 @@ type AccountPhoneInput struct {
 	CountryCode string `json:"countryCode"`
 }
 
-type Domain struct {
-	ID                    uuid.UUID                     `json:"id"`
-	Name                  string                        `json:"name"`
-	URL                   string                        `json:"url"`
-	Organization          *database_models.Organization `json:"organization"`
-	Platform              *Platform                     `json:"platform,omitempty"`
-	DNSStatus             database_enums.DNSStatus      `json:"dnsStatus"`
-	State                 StatusState                   `json:"state"`
-	Links                 []*Link                       `json:"links,omitempty"`
-	Analytics             *DomainAnalytics              `json:"analytics"`
-	LastDNSVerificationAt *time.Time                    `json:"lastDNSVerificationAt,omitempty"`
-	CreatedAt             time.Time                     `json:"createdAt"`
-	UpdatedAt             *time.Time                    `json:"updatedAt,omitempty"`
-	DeletedAt             *time.Time                    `json:"deletedAt,omitempty"`
+type AnalyticReport struct {
+	Link         *Link                   `json:"link"`
+	Domain       *database_models.Domain `json:"domain"`
+	TotalHits    int                     `json:"totalHits"`
+	TotalSuccess int                     `json:"totalSuccess"`
+	TotalFailed  int                     `json:"totalFailed"`
+	Referers     []*MetricAnalytics      `json:"referers"`
+	Locations    []*MetricAnalytics      `json:"locations"`
+	Useragents   []*MetricAnalytics      `json:"useragents"`
 }
 
-type DomainAnalytics struct {
-	ID             uuid.UUID              `json:"id"`
-	TotalLinks     int                    `json:"totalLinks"`
-	TotalPlatforms int                    `json:"totalPlatforms"`
-	TotalUsers     int                    `json:"totalUsers"`
-	Observations   []*ObservationAnalytic `json:"observations"`
+type AnalyticReports struct {
+	TodayObservations     []*ObservationAnalytic `json:"todayObservations"`
+	YesterdayObservations []*ObservationAnalytic `json:"yesterdayObservations"`
+	LastWeekObservations  string                 `json:"lastWeekObservations"`
+	LastMonthObservations string                 `json:"lastMonthObservations"`
+	LastYearObservations  string                 `json:"lastYearObservations"`
+	AllTimeObservations   string                 `json:"allTimeObservations"`
 }
 
-type DomainInput struct {
-	Name string `json:"name"`
-	URL  string `json:"url"`
+type ClientInformationInput struct {
+	Useragent string `json:"useragent"`
+	IP        string `json:"ip"`
+}
+
+type DomainCreateInput struct {
+	OrganizationID    uuid.UUID               `json:"organizationId"`
+	Name              string                  `json:"name"`
+	URL               string                  `json:"url"`
+	ClientInformation *ClientInformationInput `json:"clientInformation"`
+}
+
+type DomainVerification struct {
+	ID        uuid.UUID                `json:"id"`
+	Domain    *database_models.Domain  `json:"domain"`
+	Status    database_enums.DNSStatus `json:"status"`
+	Logs      []*Log                   `json:"logs"`
+	CreatedAt time.Time                `json:"createdAt"`
+	UpdatedAt *time.Time               `json:"updatedAt,omitempty"`
+	DeletedAt *time.Time               `json:"deletedAt,omitempty"`
 }
 
 type Link struct {
@@ -52,10 +66,10 @@ type Link struct {
 	URL                string                            `json:"url"`
 	Key                string                            `json:"key"`
 	Creator            *database_models.User             `json:"creator"`
-	Platform           *Platform                         `json:"platform"`
-	Domain             *Domain                           `json:"domain"`
-	Analytics          *LinkAnalytics                    `json:"analytics"`
-	OpenGraph          []*OpenGraph                      `json:"openGraph,omitempty"`
+	Platform           *database_models.Platform         `json:"platform"`
+	Domain             *database_models.Domain           `json:"domain"`
+	Analytics          []*MetricAnalytics                `json:"analytics"`
+	OpenGraph          []*database_types.OpenGraph       `json:"openGraph,omitempty"`
 	RedirectionOptions database_enums.RedirectionOptions `json:"redirectionOptions"`
 	State              StatusState                       `json:"state"`
 	CreatedAt          time.Time                         `json:"createdAt"`
@@ -63,21 +77,17 @@ type Link struct {
 	DeletedAt          *time.Time                        `json:"deletedAt,omitempty"`
 }
 
-type LinkAnalytics struct {
-	ID                        uuid.UUID                         `json:"id"`
-	Useragent                 string                            `json:"useragent"`
-	PlatformRedirectionChoice database_enums.RedirectionOptions `json:"platformRedirectionChoice"`
-	IP                        string                            `json:"ip"`
-	Location                  string                            `json:"location"`
-	Referrer                  string                            `json:"referrer"`
-	Observations              []*ObservationAnalytic            `json:"observations"`
-}
-
 type LinkInput struct {
 	URL                string                            `json:"url"`
 	Key                string                            `json:"key"`
 	RedirectionOptions database_enums.RedirectionOptions `json:"redirectionOptions"`
 	OpenGraph          *OpenGraphInput                   `json:"openGraph"`
+}
+
+type Log struct {
+	ID        uuid.UUID `json:"id"`
+	CreatedAt time.Time `json:"createdAt"`
+	Message   string    `json:"message"`
 }
 
 type LoginInput struct {
@@ -90,11 +100,20 @@ type LoginPayload struct {
 	RefreshToken string `json:"refreshToken"`
 }
 
+type MetricAnalytics struct {
+	Feeder       string    `json:"feeder"`
+	TotalHits    int       `json:"totalHits"`
+	TotalSuccess int       `json:"totalSuccess"`
+	TotalFailed  int       `json:"totalFailed"`
+	StartAt      time.Time `json:"startAt"`
+	EndAt        time.Time `json:"endAt"`
+}
+
 type ObservationAnalytic struct {
 	ID                uuid.UUID                         `json:"id"`
 	Link              *Link                             `json:"link"`
-	Domain            *Domain                           `json:"domain"`
-	Platform          *Platform                         `json:"platform"`
+	Domain            *database_models.Domain           `json:"domain"`
+	Platform          *database_models.Platform         `json:"platform"`
 	Useragent         string                            `json:"useragent"`
 	IP                string                            `json:"ip"`
 	Referrer          string                            `json:"referrer"`
@@ -117,19 +136,6 @@ type ObservationInput struct {
 	Success           bool                              `json:"success"`
 }
 
-type OpenGraph struct {
-	Title          *string     `json:"title,omitempty"`
-	Description    *string     `json:"description,omitempty"`
-	FavIcon        *string     `json:"favIcon,omitempty"`
-	Image          *string     `json:"image,omitempty"`
-	AlternateImage *string     `json:"alternateImage,omitempty"`
-	URL            *string     `json:"url,omitempty"`
-	SiteName       *string     `json:"siteName,omitempty"`
-	Type           *string     `json:"type,omitempty"`
-	Locale         *string     `json:"locale,omitempty"`
-	X              *OpenGraphX `json:"x,omitempty"`
-}
-
 type OpenGraphInput struct {
 	Title          string           `json:"title"`
 	Description    string           `json:"description"`
@@ -141,17 +147,6 @@ type OpenGraphInput struct {
 	Type           string           `json:"type"`
 	Locale         string           `json:"locale"`
 	X              *OpenGraphXInput `json:"x"`
-}
-
-type OpenGraphX struct {
-	Card        *string `json:"card,omitempty"`
-	Site        *string `json:"site,omitempty"`
-	Title       *string `json:"title,omitempty"`
-	Description *string `json:"description,omitempty"`
-	Image       *string `json:"image,omitempty"`
-	URL         *string `json:"url,omitempty"`
-	Type        *string `json:"type,omitempty"`
-	Creator     *string `json:"creator,omitempty"`
 }
 
 type OpenGraphXInput struct {
@@ -184,17 +179,15 @@ type PasswordReset struct {
 }
 
 type PasswordResetCreateInput struct {
-	Email     string `json:"email"`
-	Useragent string `json:"useragent"`
-	IP        string `json:"ip"`
+	Email             string                  `json:"email"`
+	ClientInformation *ClientInformationInput `json:"clientInformation"`
 }
 
 type PasswordResetUpdateInput struct {
-	Token           string `json:"token"`
-	Password        string `json:"password"`
-	ConfirmPassword string `json:"confirmPassword"`
-	Useragent       string `json:"useragent"`
-	IP              string `json:"ip"`
+	Token             string                  `json:"token"`
+	Password          string                  `json:"password"`
+	ConfirmPassword   string                  `json:"confirmPassword"`
+	ClientInformation *ClientInformationInput `json:"clientInformation"`
 }
 
 type Payment struct {
@@ -211,30 +204,19 @@ type Permission struct {
 	Name          string                          `json:"name"`
 	Description   string                          `json:"description"`
 	Organizations []*database_models.Organization `json:"organizations"`
-	Domains       []*Domain                       `json:"domains"`
-	Platforms     []*Platform                     `json:"platforms"`
+	Domains       []*database_models.Domain       `json:"domains"`
+	Platforms     []*database_models.Platform     `json:"platforms"`
 }
 
-type Platform struct {
-	ID                uuid.UUID                           `json:"id"`
-	Name              string                              `json:"name"`
-	OpenGraph         *OpenGraph                          `json:"openGraph"`
-	RedirectionChoice database_enums.RedirectionOptions   `json:"redirectionChoice"`
-	Organization      *database_models.Organization       `json:"organization"`
-	Domains           []*Domain                           `json:"domains"`
-	Permissions       []database_enums.PlatformPermission `json:"permissions"`
-	Links             []*Link                             `json:"links"`
-	Analytics         *PlatformAnalytics                  `json:"analytics"`
-	Status            StatusState                         `json:"status"`
-	Templates         []*Template                         `json:"templates"`
-	PinnedLinks       []*Link                             `json:"pinnedLinks"`
-}
-
-type PlatformAnalytics struct {
-	ID           uuid.UUID              `json:"id"`
-	TotalLinks   int                    `json:"totalLinks"`
-	TotalUsers   int                    `json:"totalUsers"`
-	Observations []*ObservationAnalytic `json:"observations"`
+type PlatformDeployment struct {
+	ID        uuid.UUID                 `json:"id"`
+	Platform  *database_models.Platform `json:"platform"`
+	Domain    *database_models.Domain   `json:"domain"`
+	Status    DeploymentStatus          `json:"status"`
+	Logs      []*Log                    `json:"logs"`
+	CreatedAt time.Time                 `json:"createdAt"`
+	UpdatedAt *time.Time                `json:"updatedAt,omitempty"`
+	DeletedAt *time.Time                `json:"deletedAt,omitempty"`
 }
 
 type PlatformInput struct {
@@ -259,8 +241,8 @@ type SocialMediaInput struct {
 type Template struct {
 	ID                uuid.UUID                         `json:"id"`
 	Name              string                            `json:"name"`
-	Platform          *Platform                         `json:"platform"`
-	OpenGraph         *OpenGraph                        `json:"openGraph"`
+	Platform          *database_models.Platform         `json:"platform"`
+	OpenGraph         *database_types.OpenGraph         `json:"openGraph"`
 	RedirectionChoice database_enums.RedirectionOptions `json:"redirectionChoice"`
 	State             StatusState                       `json:"state"`
 	CreatedBy         *database_models.User             `json:"createdBy"`
@@ -321,20 +303,61 @@ type UpdateUserInviteInput struct {
 }
 
 type UserInput struct {
-	Email           string             `json:"email"`
-	Password        string             `json:"password"`
-	ConfirmPassword string             `json:"confirmPassword"`
-	Fullname        string             `json:"fullname"`
-	Phone           *AccountPhoneInput `json:"phone"`
-	Useragent       string             `json:"useragent"`
-	IP              string             `json:"ip"`
+	Email             string                  `json:"email"`
+	Password          string                  `json:"password"`
+	ConfirmPassword   string                  `json:"confirmPassword"`
+	Fullname          string                  `json:"fullname"`
+	Phone             *AccountPhoneInput      `json:"phone"`
+	ClientInformation *ClientInformationInput `json:"clientInformation"`
 }
 
 type UserUpdatePasswordInput struct {
-	Password        string `json:"password"`
-	ConfirmPassword string `json:"confirmPassword"`
-	Useragent       string `json:"useragent"`
-	IP              string `json:"ip"`
+	Password          string                  `json:"password"`
+	ConfirmPassword   string                  `json:"confirmPassword"`
+	ClientInformation *ClientInformationInput `json:"clientInformation"`
+}
+
+type DeploymentStatus string
+
+const (
+	DeploymentStatusWorking DeploymentStatus = "WORKING"
+	DeploymentStatusFailed  DeploymentStatus = "FAILED"
+	DeploymentStatusSuccess DeploymentStatus = "SUCCESS"
+)
+
+var AllDeploymentStatus = []DeploymentStatus{
+	DeploymentStatusWorking,
+	DeploymentStatusFailed,
+	DeploymentStatusSuccess,
+}
+
+func (e DeploymentStatus) IsValid() bool {
+	switch e {
+	case DeploymentStatusWorking, DeploymentStatusFailed, DeploymentStatusSuccess:
+		return true
+	}
+	return false
+}
+
+func (e DeploymentStatus) String() string {
+	return string(e)
+}
+
+func (e *DeploymentStatus) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = DeploymentStatus(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid DeploymentStatus", str)
+	}
+	return nil
+}
+
+func (e DeploymentStatus) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
 }
 
 type PaymentPlan string

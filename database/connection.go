@@ -32,5 +32,7 @@ func migrate(db *gorm.DB) {
 		&database_relations.UserOrganization{},
 		&database_relations.UserInvite{},
 		&database_relations.PlatformUser{},
+		&database_models.Domain{},
+		&database_models.Platform{},
 	)
 }

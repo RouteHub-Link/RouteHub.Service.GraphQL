@@ -22,8 +22,8 @@ func Serve() {
 	}
 
 	resolver := &graph.Resolver{
-		DB:          database.DB,
-		UserService: &services.UserService{DB: database.DB},
+		DB:               database.DB,
+		ServiceContainer: services.NewServiceContainer(database.DB),
 	}
 
 	config := graph.Config{Resolvers: resolver}

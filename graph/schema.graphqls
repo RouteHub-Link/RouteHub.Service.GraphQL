@@ -1,10 +1,17 @@
 scalar UUID
 scalar DateTime
+scalar JSON
 
 enum DNSStatus {
   PENDING
   VERIFIED
   FAILED
+}
+
+enum DeploymentStatus {
+  WORKING
+  FAILED
+  SUCCESS
 }
 
 enum StatusState {
@@ -189,14 +196,22 @@ type Domain {
   url: String!
   organization: Organization!
   platform: Platform
-  dnsStatus: DNSStatus!
+  verification: [DomainVerification]!
   state: StatusState!
   links: [Link!]
-  analytics: DomainAnalytics!
+  analytics: [MetricAnalytics!]!
+  analyticReports: AnalyticReports!
   lastDNSVerificationAt: DateTime
   createdAt: DateTime!
   updatedAt: DateTime
   deletedAt: DateTime
+}
+
+input DomainCreateInput {
+  organizationId: UUID!
+  name: String!
+  url: String!
+  clientInformation: ClientInformationInput!
 }
 
 type Platform {
@@ -205,13 +220,42 @@ type Platform {
   openGraph: OpenGraph!
   redirectionChoice: RedirectionOptions!
   organization: Organization!
-  domains: [Domain!]!
+  domain: Domain!
   permissions: [PlatformPermission!]!
+  deployments: [PlatformDeployment!]!
   links: [Link!]!
-  analytics: PlatformAnalytics!
+  analytics: [AnalyticReport]!
+  analyticReports: AnalyticReports!
   status: StatusState!
   templates: [Template!]!
   pinnedLinks: [Link!]!
+}
+
+type PlatformDeployment {
+  id: UUID!
+  platform: Platform!
+  domain: Domain!
+  status: DeploymentStatus!
+  logs: [Log!]!
+  createdAt: DateTime!
+  updatedAt: DateTime
+  deletedAt: DateTime
+}
+
+type Log{
+  id: UUID!
+  createdAt: DateTime!
+  message: String!
+}
+
+type DomainVerification {
+  id: UUID!
+  domain: Domain!
+  status: DNSStatus!
+  logs: [Log!]!
+  createdAt: DateTime!
+  updatedAt: DateTime
+  deletedAt: DateTime
 }
 
 type Template {
@@ -268,7 +312,7 @@ type Link {
   creator: User!
   platform: Platform!
   domain: Domain!
-  analytics: LinkAnalytics!
+  analytics: [MetricAnalytics!]!
   openGraph: [OpenGraph!]
   redirectionOptions: RedirectionOptions!
   state: StatusState!
@@ -323,29 +367,34 @@ type Payment {
   # ... Add other payment-related fields
 }
 
-type LinkAnalytics {
-  id: UUID!
-  useragent: String!
-  platformRedirectionChoice: RedirectionOptions!
-  ip: String!
-  location: String!
-  referrer: String!
-  observations: [ObservationAnalytic!]!
+
+type AnalyticReports {
+  todayObservations: [ObservationAnalytic!]!
+  yesterdayObservations: [ObservationAnalytic!]!
+  lastWeekObservations: String!
+  lastMonthObservations: String!
+  lastYearObservations: String!
+  allTimeObservations: String!
 }
 
-type PlatformAnalytics {
-  id: UUID!
-  totalLinks: Int!
-  totalUsers: Int!
-  observations: [ObservationAnalytic!]!
+type AnalyticReport {
+  link: Link!
+  domain: Domain!
+  totalHits: Int!
+  totalSuccess: Int!
+  totalFailed: Int!
+  referers: [MetricAnalytics!]!
+  locations: [MetricAnalytics!]!
+  useragents: [MetricAnalytics!]!
 }
 
-type DomainAnalytics {
-  id: UUID!
-  totalLinks: Int!
-  totalPlatforms: Int!
-  totalUsers: Int!
-  observations: [ObservationAnalytic!]!
+type MetricAnalytics {
+  feeder: JSON!
+  totalHits: Int!
+  totalSuccess: Int!
+  totalFailed: Int!
+  startAt: DateTime!
+  endAt: DateTime!
 }
 
 type ObservationAnalytic {
@@ -405,34 +454,31 @@ input UserInput {
   confirmPassword: String!
   fullname: String!
   phone: AccountPhoneInput!
-  useragent: String!
-  ip: String!
+  clientInformation: ClientInformationInput!
 }
 
 input UserUpdatePasswordInput {
   password: String!
   confirmPassword: String!
-  useragent: String!
-  ip: String!
+  clientInformation: ClientInformationInput!
 }
 
 input PasswordResetCreateInput {
   email: String!
-  useragent: String!
-  ip: String!
+  clientInformation: ClientInformationInput!
 }
 
 input PasswordResetUpdateInput {
   token: String!
   password: String!
   confirmPassword: String!
-  useragent: String!
-  ip: String!
+  clientInformation: ClientInformationInput!
 }
 
-input DomainInput {
-  name: String!
-  url: String!
+
+input ClientInformationInput {
+  useragent: String!
+  ip: String!
 }
 
 input TemplateInput {
@@ -497,4 +543,6 @@ type Mutation {
   updateUserPassword(userId: ID!, input: UserUpdatePasswordInput!): User!
   requestPasswordReset(input: PasswordResetCreateInput!): PasswordReset!
   resetPassword(input: PasswordResetUpdateInput!): User!
+
+  createDomain(input: DomainCreateInput!): Domain! 
 }

@@ -1,4 +1,4 @@
-package services
+package services_user
 
 import (
 	"errors"
@@ -9,6 +9,7 @@ import (
 	database_types "github.com/RouteHub-Link/routehub-service-graphql/database/types"
 	"github.com/RouteHub-Link/routehub-service-graphql/graph/model"
 	graph_inputs "github.com/RouteHub-Link/routehub-service-graphql/graph/model/inputs"
+	services_utils "github.com/RouteHub-Link/routehub-service-graphql/services/utils"
 	"github.com/google/uuid"
 	gonanoid "github.com/matoous/go-nanoid/v2"
 )
@@ -46,7 +47,7 @@ func (u UserService) UpdateInvitation(updateUserInviteInput model.UpdateUserInvi
 		return nil, errors.New("invitation is already used")
 	}
 
-	hashedPassword, err := HashPassword(updateUserInviteInput.User.Password)
+	hashedPassword, err := services_utils.HashPassword(updateUserInviteInput.User.Password)
 	if err != nil {
 		return
 	}
