@@ -2,6 +2,7 @@ package services_domain
 
 import (
 	database_models "github.com/RouteHub-Link/routehub-service-graphql/database/models"
+
 	"github.com/RouteHub-Link/routehub-service-graphql/graph/model"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
@@ -26,7 +27,15 @@ func (ds DomainService) CreateDomain(input model.DomainCreateInput) (domain data
 }
 
 func (ds DomainService) GetDomain(id uuid.UUID) (domain *database_models.Domain, err error) {
+
 	err = ds.DB.Where("id = ?", id).First(&domain).Error
+	return
+}
+
+func (ds DomainService) GetDomainByPlatformId(platformId uuid.UUID) (domain *database_models.Domain, err error) {
+	joinQuery := ds.DB.Model(&database_models.Platform{}).Select("domain_id").Where("id = ?", platformId)
+
+	err = ds.DB.Where("id = (?)", joinQuery).First(&domain).Error
 	return
 }
 

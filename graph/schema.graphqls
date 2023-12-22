@@ -78,6 +78,11 @@ enum InvitationStatus {
 }
 
 directive @auth on FIELD_DEFINITION
+directive @platformPermission(permission: PlatformPermission!) on INPUT_OBJECT
+directive @organizationPermission(permission: OrganizationPermission!) on INPUT_OBJECT
+directive @platformDuplicateCheck on FIELD_DEFINITION
+directive @domainDuplicateCheck on FIELD_DEFINITION
+directive @linkDuplicateCheck on FIELD_DEFINITION
 
 type Query {
   me: User! @auth
@@ -198,7 +203,6 @@ type Domain {
   platform: Platform
   verification: [DomainVerification]!
   state: StatusState!
-  links: [Link!]
   analytics: [MetricAnalytics!]!
   analyticReports: AnalyticReports!
   lastDNSVerificationAt: DateTime
@@ -230,6 +234,16 @@ type Platform {
   templates: [Template!]!
   pinnedLinks: [Link!]!
 }
+
+input PlatformCreateInput @organizationPermission(permission: PLATFORM_CREATE) {
+  organizationId: UUID!
+  domainId: UUID!
+  name: String!
+  openGraph: OpenGraphInput!
+  redirectionChoice: RedirectionOptions!
+  templates: [TemplateInput]
+}
+
 
 type PlatformDeployment {
   id: UUID!
@@ -307,8 +321,8 @@ type Permission {
 
 type Link {
   id: UUID!
-  url: String!
-  key: String!
+  target: String!
+  path: String!
   creator: User!
   platform: Platform!
   domain: Domain!
@@ -321,6 +335,13 @@ type Link {
   deletedAt: DateTime
 }
 
+input LinkCreateInput {
+  target: String!
+  path: String
+  platformId: UUID!
+  redirectionOptions: RedirectionOptions
+  openGraph: OpenGraphInput!
+}
 
 type Ticket {
   id: UUID!
@@ -410,13 +431,6 @@ type ObservationAnalytic {
   success: Boolean!
   createdAt: DateTime!
   updatedAt: DateTime
-}
-
-input LinkInput {
-  url: String!
-  key: String!
-  redirectionOptions: RedirectionOptions!
-  openGraph: OpenGraphInput!
 }
 
 input TicketInput {
@@ -512,14 +526,6 @@ input OpenGraphXInput {
   creator: String!
 }
 
-input PlatformInput {
-  name: String!
-  openGraph: OpenGraphInput!
-  redirectionChoice: RedirectionOptions!
-  state: StatusState!
-  templates: [TemplateInput!]!
-}
-
 input OrganizationInput {
   name: String!
   website: String!
@@ -544,5 +550,7 @@ type Mutation {
   requestPasswordReset(input: PasswordResetCreateInput!): PasswordReset!
   resetPassword(input: PasswordResetUpdateInput!): User!
 
-  createDomain(input: DomainCreateInput!): Domain! 
+  createDomain(input: DomainCreateInput!): Domain! @domainDuplicateCheck
+  createPlatform(input: PlatformCreateInput!): Platform! @platformDuplicateCheck
+  createLink(input: LinkCreateInput!): Link! @linkDuplicateCheck
 }

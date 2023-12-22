@@ -7,7 +7,7 @@ import (
 	"github.com/google/uuid"
 )
 
-type UserOrganization struct {
+type OrganizationUser struct {
 	ID             uuid.UUID                               `gorm:"primaryKey;type:uuid;not null"`
 	UserID         uuid.UUID                               `json:"user_id" gorm:"field:user_id;primaryKey;type:uuid;not null"`
 	OrganizationID uuid.UUID                               `json:"organization_id"  gorm:"field:organization_id;primaryKey;type:uuid;not null"`

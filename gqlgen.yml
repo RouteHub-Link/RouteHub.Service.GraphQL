@@ -101,4 +101,9 @@ models:
   OrganizationsWithPermissionsInput:
     model:
       - github.com/RouteHub-Link/routehub-service-graphql/database/relations.OrganizationsWithPermissions
- 
+  OpenGraphInput:
+    model:
+      - github.com/RouteHub-Link/routehub-service-graphql/database/types.OpenGraph
+  OpenGraphXInput:
+    model:
+      - github.com/RouteHub-Link/routehub-service-graphql/database/types.OpenGraphX

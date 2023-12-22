@@ -10,8 +10,8 @@ import (
 type UserInvite struct {
 	ID                       uuid.UUID                      `gorm:"primaryKey;type:uuid;not null"`
 	Email                    string                         `gorm:"type:varchar(255);not null"`
-	OrganizationID           uuid.UUID                      `gorm:"type:uuid;not null"`
-	InvitedByID              uuid.UUID                      `gorm:"type:uuid;not null"`
+	OrganizationID           uuid.UUID                      `gorm:"type:uuid;not null;field:organization_id"`
+	InvitedByID              uuid.UUID                      `gorm:"type:uuid;not null";field:invited_by_id`
 	OrganizationPermissions  []OrganizationsWithPermissions `gorm:"serializer:json;not null"`
 	PlatformsWithPermissions []PlatformsWithPermissions     `gorm:"serializer:json;not null"`
 	Code                     string                         `gorm:"type:varchar(60);not null"`
@@ -20,12 +20,12 @@ type UserInvite struct {
 	UpdatedAt                *time.Time
 }
 
-func (ui UserInvite) ToOrganizationsPermissions(userId uuid.UUID) []UserOrganization {
-	var userOrganizations []UserOrganization
+func (ui UserInvite) ToOrganizationsPermissions(userId uuid.UUID) []OrganizationUser {
+	var organizationUsers []OrganizationUser
 	for _, organization := range ui.OrganizationPermissions {
-		userOrganizations = append(userOrganizations, organization.ToUserOrganizations(userId))
+		organizationUsers = append(organizationUsers, organization.ToOrganizationUsers(userId))
 	}
-	return userOrganizations
+	return organizationUsers
 }
 
 func (ui UserInvite) ToPlatformUsers(userId uuid.UUID) []PlatformUser {
@@ -46,8 +46,8 @@ type OrganizationsWithPermissions struct {
 	OrganizationPermissions []database_enums.OrganizationPermission
 }
 
-func (owp OrganizationsWithPermissions) ToUserOrganizations(userId uuid.UUID) UserOrganization {
-	return UserOrganization{
+func (owp OrganizationsWithPermissions) ToOrganizationUsers(userId uuid.UUID) OrganizationUser {
+	return OrganizationUser{
 		ID:             uuid.New(),
 		UserID:         userId,
 		OrganizationID: owp.OrganizationID,

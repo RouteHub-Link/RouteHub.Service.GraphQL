@@ -19,16 +19,6 @@ import (
 	"github.com/vektah/gqlparser/v2/gqlerror"
 )
 
-// CreatedAt is the resolver for the createdAt field.
-func (r *accountPhoneResolver) CreatedAt(ctx context.Context, obj *database_types.AccountPhone) (*time.Time, error) {
-	panic(fmt.Errorf("not implemented: CreatedAt - createdAt"))
-}
-
-// UpdatedAt is the resolver for the updatedAt field.
-func (r *accountPhoneResolver) UpdatedAt(ctx context.Context, obj *database_types.AccountPhone) (*time.Time, error) {
-	panic(fmt.Errorf("not implemented: UpdatedAt - updatedAt"))
-}
-
 // Organization is the resolver for the organization field.
 func (r *domainResolver) Organization(ctx context.Context, obj *database.Domain) (*database.Organization, error) {
 	panic(fmt.Errorf("not implemented: Organization - organization"))
@@ -45,13 +35,8 @@ func (r *domainResolver) Verification(ctx context.Context, obj *database.Domain)
 }
 
 // State is the resolver for the state field.
-func (r *domainResolver) State(ctx context.Context, obj *database.Domain) (model.StatusState, error) {
+func (r *domainResolver) State(ctx context.Context, obj *database.Domain) (database_enums.StatusState, error) {
 	panic(fmt.Errorf("not implemented: State - state"))
-}
-
-// Links is the resolver for the links field.
-func (r *domainResolver) Links(ctx context.Context, obj *database.Domain) ([]*model.Link, error) {
-	panic(fmt.Errorf("not implemented: Links - links"))
 }
 
 // Analytics is the resolver for the analytics field.
@@ -72,6 +57,41 @@ func (r *domainResolver) LastDNSVerificationAt(ctx context.Context, obj *databas
 // Organizations is the resolver for the Organizations field.
 func (r *industryResolver) Organizations(ctx context.Context, obj *database_types.Industry) ([]*database.Organization, error) {
 	panic(fmt.Errorf("not implemented: Organizations - Organizations"))
+}
+
+// Creator is the resolver for the creator field.
+func (r *linkResolver) Creator(ctx context.Context, obj *database.Link) (*database.User, error) {
+	return r.ServiceContainer.UserService.User(obj.CreatedBy)
+}
+
+// Platform is the resolver for the platform field.
+func (r *linkResolver) Platform(ctx context.Context, obj *database.Link) (*database.Platform, error) {
+	return r.ServiceContainer.PlatformService.GetPlatform(obj.PlatformID)
+}
+
+// Domain is the resolver for the domain field.
+func (r *linkResolver) Domain(ctx context.Context, obj *database.Link) (*database.Domain, error) {
+	return r.ServiceContainer.DomainService.GetDomainByPlatformId(obj.PlatformID)
+}
+
+// Analytics is the resolver for the analytics field.
+func (r *linkResolver) Analytics(ctx context.Context, obj *database.Link) ([]*model.MetricAnalytics, error) {
+	panic(fmt.Errorf("not implemented: Analytics - analytics"))
+}
+
+// OpenGraph is the resolver for the openGraph field.
+func (r *linkResolver) OpenGraph(ctx context.Context, obj *database.Link) ([]*database_types.OpenGraph, error) {
+	return []*database_types.OpenGraph{obj.OpenGraph}, nil
+}
+
+// RedirectionOptions is the resolver for the redirectionOptions field.
+func (r *linkResolver) RedirectionOptions(ctx context.Context, obj *database.Link) (database_enums.RedirectionOptions, error) {
+	return obj.RedirectionChoice, nil
+}
+
+// State is the resolver for the state field.
+func (r *linkResolver) State(ctx context.Context, obj *database.Link) (database_enums.StatusState, error) {
+	return obj.Status, nil
 }
 
 // CreateUser is the resolver for the createUser field.
@@ -148,6 +168,25 @@ func (r *mutationResolver) CreateDomain(ctx context.Context, input model.DomainC
 	return &domain, err
 }
 
+// CreatePlatform is the resolver for the createPlatform field.
+func (r *mutationResolver) CreatePlatform(ctx context.Context, input graph_inputs.PlatformCreateInput) (*database.Platform, error) {
+	platformService := r.ServiceContainer.PlatformService
+	userSession := auth.ForContext(ctx)
+
+	platform, err := platformService.CreatePlatform(input, userSession.ID)
+	return &platform, err
+}
+
+// CreateLink is the resolver for the createLink field.
+func (r *mutationResolver) CreateLink(ctx context.Context, input model.LinkCreateInput) (*database.Link, error) {
+	userSession := auth.ForContext(ctx)
+	if userSession == nil {
+		return nil, gqlerror.Errorf("Access Denied")
+	}
+
+	return r.ServiceContainer.LinkService.CreateLink(input, userSession.ID)
+}
+
 // Permissions is the resolver for the permissions field.
 func (r *organizationResolver) Permissions(ctx context.Context, obj *database.Organization) ([]database_enums.OrganizationPermission, error) {
 	panic(fmt.Errorf("not implemented: Permissions - permissions"))
@@ -155,12 +194,12 @@ func (r *organizationResolver) Permissions(ctx context.Context, obj *database.Or
 
 // Platforms is the resolver for the platforms field.
 func (r *organizationResolver) Platforms(ctx context.Context, obj *database.Organization) ([]*database.Platform, error) {
-	panic(fmt.Errorf("not implemented: Platforms - platforms"))
+	return r.ServiceContainer.PlatformService.GetPlatformsByOrganization(obj.ID)
 }
 
 // Users is the resolver for the users field.
 func (r *organizationResolver) Users(ctx context.Context, obj *database.Organization) ([]*database.User, error) {
-	panic(fmt.Errorf("not implemented: Users - users"))
+	return r.ServiceContainer.UserService.UsersByOrganization(obj.ID)
 }
 
 // Domains is the resolver for the domains field.
@@ -177,11 +216,6 @@ func (r *organizationResolver) PaymentPlan(ctx context.Context, obj *database.Or
 // Payments is the resolver for the payments field.
 func (r *organizationResolver) Payments(ctx context.Context, obj *database.Organization) ([]*model.Payment, error) {
 	panic(fmt.Errorf("not implemented: Payments - payments"))
-}
-
-// RedirectionChoice is the resolver for the redirectionChoice field.
-func (r *platformResolver) RedirectionChoice(ctx context.Context, obj *database.Platform) (database_enums.RedirectionOptions, error) {
-	panic(fmt.Errorf("not implemented: RedirectionChoice - redirectionChoice"))
 }
 
 // Organization is the resolver for the organization field.
@@ -206,8 +240,8 @@ func (r *platformResolver) Deployments(ctx context.Context, obj *database.Platfo
 }
 
 // Links is the resolver for the links field.
-func (r *platformResolver) Links(ctx context.Context, obj *database.Platform) ([]*model.Link, error) {
-	panic(fmt.Errorf("not implemented: Links - links"))
+func (r *platformResolver) Links(ctx context.Context, obj *database.Platform) ([]*database.Link, error) {
+	return r.ServiceContainer.LinkService.GetLinksByPlatformId(obj.ID)
 }
 
 // Analytics is the resolver for the analytics field.
@@ -220,18 +254,13 @@ func (r *platformResolver) AnalyticReports(ctx context.Context, obj *database.Pl
 	panic(fmt.Errorf("not implemented: AnalyticReports - analyticReports"))
 }
 
-// Status is the resolver for the status field.
-func (r *platformResolver) Status(ctx context.Context, obj *database.Platform) (model.StatusState, error) {
-	panic(fmt.Errorf("not implemented: Status - status"))
-}
-
 // Templates is the resolver for the templates field.
 func (r *platformResolver) Templates(ctx context.Context, obj *database.Platform) ([]*model.Template, error) {
 	panic(fmt.Errorf("not implemented: Templates - templates"))
 }
 
 // PinnedLinks is the resolver for the pinnedLinks field.
-func (r *platformResolver) PinnedLinks(ctx context.Context, obj *database.Platform) ([]*model.Link, error) {
+func (r *platformResolver) PinnedLinks(ctx context.Context, obj *database.Platform) ([]*database.Link, error) {
 	panic(fmt.Errorf("not implemented: PinnedLinks - pinnedLinks"))
 }
 
@@ -259,7 +288,7 @@ func (r *queryResolver) Organizations(ctx context.Context) ([]*database.Organiza
 
 // Platforms is the resolver for the platforms field.
 func (r *queryResolver) Platforms(ctx context.Context) ([]*database.Platform, error) {
-	panic(fmt.Errorf("not implemented: Platforms - platforms"))
+	return r.ServiceContainer.PlatformService.GetPlatforms()
 }
 
 // RefreshToken is the resolver for the refreshToken field.
@@ -269,12 +298,12 @@ func (r *queryResolver) RefreshToken(ctx context.Context, input model.RefreshTok
 
 // Organizations is the resolver for the Organizations field.
 func (r *userResolver) Organizations(ctx context.Context, obj *database.User) ([]*database.Organization, error) {
-	return r.ServiceContainer.UserService.UserOrganization(obj.ID)
+	return r.ServiceContainer.UserService.OrganizationUser(obj.ID)
 }
 
 // Platforms is the resolver for the platforms field.
 func (r *userResolver) Platforms(ctx context.Context, obj *database.User) ([]*database.Platform, error) {
-	panic(fmt.Errorf("not implemented: Platforms - platforms"))
+	return r.ServiceContainer.PlatformService.GetPlatformsByUser(obj.ID)
 }
 
 // Permissions is the resolver for the permissions field.
@@ -324,14 +353,14 @@ func (r *platformsWithPermissionsInputResolver) Permissions(ctx context.Context,
 	return nil
 }
 
-// AccountPhone returns AccountPhoneResolver implementation.
-func (r *Resolver) AccountPhone() AccountPhoneResolver { return &accountPhoneResolver{r} }
-
 // Domain returns DomainResolver implementation.
 func (r *Resolver) Domain() DomainResolver { return &domainResolver{r} }
 
 // Industry returns IndustryResolver implementation.
 func (r *Resolver) Industry() IndustryResolver { return &industryResolver{r} }
+
+// Link returns LinkResolver implementation.
+func (r *Resolver) Link() LinkResolver { return &linkResolver{r} }
 
 // Mutation returns MutationResolver implementation.
 func (r *Resolver) Mutation() MutationResolver { return &mutationResolver{r} }
@@ -361,9 +390,9 @@ func (r *Resolver) PlatformsWithPermissionsInput() PlatformsWithPermissionsInput
 	return &platformsWithPermissionsInputResolver{r}
 }
 
-type accountPhoneResolver struct{ *Resolver }
 type domainResolver struct{ *Resolver }
 type industryResolver struct{ *Resolver }
+type linkResolver struct{ *Resolver }
 type mutationResolver struct{ *Resolver }
 type organizationResolver struct{ *Resolver }
 type platformResolver struct{ *Resolver }

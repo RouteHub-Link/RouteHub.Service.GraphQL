@@ -9,6 +9,7 @@ import (
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/RouteHub-Link/routehub-service-graphql/auth"
 	"github.com/RouteHub-Link/routehub-service-graphql/database"
+	"github.com/RouteHub-Link/routehub-service-graphql/directives"
 	"github.com/RouteHub-Link/routehub-service-graphql/graph"
 	"github.com/RouteHub-Link/routehub-service-graphql/services"
 )
@@ -27,7 +28,12 @@ func Serve() {
 	}
 
 	config := graph.Config{Resolvers: resolver}
-	config.Directives.Auth = auth.AuthDirectiveHandler
+	config.Directives.Auth = directives.AuthDirectiveHandler
+	config.Directives.OrganizationPermission = directives.OrganizationPermissionDirectiveHandler
+
+	config.Directives.LinkDuplicateCheck = directives.LinkDuplicateCheckDirectiveHandler
+	config.Directives.PlatformDuplicateCheck = directives.PlatformDuplicateCheckDirectiveHandler
+	config.Directives.DomainDuplicateCheck = directives.DomainDuplicateCheckDirectiveHandler
 
 	var srv http.Handler = handler.NewDefaultServer(graph.NewExecutableSchema(config))
 

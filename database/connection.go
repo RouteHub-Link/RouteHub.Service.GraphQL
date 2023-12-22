@@ -29,10 +29,12 @@ func migrate(db *gorm.DB) {
 	db.AutoMigrate(
 		&database_models.User{},
 		&database_models.Organization{},
-		&database_relations.UserOrganization{},
+		&database_relations.OrganizationUser{},
+		&database_relations.OrganizationPlatform{},
 		&database_relations.UserInvite{},
 		&database_relations.PlatformUser{},
 		&database_models.Domain{},
 		&database_models.Platform{},
+		&database_models.Link{},
 	)
 }

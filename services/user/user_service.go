@@ -25,16 +25,28 @@ func (u UserService) Users() (users []*database_models.User, err error) {
 	return
 }
 
-func (u UserService) UserOrganization(userId uuid.UUID) (Organization []*database_models.Organization, err error) {
-	userOrganizations := []database_relations.UserOrganization{}
-	err = u.DB.Where("user_id = ?", userId).Find(&userOrganizations).Error
+func (u UserService) UsersByOrganization(organizationId uuid.UUID) (users []*database_models.User, err error) {
+	organizationUsers := []database_relations.OrganizationUser{}
+	err = u.DB.Where("organization_id = ?", organizationId).Find(&organizationUsers).Error
+	if err != nil {
+		return
+	}
+
+	joinQuery := u.DB.Model(&database_relations.OrganizationUser{}).Select("user_id").Where("organization_id = ?", organizationId)
+	err = u.DB.Where("id IN ?", joinQuery).Find(&users).Error
+	return
+}
+
+func (u UserService) OrganizationUser(userId uuid.UUID) (Organization []*database_models.Organization, err error) {
+	organizationUsers := []database_relations.OrganizationUser{}
+	err = u.DB.Where("user_id = ?", userId).Find(&organizationUsers).Error
 	if err != nil {
 		return
 	}
 
 	OrganizationIDs := []uuid.UUID{}
-	for _, userOrganization := range userOrganizations {
-		OrganizationIDs = append(OrganizationIDs, userOrganization.OrganizationID)
+	for _, organizationUser := range organizationUsers {
+		OrganizationIDs = append(OrganizationIDs, organizationUser.OrganizationID)
 	}
 
 	err = u.DB.Where("id IN ?", OrganizationIDs).Find(&Organization).Error

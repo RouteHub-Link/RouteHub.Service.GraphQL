@@ -8,9 +8,9 @@ import (
 
 type Domain struct {
 	ID             uuid.UUID `gorm:"type:uuid;primary_key;"`
+	OrganizationId uuid.UUID `gorm:"type:uuid;not null;"`
 	Name           string    `gorm:"type:varchar(255);not null;"`
 	URL            string    `gorm:"type:varchar(255);not null;"`
-	OrganizationId uuid.UUID `gorm:"type:uuid;not null;"`
 
 	CreatedAt time.Time  `json:"createdAt" gorm:"autoCreateTime"`
 	UpdatedAt *time.Time `json:"updatedAt,omitempty"`

@@ -1,5 +1,7 @@
 package database_types
 
+import "encoding/json"
+
 type OpenGraph struct {
 	Title          *string     `json:"title,omitempty"`
 	Description    *string     `json:"description,omitempty"`
@@ -22,4 +24,8 @@ type OpenGraphX struct {
 	URL         *string `json:"url,omitempty"`
 	Type        *string `json:"type,omitempty"`
 	Creator     *string `json:"creator,omitempty"`
+}
+
+func (og *OpenGraph) ParseFromJson(jsonOpenGraph string) {
+	json.Unmarshal([]byte(jsonOpenGraph), &og)
 }

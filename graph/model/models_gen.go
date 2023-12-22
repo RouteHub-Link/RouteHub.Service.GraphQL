@@ -20,7 +20,7 @@ type AccountPhoneInput struct {
 }
 
 type AnalyticReport struct {
-	Link         *Link                   `json:"link"`
+	Link         *database_models.Link   `json:"link"`
 	Domain       *database_models.Domain `json:"domain"`
 	TotalHits    int                     `json:"totalHits"`
 	TotalSuccess int                     `json:"totalSuccess"`
@@ -61,27 +61,12 @@ type DomainVerification struct {
 	DeletedAt *time.Time               `json:"deletedAt,omitempty"`
 }
 
-type Link struct {
-	ID                 uuid.UUID                         `json:"id"`
-	URL                string                            `json:"url"`
-	Key                string                            `json:"key"`
-	Creator            *database_models.User             `json:"creator"`
-	Platform           *database_models.Platform         `json:"platform"`
-	Domain             *database_models.Domain           `json:"domain"`
-	Analytics          []*MetricAnalytics                `json:"analytics"`
-	OpenGraph          []*database_types.OpenGraph       `json:"openGraph,omitempty"`
-	RedirectionOptions database_enums.RedirectionOptions `json:"redirectionOptions"`
-	State              StatusState                       `json:"state"`
-	CreatedAt          time.Time                         `json:"createdAt"`
-	UpdatedAt          *time.Time                        `json:"updatedAt,omitempty"`
-	DeletedAt          *time.Time                        `json:"deletedAt,omitempty"`
-}
-
-type LinkInput struct {
-	URL                string                            `json:"url"`
-	Key                string                            `json:"key"`
-	RedirectionOptions database_enums.RedirectionOptions `json:"redirectionOptions"`
-	OpenGraph          *OpenGraphInput                   `json:"openGraph"`
+type LinkCreateInput struct {
+	Target             string                             `json:"target"`
+	Path               *string                            `json:"path,omitempty"`
+	PlatformID         uuid.UUID                          `json:"platformId"`
+	RedirectionOptions *database_enums.RedirectionOptions `json:"redirectionOptions,omitempty"`
+	OpenGraph          *database_types.OpenGraph          `json:"openGraph"`
 }
 
 type Log struct {
@@ -111,7 +96,7 @@ type MetricAnalytics struct {
 
 type ObservationAnalytic struct {
 	ID                uuid.UUID                         `json:"id"`
-	Link              *Link                             `json:"link"`
+	Link              *database_models.Link             `json:"link"`
 	Domain            *database_models.Domain           `json:"domain"`
 	Platform          *database_models.Platform         `json:"platform"`
 	Useragent         string                            `json:"useragent"`
@@ -134,30 +119,6 @@ type ObservationInput struct {
 	Location          string                            `json:"location"`
 	RedirectionChoice database_enums.RedirectionOptions `json:"redirectionChoice"`
 	Success           bool                              `json:"success"`
-}
-
-type OpenGraphInput struct {
-	Title          string           `json:"title"`
-	Description    string           `json:"description"`
-	FavIcon        string           `json:"favIcon"`
-	Image          string           `json:"image"`
-	AlternateImage string           `json:"alternateImage"`
-	URL            string           `json:"url"`
-	SiteName       string           `json:"siteName"`
-	Type           string           `json:"type"`
-	Locale         string           `json:"locale"`
-	X              *OpenGraphXInput `json:"x"`
-}
-
-type OpenGraphXInput struct {
-	Card        string `json:"card"`
-	Site        string `json:"site"`
-	Title       string `json:"title"`
-	Description string `json:"description"`
-	Image       string `json:"image"`
-	URL         string `json:"url"`
-	Type        string `json:"type"`
-	Creator     string `json:"creator"`
 }
 
 type OrganizationInput struct {
@@ -219,14 +180,6 @@ type PlatformDeployment struct {
 	DeletedAt *time.Time                `json:"deletedAt,omitempty"`
 }
 
-type PlatformInput struct {
-	Name              string                            `json:"name"`
-	OpenGraph         *OpenGraphInput                   `json:"openGraph"`
-	RedirectionChoice database_enums.RedirectionOptions `json:"redirectionChoice"`
-	State             StatusState                       `json:"state"`
-	Templates         []*TemplateInput                  `json:"templates"`
-}
-
 type RefreshTokenInput struct {
 	NewToken        string `json:"newToken"`
 	NewRefreshToken string `json:"newRefreshToken"`
@@ -244,7 +197,7 @@ type Template struct {
 	Platform          *database_models.Platform         `json:"platform"`
 	OpenGraph         *database_types.OpenGraph         `json:"openGraph"`
 	RedirectionChoice database_enums.RedirectionOptions `json:"redirectionChoice"`
-	State             StatusState                       `json:"state"`
+	State             database_enums.StatusState        `json:"state"`
 	CreatedBy         *database_models.User             `json:"createdBy"`
 	EditedBy          *database_models.User             `json:"editedBy"`
 	CreatedAt         time.Time                         `json:"createdAt"`
@@ -254,9 +207,9 @@ type Template struct {
 
 type TemplateInput struct {
 	Name              string                            `json:"name"`
-	OpenGraph         *OpenGraphInput                   `json:"openGraph"`
+	OpenGraph         *database_types.OpenGraph         `json:"openGraph"`
 	RedirectionChoice database_enums.RedirectionOptions `json:"redirectionChoice"`
-	State             StatusState                       `json:"state"`
+	State             database_enums.StatusState        `json:"state"`
 }
 
 type Ticket struct {
@@ -441,46 +394,5 @@ func (e *PaymentStatus) UnmarshalGQL(v interface{}) error {
 }
 
 func (e PaymentStatus) MarshalGQL(w io.Writer) {
-	fmt.Fprint(w, strconv.Quote(e.String()))
-}
-
-type StatusState string
-
-const (
-	StatusStatePasive StatusState = "PASIVE"
-	StatusStateActive StatusState = "ACTIVE"
-)
-
-var AllStatusState = []StatusState{
-	StatusStatePasive,
-	StatusStateActive,
-}
-
-func (e StatusState) IsValid() bool {
-	switch e {
-	case StatusStatePasive, StatusStateActive:
-		return true
-	}
-	return false
-}
-
-func (e StatusState) String() string {
-	return string(e)
-}
-
-func (e *StatusState) UnmarshalGQL(v interface{}) error {
-	str, ok := v.(string)
-	if !ok {
-		return fmt.Errorf("enums must be strings")
-	}
-
-	*e = StatusState(str)
-	if !e.IsValid() {
-		return fmt.Errorf("%s is not a valid StatusState", str)
-	}
-	return nil
-}
-
-func (e StatusState) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }

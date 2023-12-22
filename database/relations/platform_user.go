@@ -9,8 +9,8 @@ import (
 
 type PlatformUser struct {
 	ID          uuid.UUID                           `gorm:"primaryKey;type:uuid;not null"`
-	UserID      uuid.UUID                           `json:"userId"`
-	PlatformID  uuid.UUID                           `json:"platformId"`
+	UserID      uuid.UUID                           `json:"userId" gorm:"field:user_id;type:uuid;not null"`
+	PlatformID  uuid.UUID                           `json:"platformId" gorm:"field:platform_id;type:uuid;not null"`
 	Permissions []database_enums.PlatformPermission `gorm:"serializer:json;field:platform_permissions;not null;"`
 	CreatedAt   time.Time                           `json:"createdAt" gorm:"autoCreateTime"`
 	UpdatedAt   *time.Time                          `json:"updatedAt,omitempty"`
