@@ -44,6 +44,10 @@ type ClientInformationInput struct {
 	IP        string `json:"ip"`
 }
 
+type CrawlRequestInput struct {
+	LinkID uuid.UUID `json:"linkId"`
+}
+
 type DomainCreateInput struct {
 	OrganizationID    uuid.UUID               `json:"organizationId"`
 	Name              string                  `json:"name"`
@@ -55,7 +59,7 @@ type DomainVerification struct {
 	ID        uuid.UUID                `json:"id"`
 	Domain    *database_models.Domain  `json:"domain"`
 	Status    database_enums.DNSStatus `json:"status"`
-	Logs      []*Log                   `json:"logs"`
+	Logs      []*database_types.Log    `json:"logs"`
 	CreatedAt time.Time                `json:"createdAt"`
 	UpdatedAt *time.Time               `json:"updatedAt,omitempty"`
 	DeletedAt *time.Time               `json:"deletedAt,omitempty"`
@@ -67,12 +71,6 @@ type LinkCreateInput struct {
 	PlatformID         uuid.UUID                          `json:"platformId"`
 	RedirectionOptions *database_enums.RedirectionOptions `json:"redirectionOptions,omitempty"`
 	OpenGraph          *database_types.OpenGraph          `json:"openGraph"`
-}
-
-type Log struct {
-	ID        uuid.UUID `json:"id"`
-	CreatedAt time.Time `json:"createdAt"`
-	Message   string    `json:"message"`
 }
 
 type LoginInput struct {
@@ -174,7 +172,7 @@ type PlatformDeployment struct {
 	Platform  *database_models.Platform `json:"platform"`
 	Domain    *database_models.Domain   `json:"domain"`
 	Status    DeploymentStatus          `json:"status"`
-	Logs      []*Log                    `json:"logs"`
+	Logs      []*database_types.Log     `json:"logs"`
 	CreatedAt time.Time                 `json:"createdAt"`
 	UpdatedAt *time.Time                `json:"updatedAt,omitempty"`
 	DeletedAt *time.Time                `json:"deletedAt,omitempty"`

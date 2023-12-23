@@ -1,9 +1,11 @@
 package database
 
 import (
+	"log"
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
 	embeddedpostgres "github.com/fergusstrange/embedded-postgres"
 )
@@ -19,6 +21,11 @@ func RunEmbeddedPostgres() {
 			Port(5432),
 	)
 	if err := embeddedPostgres.Start(); err != nil {
+		if err.Error() == "process already listening on port 5432" {
+			log.Printf("\nEmbedded Postgres already running on port 5432\n continueing...\n")
+			time.Sleep(3 * time.Second)
+			return
+		}
 		panic(err)
 	}
 }

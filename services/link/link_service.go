@@ -29,31 +29,48 @@ func (ls LinkService) CreateLink(input model.LinkCreateInput, userId uuid.UUID) 
 		Target:            input.Target,
 		Path:              *path,
 		RedirectionChoice: *input.RedirectionOptions,
-		Status:            database_enums.StatusStateActive,
+		Status:            database_enums.StatusStatePasive,
 		CreatedBy:         userId,
 		OpenGraph:         input.OpenGraph,
 	}
 
 	err = ls.DB.Create(&link).Error
 
-	/* TODO Get OpenGraph data from target URL
-	Mergings
+	linkCrawlerService := &LinkCrawlerService{DB: ls.DB, link: link, user: &database_models.User{ID: userId}}
+	linkCrawlerService.Crawl(true)
 
-	Platform OpenGraph
-	User Input OpenGraph
-	Crawler OpenGraph
-
-	And Update the OG data in the database
-	*/
 	return
 }
 
-func (ls LinkService) GetLinkById(id uuid.UUID) (link database_models.Link, err error) {
+func (ls LinkService) RequestCrawl(linkId uuid.UUID, userId uuid.UUID) (link *database_models.Link, err error) {
+	link, err = ls.GetLinkById(linkId)
+	if err != nil {
+		return
+	}
+
+	linkCrawlerService := &LinkCrawlerService{DB: ls.DB, link: link, user: &database_models.User{ID: userId}}
+	err = linkCrawlerService.Crawl(true)
+
+	return
+}
+
+func (ls LinkService) GetLinkById(id uuid.UUID) (link *database_models.Link, err error) {
 	err = ls.DB.First(&link, id).Error
 	return
 }
 
 func (ls LinkService) GetLinksByPlatformId(platformId uuid.UUID) (link []*database_models.Link, err error) {
 	err = ls.DB.Where("platform_id = ?", platformId).Find(&link).Error
+	return
+}
+
+func (ls LinkService) UpdateLinkStatus(link *database_models.Link, status database_enums.StatusState) (err error) {
+	link.Status = status
+	err = ls.DB.Save(&link).Error
+	return
+}
+
+func (ls LinkService) GetCrawls(linkId uuid.UUID) (crawls []*database_models.LinkCrawl, err error) {
+	err = ls.DB.Where("link_id = ?", linkId).Find(&crawls).Error
 	return
 }

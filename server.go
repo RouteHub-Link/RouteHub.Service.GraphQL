@@ -30,6 +30,7 @@ func Serve() {
 	config := graph.Config{Resolvers: resolver}
 	config.Directives.Auth = directives.AuthDirectiveHandler
 	config.Directives.OrganizationPermission = directives.OrganizationPermissionDirectiveHandler
+	config.Directives.PlatformPermission = directives.PlatformPermissionDirectiveHandler
 
 	config.Directives.LinkDuplicateCheck = directives.LinkDuplicateCheckDirectiveHandler
 	config.Directives.PlatformDuplicateCheck = directives.PlatformDuplicateCheckDirectiveHandler

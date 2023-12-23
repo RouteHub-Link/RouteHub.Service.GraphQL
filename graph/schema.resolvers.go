@@ -94,6 +94,21 @@ func (r *linkResolver) State(ctx context.Context, obj *database.Link) (database_
 	return obj.Status, nil
 }
 
+// Crawls is the resolver for the crawls field.
+func (r *linkResolver) Crawls(ctx context.Context, obj *database.Link) ([]*database.LinkCrawl, error) {
+	return r.ServiceContainer.LinkService.GetCrawls(obj.ID)
+}
+
+// Link is the resolver for the link field.
+func (r *linkCrawlResolver) Link(ctx context.Context, obj *database.LinkCrawl) (*database.Link, error) {
+	return r.ServiceContainer.LinkService.GetLinkById(obj.LinkId)
+}
+
+// CrawledBy is the resolver for the crawledBy field.
+func (r *linkCrawlResolver) CrawledBy(ctx context.Context, obj *database.LinkCrawl) (*database.User, error) {
+	return r.ServiceContainer.UserService.User(obj.CreatedBy)
+}
+
 // CreateUser is the resolver for the createUser field.
 func (r *mutationResolver) CreateUser(ctx context.Context, input model.UserInput) (*database.User, error) {
 	panic(fmt.Errorf("not implemented: CreateUser - createUser"))
@@ -185,6 +200,23 @@ func (r *mutationResolver) CreateLink(ctx context.Context, input model.LinkCreat
 	}
 
 	return r.ServiceContainer.LinkService.CreateLink(input, userSession.ID)
+}
+
+// RequestCrawl is the resolver for the requestCrawl field.
+func (r *mutationResolver) RequestCrawl(ctx context.Context, input model.CrawlRequestInput) (*database.LinkCrawl, error) {
+	userSession := auth.ForContext(ctx)
+	if userSession == nil {
+		return nil, gqlerror.Errorf("Access Denied")
+	}
+
+	link, err := r.ServiceContainer.LinkService.RequestCrawl(input.LinkID, userSession.ID)
+	if err != nil {
+		return nil, gqlerror.Errorf("Process Failed %s", err.Error())
+	}
+
+	crawls, err := r.ServiceContainer.LinkService.GetCrawls(link.ID)
+
+	return crawls[len(crawls)-1], err
 }
 
 // Permissions is the resolver for the permissions field.
@@ -362,6 +394,9 @@ func (r *Resolver) Industry() IndustryResolver { return &industryResolver{r} }
 // Link returns LinkResolver implementation.
 func (r *Resolver) Link() LinkResolver { return &linkResolver{r} }
 
+// LinkCrawl returns LinkCrawlResolver implementation.
+func (r *Resolver) LinkCrawl() LinkCrawlResolver { return &linkCrawlResolver{r} }
+
 // Mutation returns MutationResolver implementation.
 func (r *Resolver) Mutation() MutationResolver { return &mutationResolver{r} }
 
@@ -393,6 +428,7 @@ func (r *Resolver) PlatformsWithPermissionsInput() PlatformsWithPermissionsInput
 type domainResolver struct{ *Resolver }
 type industryResolver struct{ *Resolver }
 type linkResolver struct{ *Resolver }
+type linkCrawlResolver struct{ *Resolver }
 type mutationResolver struct{ *Resolver }
 type organizationResolver struct{ *Resolver }
 type platformResolver struct{ *Resolver }

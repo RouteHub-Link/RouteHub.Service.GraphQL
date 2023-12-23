@@ -13,7 +13,7 @@ type Link struct {
 	PlatformID        uuid.UUID                         `gorm:"type:uuid;not null;field:platform_id"`
 	Target            string                            `gorm:"type:varchar(255);not null;"`
 	Path              string                            `gorm:"type:varchar(255);not null;"`
-	OpenGraph         *database_types.OpenGraph         `json:"openGraph" gorm:"serializer:json"`
+	OpenGraph         *database_types.OpenGraph         `json:"open_graph" gorm:"serializer:json;field:open_graph"`
 	RedirectionChoice database_enums.RedirectionOptions `json:"redirectionChoice" gorm:"serializer:json"`
 	Status            database_enums.StatusState        `json:"status" gorm:"serializer:json"`
 

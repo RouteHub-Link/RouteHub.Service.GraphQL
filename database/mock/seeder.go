@@ -145,4 +145,46 @@ func Seed() {
 		database.DB.Create(&platform_user)
 	}
 
+	var link_count int64
+	database.DB.Model(&database_models.Link{}).Count(&link_count)
+
+	if link_count == 0 {
+		ogData := `{
+			"title": "My 10 Day GO Learning Journey",
+			"description": "In this blog i will share my experiences on GO & also i will give you whole 10 day learning exp.",
+			"alternateImage": "cdn.link.r4l.cc/alternate",
+			"favIcon": "cdn.link.r4l.cc/favicon",
+			"image": "cdn.link.r4l.cc/image",
+			"locale": "tr-TR",
+			"siteName": "Shorten Route for Links CC",
+			"type": "blog",
+			"url": "https://blog.guneskorkmaz.net/my-go-learning-journey",
+			"x": {
+			  "creator": "@runaho",
+			  "card": "R4L Shorten Link",
+			  "description": "Route Hub Link Shortener B2B Main",
+			  "image": "s.r4l.cc/image",
+			  "site": "https://routehub.link",
+			  "title": "Route Hub Shortener",
+			  "type": "website",
+			  "url": "https://blog.guneskorkmaz.net/my-go-learning-journey"
+			}
+		  }`
+
+		og := &database_types.OpenGraph{}
+		og.ParseFromJson(ogData)
+
+		link := &database_models.Link{
+			ID:                uuid.MustParse("c7d3a1e0-0c4d-4c1f-8f2c-6c4e6d6f7f3c"),
+			CreatedBy:         user.ID,
+			PlatformID:        platform.ID,
+			Target:            "https://blog.guneskorkmaz.net/my-go-learning-journey",
+			Path:              "my-go-learning-journey",
+			Status:            database_enums.StatusStateActive,
+			RedirectionChoice: database_enums.RedirectionOptionsTimed,
+			OpenGraph:         og,
+		}
+
+		database.DB.Create(link)
+	}
 }

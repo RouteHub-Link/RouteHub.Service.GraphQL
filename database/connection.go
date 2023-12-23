@@ -36,5 +36,6 @@ func migrate(db *gorm.DB) {
 		&database_models.Domain{},
 		&database_models.Platform{},
 		&database_models.Link{},
+		&database_models.LinkCrawl{},
 	)
 }

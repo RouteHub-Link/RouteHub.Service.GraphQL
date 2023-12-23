@@ -77,6 +77,13 @@ enum InvitationStatus {
   REJECTED
 }
 
+enum CrawlStatus {
+  REQUESTED
+  STARTED
+  SUCCESS
+  FAILED
+}
+
 directive @auth on FIELD_DEFINITION
 directive @platformPermission(permission: PlatformPermission!) on INPUT_OBJECT
 directive @organizationPermission(permission: OrganizationPermission!) on INPUT_OBJECT
@@ -330,12 +337,32 @@ type Link {
   openGraph: [OpenGraph!]
   redirectionOptions: RedirectionOptions!
   state: StatusState!
+  crawls: [LinkCrawl!]!
   createdAt: DateTime!
   updatedAt: DateTime
   deletedAt: DateTime
 }
 
-input LinkCreateInput {
+type LinkCrawl {
+  id: UUID!
+  target: String!
+  link: Link!
+  crawlStatus: CrawlStatus!
+  logs: [Log!]!
+  result: OpenGraph
+  crawledBy: User!
+  createdAt: DateTime!
+  startAt: DateTime
+  endAt: DateTime
+  updatedAt: DateTime
+}
+
+input CrawlRequestInput @platformPermission(permission: LINK_UPDATE) {
+  linkId: UUID!
+}
+
+
+input LinkCreateInput @platformPermission(permission: LINK_CREATE) {
   target: String!
   path: String
   platformId: UUID!
@@ -553,4 +580,5 @@ type Mutation {
   createDomain(input: DomainCreateInput!): Domain! @domainDuplicateCheck
   createPlatform(input: PlatformCreateInput!): Platform! @platformDuplicateCheck
   createLink(input: LinkCreateInput!): Link! @linkDuplicateCheck
+  requestCrawl(input: CrawlRequestInput!): LinkCrawl!
 }

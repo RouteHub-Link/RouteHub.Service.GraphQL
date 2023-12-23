@@ -49,6 +49,7 @@ type ResolverRoot interface {
 	Domain() DomainResolver
 	Industry() IndustryResolver
 	Link() LinkResolver
+	LinkCrawl() LinkCrawlResolver
 	Mutation() MutationResolver
 	Organization() OrganizationResolver
 	Platform() PlatformResolver
@@ -130,6 +131,7 @@ type ComplexityRoot struct {
 
 	Link struct {
 		Analytics          func(childComplexity int) int
+		Crawls             func(childComplexity int) int
 		CreatedAt          func(childComplexity int) int
 		Creator            func(childComplexity int) int
 		DeletedAt          func(childComplexity int) int
@@ -142,6 +144,20 @@ type ComplexityRoot struct {
 		State              func(childComplexity int) int
 		Target             func(childComplexity int) int
 		UpdatedAt          func(childComplexity int) int
+	}
+
+	LinkCrawl struct {
+		CrawlStatus func(childComplexity int) int
+		CrawledBy   func(childComplexity int) int
+		CreatedAt   func(childComplexity int) int
+		EndAt       func(childComplexity int) int
+		ID          func(childComplexity int) int
+		Link        func(childComplexity int) int
+		Logs        func(childComplexity int) int
+		Result      func(childComplexity int) int
+		StartAt     func(childComplexity int) int
+		Target      func(childComplexity int) int
+		UpdatedAt   func(childComplexity int) int
 	}
 
 	Log struct {
@@ -171,6 +187,7 @@ type ComplexityRoot struct {
 		CreateUser           func(childComplexity int, input model.UserInput) int
 		InviteUser           func(childComplexity int, input graph_inputs.UserInviteInput) int
 		LoginUser            func(childComplexity int, input model.LoginInput) int
+		RequestCrawl         func(childComplexity int, input model.CrawlRequestInput) int
 		RequestPasswordReset func(childComplexity int, input model.PasswordResetCreateInput) int
 		ResetPassword        func(childComplexity int, input model.PasswordResetUpdateInput) int
 		UpdateUserInvitation func(childComplexity int, input model.UpdateUserInviteInput) int
@@ -393,6 +410,12 @@ type LinkResolver interface {
 	OpenGraph(ctx context.Context, obj *database_models.Link) ([]*database_types.OpenGraph, error)
 	RedirectionOptions(ctx context.Context, obj *database_models.Link) (database_enums.RedirectionOptions, error)
 	State(ctx context.Context, obj *database_models.Link) (database_enums.StatusState, error)
+	Crawls(ctx context.Context, obj *database_models.Link) ([]*database_models.LinkCrawl, error)
+}
+type LinkCrawlResolver interface {
+	Link(ctx context.Context, obj *database_models.LinkCrawl) (*database_models.Link, error)
+
+	CrawledBy(ctx context.Context, obj *database_models.LinkCrawl) (*database_models.User, error)
 }
 type MutationResolver interface {
 	CreateUser(ctx context.Context, input model.UserInput) (*database_models.User, error)
@@ -405,6 +428,7 @@ type MutationResolver interface {
 	CreateDomain(ctx context.Context, input model.DomainCreateInput) (*database_models.Domain, error)
 	CreatePlatform(ctx context.Context, input graph_inputs.PlatformCreateInput) (*database_models.Platform, error)
 	CreateLink(ctx context.Context, input model.LinkCreateInput) (*database_models.Link, error)
+	RequestCrawl(ctx context.Context, input model.CrawlRequestInput) (*database_models.LinkCrawl, error)
 }
 type OrganizationResolver interface {
 	Permissions(ctx context.Context, obj *database_models.Organization) ([]database_enums.OrganizationPermission, error)
@@ -769,6 +793,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Link.Analytics(childComplexity), true
 
+	case "Link.crawls":
+		if e.complexity.Link.Crawls == nil {
+			break
+		}
+
+		return e.complexity.Link.Crawls(childComplexity), true
+
 	case "Link.createdAt":
 		if e.complexity.Link.CreatedAt == nil {
 			break
@@ -852,6 +883,83 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Link.UpdatedAt(childComplexity), true
+
+	case "LinkCrawl.crawlStatus":
+		if e.complexity.LinkCrawl.CrawlStatus == nil {
+			break
+		}
+
+		return e.complexity.LinkCrawl.CrawlStatus(childComplexity), true
+
+	case "LinkCrawl.crawledBy":
+		if e.complexity.LinkCrawl.CrawledBy == nil {
+			break
+		}
+
+		return e.complexity.LinkCrawl.CrawledBy(childComplexity), true
+
+	case "LinkCrawl.createdAt":
+		if e.complexity.LinkCrawl.CreatedAt == nil {
+			break
+		}
+
+		return e.complexity.LinkCrawl.CreatedAt(childComplexity), true
+
+	case "LinkCrawl.endAt":
+		if e.complexity.LinkCrawl.EndAt == nil {
+			break
+		}
+
+		return e.complexity.LinkCrawl.EndAt(childComplexity), true
+
+	case "LinkCrawl.id":
+		if e.complexity.LinkCrawl.ID == nil {
+			break
+		}
+
+		return e.complexity.LinkCrawl.ID(childComplexity), true
+
+	case "LinkCrawl.link":
+		if e.complexity.LinkCrawl.Link == nil {
+			break
+		}
+
+		return e.complexity.LinkCrawl.Link(childComplexity), true
+
+	case "LinkCrawl.logs":
+		if e.complexity.LinkCrawl.Logs == nil {
+			break
+		}
+
+		return e.complexity.LinkCrawl.Logs(childComplexity), true
+
+	case "LinkCrawl.result":
+		if e.complexity.LinkCrawl.Result == nil {
+			break
+		}
+
+		return e.complexity.LinkCrawl.Result(childComplexity), true
+
+	case "LinkCrawl.startAt":
+		if e.complexity.LinkCrawl.StartAt == nil {
+			break
+		}
+
+		return e.complexity.LinkCrawl.StartAt(childComplexity), true
+
+	case "LinkCrawl.target":
+		if e.complexity.LinkCrawl.Target == nil {
+			break
+		}
+
+		return e.complexity.LinkCrawl.Target(childComplexity), true
+
+	case "LinkCrawl.updatedAt":
+		if e.complexity.LinkCrawl.UpdatedAt == nil {
+			break
+		}
+
+		return e.complexity.LinkCrawl.UpdatedAt(childComplexity), true
 
 	case "Log.createdAt":
 		if e.complexity.Log.CreatedAt == nil {
@@ -1001,6 +1109,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.LoginUser(childComplexity, args["input"].(model.LoginInput)), true
+
+	case "Mutation.requestCrawl":
+		if e.complexity.Mutation.RequestCrawl == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_requestCrawl_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.RequestCrawl(childComplexity, args["input"].(model.CrawlRequestInput)), true
 
 	case "Mutation.requestPasswordReset":
 		if e.complexity.Mutation.RequestPasswordReset == nil {
@@ -2094,6 +2214,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
 		ec.unmarshalInputAccountPhoneInput,
 		ec.unmarshalInputClientInformationInput,
+		ec.unmarshalInputCrawlRequestInput,
 		ec.unmarshalInputDomainCreateInput,
 		ec.unmarshalInputLinkCreateInput,
 		ec.unmarshalInputLoginInput,
@@ -2343,6 +2464,21 @@ func (ec *executionContext) field_Mutation_loginUser_args(ctx context.Context, r
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
 		arg0, err = ec.unmarshalNLoginInput2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐLoginInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_requestCrawl_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.CrawlRequestInput
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalNCrawlRequestInput2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐCrawlRequestInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -2764,6 +2900,8 @@ func (ec *executionContext) fieldContext_AnalyticReport_link(ctx context.Context
 				return ec.fieldContext_Link_redirectionOptions(ctx, field)
 			case "state":
 				return ec.fieldContext_Link_state(ctx, field)
+			case "crawls":
+				return ec.fieldContext_Link_crawls(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Link_createdAt(ctx, field)
 			case "updatedAt":
@@ -4319,9 +4457,9 @@ func (ec *executionContext) _DomainVerification_logs(ctx context.Context, field 
 		}
 		return graphql.Null
 	}
-	res := resTmp.([]*model.Log)
+	res := resTmp.([]*database_types.Log)
 	fc.Result = res
-	return ec.marshalNLog2ᚕᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐLogᚄ(ctx, field.Selections, res)
+	return ec.marshalNLog2ᚕᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐLogᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_DomainVerification_logs(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -5148,6 +5286,74 @@ func (ec *executionContext) fieldContext_Link_state(ctx context.Context, field g
 	return fc, nil
 }
 
+func (ec *executionContext) _Link_crawls(ctx context.Context, field graphql.CollectedField, obj *database_models.Link) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Link_crawls(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Link().Crawls(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*database_models.LinkCrawl)
+	fc.Result = res
+	return ec.marshalNLinkCrawl2ᚕᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋmodelsᚐLinkCrawlᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Link_crawls(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Link",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_LinkCrawl_id(ctx, field)
+			case "target":
+				return ec.fieldContext_LinkCrawl_target(ctx, field)
+			case "link":
+				return ec.fieldContext_LinkCrawl_link(ctx, field)
+			case "crawlStatus":
+				return ec.fieldContext_LinkCrawl_crawlStatus(ctx, field)
+			case "logs":
+				return ec.fieldContext_LinkCrawl_logs(ctx, field)
+			case "result":
+				return ec.fieldContext_LinkCrawl_result(ctx, field)
+			case "crawledBy":
+				return ec.fieldContext_LinkCrawl_crawledBy(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_LinkCrawl_createdAt(ctx, field)
+			case "startAt":
+				return ec.fieldContext_LinkCrawl_startAt(ctx, field)
+			case "endAt":
+				return ec.fieldContext_LinkCrawl_endAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_LinkCrawl_updatedAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type LinkCrawl", field.Name)
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Link_createdAt(ctx context.Context, field graphql.CollectedField, obj *database_models.Link) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Link_createdAt(ctx, field)
 	if err != nil {
@@ -5274,7 +5480,569 @@ func (ec *executionContext) fieldContext_Link_deletedAt(ctx context.Context, fie
 	return fc, nil
 }
 
-func (ec *executionContext) _Log_id(ctx context.Context, field graphql.CollectedField, obj *model.Log) (ret graphql.Marshaler) {
+func (ec *executionContext) _LinkCrawl_id(ctx context.Context, field graphql.CollectedField, obj *database_models.LinkCrawl) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_LinkCrawl_id(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(uuid.UUID)
+	fc.Result = res
+	return ec.marshalNUUID2githubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_LinkCrawl_id(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "LinkCrawl",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type UUID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _LinkCrawl_target(ctx context.Context, field graphql.CollectedField, obj *database_models.LinkCrawl) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_LinkCrawl_target(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Target, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_LinkCrawl_target(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "LinkCrawl",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _LinkCrawl_link(ctx context.Context, field graphql.CollectedField, obj *database_models.LinkCrawl) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_LinkCrawl_link(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.LinkCrawl().Link(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*database_models.Link)
+	fc.Result = res
+	return ec.marshalNLink2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋmodelsᚐLink(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_LinkCrawl_link(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "LinkCrawl",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Link_id(ctx, field)
+			case "target":
+				return ec.fieldContext_Link_target(ctx, field)
+			case "path":
+				return ec.fieldContext_Link_path(ctx, field)
+			case "creator":
+				return ec.fieldContext_Link_creator(ctx, field)
+			case "platform":
+				return ec.fieldContext_Link_platform(ctx, field)
+			case "domain":
+				return ec.fieldContext_Link_domain(ctx, field)
+			case "analytics":
+				return ec.fieldContext_Link_analytics(ctx, field)
+			case "openGraph":
+				return ec.fieldContext_Link_openGraph(ctx, field)
+			case "redirectionOptions":
+				return ec.fieldContext_Link_redirectionOptions(ctx, field)
+			case "state":
+				return ec.fieldContext_Link_state(ctx, field)
+			case "crawls":
+				return ec.fieldContext_Link_crawls(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Link_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Link_updatedAt(ctx, field)
+			case "deletedAt":
+				return ec.fieldContext_Link_deletedAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Link", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _LinkCrawl_crawlStatus(ctx context.Context, field graphql.CollectedField, obj *database_models.LinkCrawl) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_LinkCrawl_crawlStatus(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CrawlStatus, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(database_enums.CrawlStatus)
+	fc.Result = res
+	return ec.marshalNCrawlStatus2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐCrawlStatus(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_LinkCrawl_crawlStatus(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "LinkCrawl",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type CrawlStatus does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _LinkCrawl_logs(ctx context.Context, field graphql.CollectedField, obj *database_models.LinkCrawl) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_LinkCrawl_logs(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Logs, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*database_types.Log)
+	fc.Result = res
+	return ec.marshalNLog2ᚕᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐLogᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_LinkCrawl_logs(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "LinkCrawl",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Log_id(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Log_createdAt(ctx, field)
+			case "message":
+				return ec.fieldContext_Log_message(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Log", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _LinkCrawl_result(ctx context.Context, field graphql.CollectedField, obj *database_models.LinkCrawl) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_LinkCrawl_result(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Result, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*database_types.OpenGraph)
+	fc.Result = res
+	return ec.marshalOOpenGraph2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐOpenGraph(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_LinkCrawl_result(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "LinkCrawl",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "title":
+				return ec.fieldContext_OpenGraph_title(ctx, field)
+			case "description":
+				return ec.fieldContext_OpenGraph_description(ctx, field)
+			case "favIcon":
+				return ec.fieldContext_OpenGraph_favIcon(ctx, field)
+			case "image":
+				return ec.fieldContext_OpenGraph_image(ctx, field)
+			case "alternateImage":
+				return ec.fieldContext_OpenGraph_alternateImage(ctx, field)
+			case "url":
+				return ec.fieldContext_OpenGraph_url(ctx, field)
+			case "siteName":
+				return ec.fieldContext_OpenGraph_siteName(ctx, field)
+			case "type":
+				return ec.fieldContext_OpenGraph_type(ctx, field)
+			case "locale":
+				return ec.fieldContext_OpenGraph_locale(ctx, field)
+			case "x":
+				return ec.fieldContext_OpenGraph_x(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type OpenGraph", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _LinkCrawl_crawledBy(ctx context.Context, field graphql.CollectedField, obj *database_models.LinkCrawl) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_LinkCrawl_crawledBy(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.LinkCrawl().CrawledBy(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*database_models.User)
+	fc.Result = res
+	return ec.marshalNUser2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋmodelsᚐUser(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_LinkCrawl_crawledBy(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "LinkCrawl",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_User_id(ctx, field)
+			case "avatar":
+				return ec.fieldContext_User_avatar(ctx, field)
+			case "email":
+				return ec.fieldContext_User_email(ctx, field)
+			case "fullname":
+				return ec.fieldContext_User_fullname(ctx, field)
+			case "verified":
+				return ec.fieldContext_User_verified(ctx, field)
+			case "phone":
+				return ec.fieldContext_User_phone(ctx, field)
+			case "organizations":
+				return ec.fieldContext_User_organizations(ctx, field)
+			case "platforms":
+				return ec.fieldContext_User_platforms(ctx, field)
+			case "permissions":
+				return ec.fieldContext_User_permissions(ctx, field)
+			case "payments":
+				return ec.fieldContext_User_payments(ctx, field)
+			case "userInvites":
+				return ec.fieldContext_User_userInvites(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_User_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_User_updatedAt(ctx, field)
+			case "deletedAt":
+				return ec.fieldContext_User_deletedAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _LinkCrawl_createdAt(ctx context.Context, field graphql.CollectedField, obj *database_models.LinkCrawl) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_LinkCrawl_createdAt(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CreatedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(time.Time)
+	fc.Result = res
+	return ec.marshalNDateTime2timeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_LinkCrawl_createdAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "LinkCrawl",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type DateTime does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _LinkCrawl_startAt(ctx context.Context, field graphql.CollectedField, obj *database_models.LinkCrawl) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_LinkCrawl_startAt(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.StartAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*time.Time)
+	fc.Result = res
+	return ec.marshalODateTime2ᚖtimeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_LinkCrawl_startAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "LinkCrawl",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type DateTime does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _LinkCrawl_endAt(ctx context.Context, field graphql.CollectedField, obj *database_models.LinkCrawl) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_LinkCrawl_endAt(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.EndAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*time.Time)
+	fc.Result = res
+	return ec.marshalODateTime2ᚖtimeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_LinkCrawl_endAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "LinkCrawl",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type DateTime does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _LinkCrawl_updatedAt(ctx context.Context, field graphql.CollectedField, obj *database_models.LinkCrawl) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_LinkCrawl_updatedAt(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.UpdatedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*time.Time)
+	fc.Result = res
+	return ec.marshalODateTime2ᚖtimeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_LinkCrawl_updatedAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "LinkCrawl",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type DateTime does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Log_id(ctx context.Context, field graphql.CollectedField, obj *database_types.Log) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Log_id(ctx, field)
 	if err != nil {
 		return graphql.Null
@@ -5318,7 +6086,7 @@ func (ec *executionContext) fieldContext_Log_id(ctx context.Context, field graph
 	return fc, nil
 }
 
-func (ec *executionContext) _Log_createdAt(ctx context.Context, field graphql.CollectedField, obj *model.Log) (ret graphql.Marshaler) {
+func (ec *executionContext) _Log_createdAt(ctx context.Context, field graphql.CollectedField, obj *database_types.Log) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Log_createdAt(ctx, field)
 	if err != nil {
 		return graphql.Null
@@ -5362,7 +6130,7 @@ func (ec *executionContext) fieldContext_Log_createdAt(ctx context.Context, fiel
 	return fc, nil
 }
 
-func (ec *executionContext) _Log_message(ctx context.Context, field graphql.CollectedField, obj *model.Log) (ret graphql.Marshaler) {
+func (ec *executionContext) _Log_message(ctx context.Context, field graphql.CollectedField, obj *database_types.Log) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Log_message(ctx, field)
 	if err != nil {
 		return graphql.Null
@@ -6584,6 +7352,8 @@ func (ec *executionContext) fieldContext_Mutation_createLink(ctx context.Context
 				return ec.fieldContext_Link_redirectionOptions(ctx, field)
 			case "state":
 				return ec.fieldContext_Link_state(ctx, field)
+			case "crawls":
+				return ec.fieldContext_Link_crawls(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Link_createdAt(ctx, field)
 			case "updatedAt":
@@ -6602,6 +7372,85 @@ func (ec *executionContext) fieldContext_Mutation_createLink(ctx context.Context
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_createLink_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_requestCrawl(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_requestCrawl(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().RequestCrawl(rctx, fc.Args["input"].(model.CrawlRequestInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*database_models.LinkCrawl)
+	fc.Result = res
+	return ec.marshalNLinkCrawl2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋmodelsᚐLinkCrawl(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_requestCrawl(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_LinkCrawl_id(ctx, field)
+			case "target":
+				return ec.fieldContext_LinkCrawl_target(ctx, field)
+			case "link":
+				return ec.fieldContext_LinkCrawl_link(ctx, field)
+			case "crawlStatus":
+				return ec.fieldContext_LinkCrawl_crawlStatus(ctx, field)
+			case "logs":
+				return ec.fieldContext_LinkCrawl_logs(ctx, field)
+			case "result":
+				return ec.fieldContext_LinkCrawl_result(ctx, field)
+			case "crawledBy":
+				return ec.fieldContext_LinkCrawl_crawledBy(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_LinkCrawl_createdAt(ctx, field)
+			case "startAt":
+				return ec.fieldContext_LinkCrawl_startAt(ctx, field)
+			case "endAt":
+				return ec.fieldContext_LinkCrawl_endAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_LinkCrawl_updatedAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type LinkCrawl", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_requestCrawl_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -6711,6 +7560,8 @@ func (ec *executionContext) fieldContext_ObservationAnalytic_link(ctx context.Co
 				return ec.fieldContext_Link_redirectionOptions(ctx, field)
 			case "state":
 				return ec.fieldContext_Link_state(ctx, field)
+			case "crawls":
+				return ec.fieldContext_Link_crawls(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Link_createdAt(ctx, field)
 			case "updatedAt":
@@ -7242,9 +8093,9 @@ func (ec *executionContext) _OpenGraph_title(ctx context.Context, field graphql.
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*string)
+	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+	return ec.marshalOString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_OpenGraph_title(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -7283,9 +8134,9 @@ func (ec *executionContext) _OpenGraph_description(ctx context.Context, field gr
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*string)
+	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+	return ec.marshalOString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_OpenGraph_description(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -7324,9 +8175,9 @@ func (ec *executionContext) _OpenGraph_favIcon(ctx context.Context, field graphq
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*string)
+	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+	return ec.marshalOString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_OpenGraph_favIcon(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -7365,9 +8216,9 @@ func (ec *executionContext) _OpenGraph_image(ctx context.Context, field graphql.
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*string)
+	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+	return ec.marshalOString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_OpenGraph_image(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -7406,9 +8257,9 @@ func (ec *executionContext) _OpenGraph_alternateImage(ctx context.Context, field
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*string)
+	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+	return ec.marshalOString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_OpenGraph_alternateImage(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -7447,9 +8298,9 @@ func (ec *executionContext) _OpenGraph_url(ctx context.Context, field graphql.Co
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*string)
+	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+	return ec.marshalOString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_OpenGraph_url(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -7488,9 +8339,9 @@ func (ec *executionContext) _OpenGraph_siteName(ctx context.Context, field graph
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*string)
+	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+	return ec.marshalOString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_OpenGraph_siteName(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -7529,9 +8380,9 @@ func (ec *executionContext) _OpenGraph_type(ctx context.Context, field graphql.C
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*string)
+	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+	return ec.marshalOString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_OpenGraph_type(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -7570,9 +8421,9 @@ func (ec *executionContext) _OpenGraph_locale(ctx context.Context, field graphql
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*string)
+	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+	return ec.marshalOString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_OpenGraph_locale(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -7670,9 +8521,9 @@ func (ec *executionContext) _OpenGraphX_card(ctx context.Context, field graphql.
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*string)
+	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+	return ec.marshalOString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_OpenGraphX_card(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -7711,9 +8562,9 @@ func (ec *executionContext) _OpenGraphX_site(ctx context.Context, field graphql.
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*string)
+	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+	return ec.marshalOString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_OpenGraphX_site(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -7752,9 +8603,9 @@ func (ec *executionContext) _OpenGraphX_title(ctx context.Context, field graphql
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*string)
+	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+	return ec.marshalOString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_OpenGraphX_title(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -7793,9 +8644,9 @@ func (ec *executionContext) _OpenGraphX_description(ctx context.Context, field g
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*string)
+	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+	return ec.marshalOString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_OpenGraphX_description(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -7834,9 +8685,9 @@ func (ec *executionContext) _OpenGraphX_image(ctx context.Context, field graphql
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*string)
+	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+	return ec.marshalOString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_OpenGraphX_image(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -7875,9 +8726,9 @@ func (ec *executionContext) _OpenGraphX_url(ctx context.Context, field graphql.C
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*string)
+	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+	return ec.marshalOString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_OpenGraphX_url(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -7916,9 +8767,9 @@ func (ec *executionContext) _OpenGraphX_type(ctx context.Context, field graphql.
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*string)
+	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+	return ec.marshalOString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_OpenGraphX_type(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -7957,9 +8808,9 @@ func (ec *executionContext) _OpenGraphX_creator(ctx context.Context, field graph
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*string)
+	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+	return ec.marshalOString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_OpenGraphX_creator(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -10171,6 +11022,8 @@ func (ec *executionContext) fieldContext_Platform_links(ctx context.Context, fie
 				return ec.fieldContext_Link_redirectionOptions(ctx, field)
 			case "state":
 				return ec.fieldContext_Link_state(ctx, field)
+			case "crawls":
+				return ec.fieldContext_Link_crawls(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Link_createdAt(ctx, field)
 			case "updatedAt":
@@ -10475,6 +11328,8 @@ func (ec *executionContext) fieldContext_Platform_pinnedLinks(ctx context.Contex
 				return ec.fieldContext_Link_redirectionOptions(ctx, field)
 			case "state":
 				return ec.fieldContext_Link_state(ctx, field)
+			case "crawls":
+				return ec.fieldContext_Link_crawls(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Link_createdAt(ctx, field)
 			case "updatedAt":
@@ -10748,9 +11603,9 @@ func (ec *executionContext) _PlatformDeployment_logs(ctx context.Context, field 
 		}
 		return graphql.Null
 	}
-	res := resTmp.([]*model.Log)
+	res := resTmp.([]*database_types.Log)
 	fc.Result = res
-	return ec.marshalNLog2ᚕᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐLogᚄ(ctx, field.Selections, res)
+	return ec.marshalNLog2ᚕᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐLogᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_PlatformDeployment_logs(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -16210,6 +17065,52 @@ func (ec *executionContext) unmarshalInputClientInformationInput(ctx context.Con
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputCrawlRequestInput(ctx context.Context, obj interface{}) (model.CrawlRequestInput, error) {
+	var it model.CrawlRequestInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"linkId"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "linkId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("linkId"))
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalNUUID2githubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				permission, err := ec.unmarshalNPlatformPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐPlatformPermission(ctx, "LINK_UPDATE")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.PlatformPermission == nil {
+					return nil, errors.New("directive platformPermission is not implemented")
+				}
+				return ec.directives.PlatformPermission(ctx, obj, directive0, permission)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(uuid.UUID); ok {
+				it.LinkID = data
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be github.com/google/uuid.UUID`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputDomainCreateInput(ctx context.Context, obj interface{}) (model.DomainCreateInput, error) {
 	var it model.DomainCreateInput
 	asMap := map[string]interface{}{}
@@ -16274,39 +17175,136 @@ func (ec *executionContext) unmarshalInputLinkCreateInput(ctx context.Context, o
 		switch k {
 		case "target":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("target"))
-			data, err := ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalNString2string(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				permission, err := ec.unmarshalNPlatformPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐPlatformPermission(ctx, "LINK_CREATE")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.PlatformPermission == nil {
+					return nil, errors.New("directive platformPermission is not implemented")
+				}
+				return ec.directives.PlatformPermission(ctx, obj, directive0, permission)
 			}
-			it.Target = data
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(string); ok {
+				it.Target = data
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be string`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
 		case "path":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("path"))
-			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				permission, err := ec.unmarshalNPlatformPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐPlatformPermission(ctx, "LINK_CREATE")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.PlatformPermission == nil {
+					return nil, errors.New("directive platformPermission is not implemented")
+				}
+				return ec.directives.PlatformPermission(ctx, obj, directive0, permission)
 			}
-			it.Path = data
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*string); ok {
+				it.Path = data
+			} else if tmp == nil {
+				it.Path = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
 		case "platformId":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("platformId"))
-			data, err := ec.unmarshalNUUID2githubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, v)
-			if err != nil {
-				return it, err
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalNUUID2githubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, v)
 			}
-			it.PlatformID = data
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				permission, err := ec.unmarshalNPlatformPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐPlatformPermission(ctx, "LINK_CREATE")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.PlatformPermission == nil {
+					return nil, errors.New("directive platformPermission is not implemented")
+				}
+				return ec.directives.PlatformPermission(ctx, obj, directive0, permission)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(uuid.UUID); ok {
+				it.PlatformID = data
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be github.com/google/uuid.UUID`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
 		case "redirectionOptions":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("redirectionOptions"))
-			data, err := ec.unmarshalORedirectionOptions2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐRedirectionOptions(ctx, v)
-			if err != nil {
-				return it, err
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalORedirectionOptions2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐRedirectionOptions(ctx, v)
 			}
-			it.RedirectionOptions = data
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				permission, err := ec.unmarshalNPlatformPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐPlatformPermission(ctx, "LINK_CREATE")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.PlatformPermission == nil {
+					return nil, errors.New("directive platformPermission is not implemented")
+				}
+				return ec.directives.PlatformPermission(ctx, obj, directive0, permission)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*database_enums.RedirectionOptions); ok {
+				it.RedirectionOptions = data
+			} else if tmp == nil {
+				it.RedirectionOptions = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *github.com/RouteHub-Link/routehub-service-graphql/database/enums.RedirectionOptions`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
 		case "openGraph":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("openGraph"))
-			data, err := ec.unmarshalNOpenGraphInput2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐOpenGraph(ctx, v)
-			if err != nil {
-				return it, err
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalNOpenGraphInput2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐOpenGraph(ctx, v)
 			}
-			it.OpenGraph = data
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				permission, err := ec.unmarshalNPlatformPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐPlatformPermission(ctx, "LINK_CREATE")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.PlatformPermission == nil {
+					return nil, errors.New("directive platformPermission is not implemented")
+				}
+				return ec.directives.PlatformPermission(ctx, obj, directive0, permission)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*database_types.OpenGraph); ok {
+				it.OpenGraph = data
+			} else if tmp == nil {
+				it.OpenGraph = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *github.com/RouteHub-Link/routehub-service-graphql/database/types.OpenGraph`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
 		}
 	}
 
@@ -16446,63 +17444,63 @@ func (ec *executionContext) unmarshalInputOpenGraphInput(ctx context.Context, ob
 		switch k {
 		case "title":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("title"))
-			data, err := ec.unmarshalNString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.Title = data
 		case "description":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("description"))
-			data, err := ec.unmarshalNString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.Description = data
 		case "favIcon":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("favIcon"))
-			data, err := ec.unmarshalNString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.FavIcon = data
 		case "image":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("image"))
-			data, err := ec.unmarshalNString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.Image = data
 		case "alternateImage":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("alternateImage"))
-			data, err := ec.unmarshalNString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.AlternateImage = data
 		case "url":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("url"))
-			data, err := ec.unmarshalNString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.URL = data
 		case "siteName":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("siteName"))
-			data, err := ec.unmarshalNString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.SiteName = data
 		case "type":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("type"))
-			data, err := ec.unmarshalNString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.Type = data
 		case "locale":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("locale"))
-			data, err := ec.unmarshalNString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -16536,56 +17534,56 @@ func (ec *executionContext) unmarshalInputOpenGraphXInput(ctx context.Context, o
 		switch k {
 		case "card":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("card"))
-			data, err := ec.unmarshalNString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.Card = data
 		case "site":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("site"))
-			data, err := ec.unmarshalNString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.Site = data
 		case "title":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("title"))
-			data, err := ec.unmarshalNString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.Title = data
 		case "description":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("description"))
-			data, err := ec.unmarshalNString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.Description = data
 		case "image":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("image"))
-			data, err := ec.unmarshalNString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.Image = data
 		case "url":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("url"))
-			data, err := ec.unmarshalNString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.URL = data
 		case "type":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("type"))
-			data, err := ec.unmarshalNString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.Type = data
 		case "creator":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("creator"))
-			data, err := ec.unmarshalNString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -18285,6 +19283,42 @@ func (ec *executionContext) _Link(ctx context.Context, sel ast.SelectionSet, obj
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "crawls":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Link_crawls(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "createdAt":
 			out.Values[i] = ec._Link_createdAt(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -18317,9 +19351,148 @@ func (ec *executionContext) _Link(ctx context.Context, sel ast.SelectionSet, obj
 	return out
 }
 
+var linkCrawlImplementors = []string{"LinkCrawl"}
+
+func (ec *executionContext) _LinkCrawl(ctx context.Context, sel ast.SelectionSet, obj *database_models.LinkCrawl) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, linkCrawlImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("LinkCrawl")
+		case "id":
+			out.Values[i] = ec._LinkCrawl_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "target":
+			out.Values[i] = ec._LinkCrawl_target(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "link":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._LinkCrawl_link(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "crawlStatus":
+			out.Values[i] = ec._LinkCrawl_crawlStatus(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "logs":
+			out.Values[i] = ec._LinkCrawl_logs(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "result":
+			out.Values[i] = ec._LinkCrawl_result(ctx, field, obj)
+		case "crawledBy":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._LinkCrawl_crawledBy(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "createdAt":
+			out.Values[i] = ec._LinkCrawl_createdAt(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "startAt":
+			out.Values[i] = ec._LinkCrawl_startAt(ctx, field, obj)
+		case "endAt":
+			out.Values[i] = ec._LinkCrawl_endAt(ctx, field, obj)
+		case "updatedAt":
+			out.Values[i] = ec._LinkCrawl_updatedAt(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
 var logImplementors = []string{"Log"}
 
-func (ec *executionContext) _Log(ctx context.Context, sel ast.SelectionSet, obj *model.Log) graphql.Marshaler {
+func (ec *executionContext) _Log(ctx context.Context, sel ast.SelectionSet, obj *database_types.Log) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, logImplementors)
 
 	out := graphql.NewFieldSet(fields)
@@ -18559,6 +19732,13 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		case "createLink":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_createLink(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "requestCrawl":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_requestCrawl(ctx, field)
 			})
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
@@ -21018,6 +22198,21 @@ func (ec *executionContext) unmarshalNClientInformationInput2ᚖgithubᚗcomᚋR
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
+func (ec *executionContext) unmarshalNCrawlRequestInput2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐCrawlRequestInput(ctx context.Context, v interface{}) (model.CrawlRequestInput, error) {
+	res, err := ec.unmarshalInputCrawlRequestInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNCrawlStatus2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐCrawlStatus(ctx context.Context, v interface{}) (database_enums.CrawlStatus, error) {
+	var res database_enums.CrawlStatus
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNCrawlStatus2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐCrawlStatus(ctx context.Context, sel ast.SelectionSet, v database_enums.CrawlStatus) graphql.Marshaler {
+	return v
+}
+
 func (ec *executionContext) unmarshalNDNSStatus2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐDNSStatus(ctx context.Context, v interface{}) (database_enums.DNSStatus, error) {
 	var res database_enums.DNSStatus
 	err := res.UnmarshalGQL(v)
@@ -21292,12 +22487,11 @@ func (ec *executionContext) marshalNLink2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋrou
 	return ec._Link(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNLinkCreateInput2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐLinkCreateInput(ctx context.Context, v interface{}) (model.LinkCreateInput, error) {
-	res, err := ec.unmarshalInputLinkCreateInput(ctx, v)
-	return res, graphql.ErrorOnPath(ctx, err)
+func (ec *executionContext) marshalNLinkCrawl2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋmodelsᚐLinkCrawl(ctx context.Context, sel ast.SelectionSet, v database_models.LinkCrawl) graphql.Marshaler {
+	return ec._LinkCrawl(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNLog2ᚕᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐLogᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Log) graphql.Marshaler {
+func (ec *executionContext) marshalNLinkCrawl2ᚕᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋmodelsᚐLinkCrawlᚄ(ctx context.Context, sel ast.SelectionSet, v []*database_models.LinkCrawl) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -21321,7 +22515,7 @@ func (ec *executionContext) marshalNLog2ᚕᚖgithubᚗcomᚋRouteHubᚑLinkᚋr
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNLog2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐLog(ctx, sel, v[i])
+			ret[i] = ec.marshalNLinkCrawl2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋmodelsᚐLinkCrawl(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -21341,7 +22535,66 @@ func (ec *executionContext) marshalNLog2ᚕᚖgithubᚗcomᚋRouteHubᚑLinkᚋr
 	return ret
 }
 
-func (ec *executionContext) marshalNLog2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐLog(ctx context.Context, sel ast.SelectionSet, v *model.Log) graphql.Marshaler {
+func (ec *executionContext) marshalNLinkCrawl2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋmodelsᚐLinkCrawl(ctx context.Context, sel ast.SelectionSet, v *database_models.LinkCrawl) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._LinkCrawl(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNLinkCreateInput2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐLinkCreateInput(ctx context.Context, v interface{}) (model.LinkCreateInput, error) {
+	res, err := ec.unmarshalInputLinkCreateInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNLog2ᚕᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐLogᚄ(ctx context.Context, sel ast.SelectionSet, v []*database_types.Log) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNLog2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐLog(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalNLog2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐLog(ctx context.Context, sel ast.SelectionSet, v *database_types.Log) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -22127,27 +23380,6 @@ func (ec *executionContext) marshalNString2string(ctx context.Context, sel ast.S
 	return res
 }
 
-func (ec *executionContext) unmarshalNString2ᚖstring(ctx context.Context, v interface{}) (*string, error) {
-	res, err := graphql.UnmarshalString(v)
-	return &res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalNString2ᚖstring(ctx context.Context, sel ast.SelectionSet, v *string) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	res := graphql.MarshalString(*v)
-	if res == graphql.Null {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-	}
-	return res
-}
-
 func (ec *executionContext) marshalNTemplate2ᚕᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐTemplateᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Template) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
@@ -22845,6 +24077,13 @@ func (ec *executionContext) marshalOOpenGraph2ᚕᚖgithubᚗcomᚋRouteHubᚑLi
 	return ret
 }
 
+func (ec *executionContext) marshalOOpenGraph2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐOpenGraph(ctx context.Context, sel ast.SelectionSet, v *database_types.OpenGraph) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._OpenGraph(ctx, sel, v)
+}
+
 func (ec *executionContext) marshalOOpenGraphX2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐOpenGraphX(ctx context.Context, sel ast.SelectionSet, v *database_types.OpenGraphX) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
@@ -22873,6 +24112,16 @@ func (ec *executionContext) marshalORedirectionOptions2ᚖgithubᚗcomᚋRouteHu
 		return graphql.Null
 	}
 	return v
+}
+
+func (ec *executionContext) unmarshalOString2string(ctx context.Context, v interface{}) (string, error) {
+	res, err := graphql.UnmarshalString(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOString2string(ctx context.Context, sel ast.SelectionSet, v string) graphql.Marshaler {
+	res := graphql.MarshalString(v)
+	return res
 }
 
 func (ec *executionContext) unmarshalOString2ᚕstringᚄ(ctx context.Context, v interface{}) ([]string, error) {
