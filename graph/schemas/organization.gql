@@ -1,0 +1,51 @@
+type Organization {
+  id: UUID!
+  name: String!
+  website: String!
+  permissions: [OrganizationPermission!]!
+  platforms: [Platform!]!
+  industry: [Industry!]
+  description: String!
+  location: String!
+  socialMedias: [SocialMedia!]!
+  users: [User!]!
+  domains: [Domain!]!
+  paymentPlan: PaymentPlan!
+  payments: [Payment!]!
+}
+
+type Industry {
+  name: String!
+  organizations: [Organization!]!
+}
+
+
+type SocialMedia {
+  name: String!
+  url: String!
+  icon: String!
+}
+
+input OrganizationInput {
+  name: String!
+  website: String!
+  description: String!
+  location: String!
+  socialMedias: [SocialMediaInput!]!
+}
+
+input OrganizationsWithPermissionsInput {
+  organizationId: UUID!
+  permissions: [OrganizationPermission!]!
+}
+
+input SocialMediaInput {
+  name: String!
+  url: String!
+  icon: String!
+}
+
+
+extend type Query {
+  organizations: [Organization!]! @auth
+}

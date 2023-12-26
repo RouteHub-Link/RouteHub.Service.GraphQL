@@ -1,0 +1,123 @@
+type Link {
+  id: UUID!
+  target: String!
+  path: String!
+  creator: User!
+  platform: Platform!
+  domain: Domain!
+  analytics: [MetricAnalytics!]!
+  openGraph: [OpenGraph!]
+  redirectionOptions: RedirectionOptions!
+  state: StatusState!
+  crawls: [LinkCrawl!]!
+  createdAt: DateTime!
+  updatedAt: DateTime
+  deletedAt: DateTime
+}
+
+type LinkEdge {
+  cursor: String!
+  node: Link!
+}
+
+type LinkConnection {
+  edges: [LinkEdge!]!
+  pageInfo: PageInfo!
+  totalCount: Int!
+}
+
+input LinkFilter {
+  platform: UUIDFilter
+  domain: UUIDFilter
+}
+
+type LinkCrawl {
+  id: UUID!
+  target: String!
+  link: Link!
+  crawlStatus: CrawlStatus!
+  logs: [Log!]!
+  result: OpenGraph
+  crawledBy: User!
+  createdAt: DateTime!
+  startAt: DateTime
+  endAt: DateTime
+  updatedAt: DateTime
+}
+
+input CrawlRequestInput @platformPermission(permission: LINK_UPDATE) {
+  linkId: UUID!
+}
+
+input LinkCreateInput @platformPermission(permission: LINK_CREATE) {
+  target: String!
+  path: String
+  platformId: UUID!
+  redirectionOptions: RedirectionOptions
+  openGraph: OpenGraphInput!
+}
+
+type OpenGraph {
+  title: String
+  description: String
+  favIcon: String
+  image: String
+  alternateImage: String
+  url: String
+  siteName: String
+  type: String
+  locale: String
+  x: OpenGraphX
+}
+
+type OpenGraphX {
+  card: String
+  site: String
+  title: String
+  description: String
+  image: String
+  url: String
+  type: String
+  creator: String
+} 
+
+input OpenGraphInput {
+  title: String!
+  description: String!
+  favIcon: String!
+  image: String!
+  alternateImage: String!
+  url: String!
+  siteName: String!
+  type: String!
+  locale: String!
+  x: OpenGraphXInput!
+}
+
+input OpenGraphXInput {
+  card: String!
+  site: String!
+  title: String!
+  description: String!
+  image: String!
+  url: String!
+  type: String!
+  creator: String!
+}
+
+
+extend type Query{
+    links(
+        first: Int
+        after: String
+        last: Int
+        before: String
+        orderBy: Map
+        where: LinkFilter
+    ) : LinkConnection!
+}
+
+extend type Mutation {
+  createLink(input: LinkCreateInput!): Link! @auth
+  requestCrawl(input: CrawlRequestInput!): LinkCrawl! @auth
+}

@@ -1,0 +1,95 @@
+scalar DateTime
+scalar JSON
+
+enum DNSStatus {
+  PENDING
+  VERIFIED
+  FAILED
+}
+
+enum DeploymentStatus {
+  WORKING
+  FAILED
+  SUCCESS
+}
+
+enum StatusState {
+  PASIVE
+  ACTIVE
+}
+
+enum TicketStatus {
+  OPEN
+  CLOSED
+}
+
+enum TicketSender {
+  USER
+  Admin
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCESS
+  FAILED
+}
+
+enum RedirectionOptions {
+  TIMED
+  NOT_AUTO_REDIRECT
+  DIRECT_HTTP_REDIRECT
+  CONFIRM_REDIRECT
+}
+
+enum PaymentPlan {
+  FREE
+  MONTHLY
+}
+
+enum PlatformPermission {
+  LINK_CREATE
+  LINK_UPDATE
+  LINK_DELETE
+  PLATFORM_CREATE
+  PLATFORM_UPDATE
+  PLATFORM_DELETE
+}
+
+enum OrganizationPermission {
+  DOMAIN_CREATE
+  DOMAIN_UPDATE
+  DOMAIN_DELETE
+  ORGANIZATION_UPDATE
+  ORGANIZATION_DELETE
+  ORGANIZATION_USER_INVITE
+  PLATFORM_CREATE
+  PLATFORM_UPDATE
+  PLATFORM_DELETE
+  PLATFORM_USER_ADD
+  PLATFORM_USER_REMOVE
+  PLATFORM_USER_UPDATE
+}
+
+enum InvitationStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+}
+
+enum CrawlStatus {
+  REQUESTED
+  STARTED
+  SUCCESS
+  FAILED
+}
+
+directive @auth on FIELD_DEFINITION
+directive @organizationPermission(permission: OrganizationPermission!) on INPUT_OBJECT
+directive @platformPermission(permission: PlatformPermission!) on INPUT_OBJECT
+directive @domainURLCheck on INPUT_OBJECT
+
+type Log{
+  id: UUID!
+  createdAt: DateTime!
+  message: String!
+}

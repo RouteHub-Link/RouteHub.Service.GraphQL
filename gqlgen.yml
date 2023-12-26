@@ -1,6 +1,8 @@
 # Where are all the schema files located? globs are supported eg  src/**/*.graphqls
 schema:
-  - graph/*.graphqls
+  - graph/schemas/*.graphqls
+  - graph/schemas/*.graphql
+  - graph/schemas/*.gql
 
 # Where should the generated server code go?
 exec:
@@ -20,7 +22,7 @@ model:
 # Where should the resolver implementations go?
 resolver:
   layout: follow-schema
-  dir: graph
+  dir: graph/resolvers
   package: graph
   filename_template: "{name}.resolvers.go"
   # Optional: turn on to not generate template comments above resolvers
@@ -71,6 +73,7 @@ autobind:
   - "github.com/RouteHub-Link/routehub-service-graphql/database/types"
   - "github.com/RouteHub-Link/routehub-service-graphql/database/relations"
   - "github.com/RouteHub-Link/routehub-service-graphql/graph/model/inputs"
+  - "github.com/RouteHub-Link/routehub-service-graphql/graph/model/connections"
 
 # This section declares type mapping between the GraphQL and go type systems
 #

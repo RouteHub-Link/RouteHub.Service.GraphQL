@@ -1,4 +1,4 @@
-package utils
+package services_utils
 
 import (
 	"errors"

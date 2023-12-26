@@ -39,6 +39,12 @@ type AnalyticReports struct {
 	AllTimeObservations   string                 `json:"allTimeObservations"`
 }
 
+type BooleanFilter struct {
+	Equal    *bool `json:"equal,omitempty"`
+	NotEqual *bool `json:"notEqual,omitempty"`
+	IsNull   *bool `json:"isNull,omitempty"`
+}
+
 type ClientInformationInput struct {
 	Useragent string `json:"useragent"`
 	IP        string `json:"ip"`
@@ -65,12 +71,58 @@ type DomainVerification struct {
 	DeletedAt *time.Time               `json:"deletedAt,omitempty"`
 }
 
+type FloatFilter struct {
+	Equal    *float64  `json:"equal,omitempty"`
+	NotEqual *float64  `json:"notEqual,omitempty"`
+	In       []float64 `json:"in,omitempty"`
+	NotIn    []float64 `json:"notIn,omitempty"`
+	Gt       *float64  `json:"gt,omitempty"`
+	Gte      *float64  `json:"gte,omitempty"`
+	Lt       *float64  `json:"lt,omitempty"`
+	Lte      *float64  `json:"lte,omitempty"`
+	IsNull   *bool     `json:"isNull,omitempty"`
+}
+
+type IDFilter struct {
+	Equal        *string  `json:"equal,omitempty"`
+	EqualFold    *string  `json:"equalFold,omitempty"`
+	NotEqual     *string  `json:"notEqual,omitempty"`
+	In           []string `json:"in,omitempty"`
+	NotIn        []string `json:"notIn,omitempty"`
+	Contains     *string  `json:"contains,omitempty"`
+	ContainsFold *string  `json:"containsFold,omitempty"`
+	Gt           *string  `json:"gt,omitempty"`
+	Gte          *string  `json:"gte,omitempty"`
+	Lt           *string  `json:"lt,omitempty"`
+	Lte          *string  `json:"lte,omitempty"`
+	HasPrefix    *string  `json:"hasPrefix,omitempty"`
+	HasSuffix    *string  `json:"hasSuffix,omitempty"`
+	IsNull       *bool    `json:"isNull,omitempty"`
+}
+
+type IntFilter struct {
+	Equal    *int  `json:"equal,omitempty"`
+	NotEqual *int  `json:"notEqual,omitempty"`
+	In       []int `json:"in,omitempty"`
+	NotIn    []int `json:"notIn,omitempty"`
+	Gt       *int  `json:"gt,omitempty"`
+	Gte      *int  `json:"gte,omitempty"`
+	Lt       *int  `json:"lt,omitempty"`
+	Lte      *int  `json:"lte,omitempty"`
+	IsNull   *bool `json:"isNull,omitempty"`
+}
+
 type LinkCreateInput struct {
 	Target             string                             `json:"target"`
 	Path               *string                            `json:"path,omitempty"`
 	PlatformID         uuid.UUID                          `json:"platformId"`
 	RedirectionOptions *database_enums.RedirectionOptions `json:"redirectionOptions,omitempty"`
 	OpenGraph          *database_types.OpenGraph          `json:"openGraph"`
+}
+
+type LinkFilter struct {
+	Platform *UUIDFilter `json:"platform,omitempty"`
+	Domain   *UUIDFilter `json:"domain,omitempty"`
 }
 
 type LoginInput struct {
@@ -81,6 +133,33 @@ type LoginInput struct {
 type LoginPayload struct {
 	Token        string `json:"token"`
 	RefreshToken string `json:"refreshToken"`
+}
+
+type MapEntry struct {
+	Key   string `json:"key"`
+	Value string `json:"value"`
+}
+
+type MapFilter struct {
+	Equal        *MapEntry   `json:"equal,omitempty"`
+	EqualFold    *MapEntry   `json:"equalFold,omitempty"`
+	NotEqual     *MapEntry   `json:"notEqual,omitempty"`
+	In           *MapInEntry `json:"in,omitempty"`
+	NotIn        *MapInEntry `json:"notIn,omitempty"`
+	Contains     *MapEntry   `json:"contains,omitempty"`
+	ContainsFold *MapEntry   `json:"containsFold,omitempty"`
+	Gt           *MapEntry   `json:"gt,omitempty"`
+	Gte          *MapEntry   `json:"gte,omitempty"`
+	Lt           *MapEntry   `json:"lt,omitempty"`
+	Lte          *MapEntry   `json:"lte,omitempty"`
+	HasPrefix    *MapEntry   `json:"hasPrefix,omitempty"`
+	HasSuffix    *MapEntry   `json:"hasSuffix,omitempty"`
+	IsNull       *bool       `json:"isNull,omitempty"`
+}
+
+type MapInEntry struct {
+	Key   string   `json:"key"`
+	Value []string `json:"value,omitempty"`
 }
 
 type MetricAnalytics struct {
@@ -189,6 +268,23 @@ type SocialMediaInput struct {
 	Icon string `json:"icon"`
 }
 
+type StringFilter struct {
+	Equal        *string  `json:"equal,omitempty"`
+	EqualFold    *string  `json:"equalFold,omitempty"`
+	NotEqual     *string  `json:"notEqual,omitempty"`
+	In           []string `json:"in,omitempty"`
+	NotIn        []string `json:"notIn,omitempty"`
+	Contains     *string  `json:"contains,omitempty"`
+	ContainsFold *string  `json:"containsFold,omitempty"`
+	Gt           *string  `json:"gt,omitempty"`
+	Gte          *string  `json:"gte,omitempty"`
+	Lt           *string  `json:"lt,omitempty"`
+	Lte          *string  `json:"lte,omitempty"`
+	HasPrefix    *string  `json:"hasPrefix,omitempty"`
+	HasSuffix    *string  `json:"hasSuffix,omitempty"`
+	IsNull       *bool    `json:"isNull,omitempty"`
+}
+
 type Template struct {
 	ID                uuid.UUID                         `json:"id"`
 	Name              string                            `json:"name"`
@@ -245,6 +341,30 @@ type TicketMessage struct {
 
 type TicketMessageInput struct {
 	Content string `json:"content"`
+}
+
+type TimeFilter struct {
+	Equal    *time.Time   `json:"equal,omitempty"`
+	NotEqual *time.Time   `json:"notEqual,omitempty"`
+	In       []*time.Time `json:"in,omitempty"`
+	NotIn    []*time.Time `json:"notIn,omitempty"`
+	Gt       *time.Time   `json:"gt,omitempty"`
+	Gte      *time.Time   `json:"gte,omitempty"`
+	Lt       *time.Time   `json:"lt,omitempty"`
+	Lte      *time.Time   `json:"lte,omitempty"`
+	IsNull   *bool        `json:"isNull,omitempty"`
+}
+
+type UUIDFilter struct {
+	Equal    *uuid.UUID  `json:"equal,omitempty"`
+	NotEqual *uuid.UUID  `json:"notEqual,omitempty"`
+	In       []uuid.UUID `json:"in,omitempty"`
+	NotIn    []uuid.UUID `json:"notIn,omitempty"`
+	Gt       *uuid.UUID  `json:"gt,omitempty"`
+	Gte      *uuid.UUID  `json:"gte,omitempty"`
+	Lt       *uuid.UUID  `json:"lt,omitempty"`
+	Lte      *uuid.UUID  `json:"lte,omitempty"`
+	IsNull   *bool       `json:"isNull,omitempty"`
 }
 
 type UpdateUserInviteInput struct {

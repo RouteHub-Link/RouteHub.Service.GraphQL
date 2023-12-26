@@ -1,0 +1,36 @@
+type Domain {
+  id: UUID!
+  name: String!
+  url: String!
+  organization: Organization!
+  platform: Platform
+  verification: [DomainVerification]!
+  state: StatusState!
+  analytics: [MetricAnalytics!]!
+  analyticReports: AnalyticReports!
+  lastDNSVerificationAt: DateTime
+  createdAt: DateTime!
+  updatedAt: DateTime
+  deletedAt: DateTime
+}
+
+input DomainCreateInput @domainURLCheck {
+  organizationId: UUID!
+  name: String!
+  url: String!
+  clientInformation: ClientInformationInput!
+}
+
+type DomainVerification {
+  id: UUID!
+  domain: Domain!
+  status: DNSStatus!
+  logs: [Log!]!
+  createdAt: DateTime!
+  updatedAt: DateTime
+  deletedAt: DateTime
+}
+
+extend type Mutation {
+  createDomain(input: DomainCreateInput!): Domain! @auth
+}

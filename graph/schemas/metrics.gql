@@ -1,0 +1,56 @@
+
+type AnalyticReports {
+  todayObservations: [ObservationAnalytic!]!
+  yesterdayObservations: [ObservationAnalytic!]!
+  lastWeekObservations: String!
+  lastMonthObservations: String!
+  lastYearObservations: String!
+  allTimeObservations: String!
+}
+
+type AnalyticReport {
+  link: Link!
+  domain: Domain!
+  totalHits: Int!
+  totalSuccess: Int!
+  totalFailed: Int!
+  referers: [MetricAnalytics!]!
+  locations: [MetricAnalytics!]!
+  useragents: [MetricAnalytics!]!
+}
+
+type MetricAnalytics {
+  feeder: JSON!
+  totalHits: Int!
+  totalSuccess: Int!
+  totalFailed: Int!
+  startAt: DateTime!
+  endAt: DateTime!
+}
+
+type ObservationAnalytic {
+  id: UUID!
+  link: Link!
+  domain: Domain!
+  platform: Platform!
+  useragent: String!
+  ip: String!
+  referrer: String!
+  location: String!
+  redirectionChoice: RedirectionOptions!
+  success: Boolean!
+  createdAt: DateTime!
+  updatedAt: DateTime
+}
+
+input ObservationInput {
+  linkId: UUID!
+  domainId: UUID!
+  platformId: UUID!
+  useragent: String!
+  ip: String!
+  referrer: String!
+  location: String!
+  redirectionChoice: RedirectionOptions!
+  success: Boolean!
+}

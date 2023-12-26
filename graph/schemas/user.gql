@@ -1,0 +1,138 @@
+type User {
+  id: UUID!
+  avatar: String!
+  email: String!
+  fullname: String!
+  verified: Boolean!
+  phone: AccountPhone!
+  organizations: [Organization!]!
+  platforms: [Platform!]!
+  permissions: [Permission!]!
+  payments: [Payment!]!
+  userInvites: [UserInvite!]!
+
+  createdAt: DateTime!
+  updatedAt: DateTime
+  deletedAt: DateTime
+}
+
+type UserInvite {
+  id: UUID!
+  email: String!
+  code: String!
+  organization: Organization!
+  platforms: [Platform!]!
+  user: User!
+  status: InvitationStatus!
+  createdAt: DateTime!
+  updatedAt: DateTime
+  deletedAt: DateTime
+}
+
+type LoginPayload {
+  token: String!
+  refreshToken: String!
+}
+
+type PasswordReset {
+  id: UUID!
+  user: User!
+  token: String!
+  createdAt: DateTime!
+  expiresAt: DateTime!
+  updatedAt: DateTime
+  deletedAt: DateTime
+}
+
+type AccountPhone {
+  number: String!
+  countryCode: String!
+  verified: Boolean!
+  createdAt: DateTime!
+  updatedAt: DateTime
+}
+
+type Permission {
+  id: UUID!
+  name: String!
+  description: String!
+  organizations: [Organization!]!
+  domains: [Domain!]!
+  platforms: [Platform!]!
+}
+
+input UserInviteInput {
+  email: String!
+  organizationsPermissions: [OrganizationsWithPermissionsInput!]!
+  platformsWithPermissions: [PlatformsWithPermissionsInput!]!
+}
+
+input AccountPhoneInput {
+  number: String!
+  countryCode: String!
+}
+
+input UpdateUserInviteInput {
+  code: String!
+  status: InvitationStatus!
+  user: UserInput!
+}
+
+
+input LoginInput {
+  email: String!
+  password: String!
+}
+
+input RefreshTokenInput{
+  newToken: String!
+  newRefreshToken: String!
+}
+
+input UserInput {
+  email: String!
+  password: String!
+  confirmPassword: String!
+  fullname: String!
+  phone: AccountPhoneInput!
+  clientInformation: ClientInformationInput!
+}
+
+input UserUpdatePasswordInput {
+  password: String!
+  confirmPassword: String!
+  clientInformation: ClientInformationInput!
+}
+
+input PasswordResetCreateInput {
+  email: String!
+  clientInformation: ClientInformationInput!
+}
+
+input PasswordResetUpdateInput {
+  token: String!
+  password: String!
+  confirmPassword: String!
+  clientInformation: ClientInformationInput!
+}
+
+input ClientInformationInput {
+  useragent: String!
+  ip: String!
+}
+
+extend type Query {
+  me: User! @auth
+  users: [User!]!
+}
+
+extend type Mutation {
+  refreshToken(input: RefreshTokenInput!): String! @auth
+  createUser(input: UserInput!): User!
+  loginUser(input: LoginInput!): LoginPayload!
+  inviteUser(input: UserInviteInput!): UserInvite! @auth
+  updateUserInvitation(input: UpdateUserInviteInput!): InvitationStatus!
+  updateUserPassword(userId: ID!, input: UserUpdatePasswordInput!): User!
+  requestPasswordReset(input: PasswordResetCreateInput!): PasswordReset!
+  resetPassword(input: PasswordResetUpdateInput!): User!
+}

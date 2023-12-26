@@ -11,6 +11,7 @@ import (
 	"github.com/RouteHub-Link/routehub-service-graphql/database"
 	"github.com/RouteHub-Link/routehub-service-graphql/directives"
 	"github.com/RouteHub-Link/routehub-service-graphql/graph"
+	Resolvers "github.com/RouteHub-Link/routehub-service-graphql/graph/resolvers"
 	"github.com/RouteHub-Link/routehub-service-graphql/services"
 )
 
@@ -22,7 +23,7 @@ func Serve() {
 		port = defaultPort
 	}
 
-	resolver := &graph.Resolver{
+	resolver := &Resolvers.Resolver{
 		DB:               database.DB,
 		ServiceContainer: services.NewServiceContainer(database.DB),
 	}
@@ -31,10 +32,7 @@ func Serve() {
 	config.Directives.Auth = directives.AuthDirectiveHandler
 	config.Directives.OrganizationPermission = directives.OrganizationPermissionDirectiveHandler
 	config.Directives.PlatformPermission = directives.PlatformPermissionDirectiveHandler
-
-	config.Directives.LinkDuplicateCheck = directives.LinkDuplicateCheckDirectiveHandler
-	config.Directives.PlatformDuplicateCheck = directives.PlatformDuplicateCheckDirectiveHandler
-	config.Directives.DomainDuplicateCheck = directives.DomainDuplicateCheckDirectiveHandler
+	config.Directives.DomainURLCheck = directives.DomainURLCheckDirectiveHandler
 
 	var srv http.Handler = handler.NewDefaultServer(graph.NewExecutableSchema(config))
 

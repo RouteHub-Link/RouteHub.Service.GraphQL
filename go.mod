@@ -4,6 +4,7 @@ go 1.20
 
 require (
 	github.com/99designs/gqlgen v0.17.41
+	github.com/cloudmatelabs/gorm-gqlgen-relay v1.3.2
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/fergusstrange/embedded-postgres v1.25.0
 	github.com/gocolly/colly/v2 v2.1.0

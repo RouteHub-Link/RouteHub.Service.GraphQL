@@ -22,3 +22,7 @@ type Link struct {
 	UpdatedAt *time.Time `gorm:"autoUpdateTime:milli"`
 	DeletedAt *time.Time `gorm:"index"`
 }
+
+func (Link) TableName() string {
+	return "links"
+}

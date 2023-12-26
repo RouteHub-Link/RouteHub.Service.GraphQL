@@ -20,8 +20,6 @@ func OrganizationPermissionDirectiveHandler(ctx context.Context, obj interface{}
 		return nil, gqlerror.Errorf("Access Denied")
 	}
 
-	//log.Printf("ctx: %+v\n obj %+v\n", ctx, obj)
-
 	organizationId, ok := obj.(map[string]interface{})["organizationId"].(string)
 	if !ok {
 		return nil, gqlerror.Errorf("organizationId not found in obj")

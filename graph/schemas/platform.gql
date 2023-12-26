@@ -1,0 +1,73 @@
+
+type Platform {
+  id: UUID!
+  name: String!
+  openGraph: OpenGraph!
+  redirectionChoice: RedirectionOptions!
+  organization: Organization!
+  domain: Domain!
+  permissions: [PlatformPermission!]!
+  deployments: [PlatformDeployment!]!
+  links: [Link!]!
+  analytics: [AnalyticReport]!
+  analyticReports: AnalyticReports!
+  status: StatusState!
+  templates: [Template!]!
+  pinnedLinks: [Link!]!
+}
+
+
+input PlatformCreateInput @organizationPermission(permission: PLATFORM_CREATE) {
+  organizationId: UUID!
+  domainId: UUID!
+  name: String!
+  openGraph: OpenGraphInput!
+  redirectionChoice: RedirectionOptions!
+  templates: [TemplateInput]
+}
+
+type PlatformDeployment {
+  id: UUID!
+  platform: Platform!
+  domain: Domain!
+  status: DeploymentStatus!
+  logs: [Log!]!
+  createdAt: DateTime!
+  updatedAt: DateTime
+  deletedAt: DateTime
+}
+
+input PlatformsWithPermissionsInput {
+  platformId: UUID!
+  permissions: [PlatformPermission!]!
+}
+
+type Template {
+  id: UUID!
+  name: String!
+  platform: Platform!
+  openGraph: OpenGraph!
+  redirectionChoice: RedirectionOptions!
+  state: StatusState!
+  createdBy: User!
+  editedBy: User!
+  createdAt: DateTime!
+  updatedAt: DateTime
+  deletedAt: DateTime
+}
+
+input TemplateInput {
+  name: String!
+  openGraph: OpenGraphInput!
+  redirectionChoice: RedirectionOptions!
+  state: StatusState!
+}
+
+
+extend type Query {
+  platforms: [Platform!]!
+}
+
+extend type Mutation {
+  createPlatform(input: PlatformCreateInput!): Platform! @auth
+}

@@ -9,18 +9,18 @@ import (
 type OrganizationPermission string
 
 const (
-	OrganizationPermissionDomainCreate       OrganizationPermission = "DOMAIN_CREATE"
-	OrganizationPermissionDomainUpdate       OrganizationPermission = "DOMAIN_UPDATE"
-	OrganizationPermissionDomainDelete       OrganizationPermission = "DOMAIN_DELETE"
-	OrganizationPermissionOrganizationUpdate OrganizationPermission = "Organization_UPDATE"
-	OrganizationPermissionOrganizationDelete OrganizationPermission = "Organization_DELETE"
-	OrganizationPermissionPlatformCreate     OrganizationPermission = "PLATFORM_CREATE"
-	OrganizationPermissionPlatformUpdate     OrganizationPermission = "PLATFORM_UPDATE"
-	OrganizationPermissionPlatformDelete     OrganizationPermission = "PLATFORM_DELETE"
-	OrganizationPermissionUserInvite         OrganizationPermission = "USER_INVITE"
-	OrganizationPermissionPlatformUserAdd    OrganizationPermission = "PLATFORM_USER_ADD"
-	OrganizationPermissionPlatformUserRemove OrganizationPermission = "PLATFORM_USER_REMOVE"
-	OrganizationPermissionPlatformUserUpdate OrganizationPermission = "PLATFORM_USER_UPDATE"
+	OrganizationPermissionDomainCreate           OrganizationPermission = "DOMAIN_CREATE"
+	OrganizationPermissionDomainUpdate           OrganizationPermission = "DOMAIN_UPDATE"
+	OrganizationPermissionDomainDelete           OrganizationPermission = "DOMAIN_DELETE"
+	OrganizationPermissionOrganizationUpdate     OrganizationPermission = "ORGANIZATION_UPDATE"
+	OrganizationPermissionOrganizationDelete     OrganizationPermission = "ORGANIZATION_DELETE"
+	OrganizationPermissionOrganizationUserInvite OrganizationPermission = "ORGANIZATION_USER_INVITE"
+	OrganizationPermissionPlatformCreate         OrganizationPermission = "PLATFORM_CREATE"
+	OrganizationPermissionPlatformUpdate         OrganizationPermission = "PLATFORM_UPDATE"
+	OrganizationPermissionPlatformDelete         OrganizationPermission = "PLATFORM_DELETE"
+	OrganizationPermissionPlatformUserAdd        OrganizationPermission = "PLATFORM_USER_ADD"
+	OrganizationPermissionPlatformUserRemove     OrganizationPermission = "PLATFORM_USER_REMOVE"
+	OrganizationPermissionPlatformUserUpdate     OrganizationPermission = "PLATFORM_USER_UPDATE"
 )
 
 var AllOrganizationPermission = []OrganizationPermission{
@@ -32,7 +32,7 @@ var AllOrganizationPermission = []OrganizationPermission{
 	OrganizationPermissionPlatformCreate,
 	OrganizationPermissionPlatformUpdate,
 	OrganizationPermissionPlatformDelete,
-	OrganizationPermissionUserInvite,
+	OrganizationPermissionOrganizationUserInvite,
 	OrganizationPermissionPlatformUserAdd,
 	OrganizationPermissionPlatformUserRemove,
 	OrganizationPermissionPlatformUserUpdate,
@@ -40,7 +40,7 @@ var AllOrganizationPermission = []OrganizationPermission{
 
 func (e OrganizationPermission) IsValid() bool {
 	switch e {
-	case OrganizationPermissionDomainCreate, OrganizationPermissionDomainUpdate, OrganizationPermissionDomainDelete, OrganizationPermissionOrganizationUpdate, OrganizationPermissionOrganizationDelete, OrganizationPermissionPlatformCreate, OrganizationPermissionPlatformUpdate, OrganizationPermissionPlatformDelete, OrganizationPermissionUserInvite, OrganizationPermissionPlatformUserAdd, OrganizationPermissionPlatformUserRemove, OrganizationPermissionPlatformUserUpdate:
+	case OrganizationPermissionDomainCreate, OrganizationPermissionDomainUpdate, OrganizationPermissionDomainDelete, OrganizationPermissionOrganizationUpdate, OrganizationPermissionOrganizationDelete, OrganizationPermissionPlatformCreate, OrganizationPermissionPlatformUpdate, OrganizationPermissionPlatformDelete, OrganizationPermissionOrganizationUserInvite, OrganizationPermissionPlatformUserAdd, OrganizationPermissionPlatformUserRemove, OrganizationPermissionPlatformUserUpdate:
 		return true
 	}
 	return false
