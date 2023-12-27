@@ -12,6 +12,7 @@ import (
 	"github.com/RouteHub-Link/routehub-service-graphql/directives"
 	"github.com/RouteHub-Link/routehub-service-graphql/graph"
 	Resolvers "github.com/RouteHub-Link/routehub-service-graphql/graph/resolvers"
+	"github.com/RouteHub-Link/routehub-service-graphql/loaders"
 	"github.com/RouteHub-Link/routehub-service-graphql/services"
 )
 
@@ -26,6 +27,7 @@ func Serve() {
 	resolver := &Resolvers.Resolver{
 		DB:               database.DB,
 		ServiceContainer: services.NewServiceContainer(database.DB),
+		LoaderContainer:  loaders.NewLoaderContainer(),
 	}
 
 	config := graph.Config{Resolvers: resolver}
@@ -37,6 +39,7 @@ func Serve() {
 	var srv http.Handler = handler.NewDefaultServer(graph.NewExecutableSchema(config))
 
 	srv = auth.Middleware(srv)
+	srv = loaders.Middleware(srv)
 
 	http.Handle("/", playground.Handler("GraphQL playground", "/query"))
 	http.Handle("/query", srv)

@@ -25,6 +25,11 @@ func (u UserService) Users() (users []*database_models.User, err error) {
 	return
 }
 
+func (u UserService) UsersByIds(ids []uuid.UUID) (users []*database_models.User, err error) {
+	err = u.DB.Where("id IN ?", ids).Find(&users).Error
+	return
+}
+
 func (u UserService) UsersByOrganization(organizationId uuid.UUID) (users []*database_models.User, err error) {
 	organizationUsers := []database_relations.OrganizationUser{}
 	err = u.DB.Where("organization_id = ?", organizationId).Find(&organizationUsers).Error

@@ -1,6 +1,7 @@
 package graph
 
 import (
+	"github.com/RouteHub-Link/routehub-service-graphql/loaders"
 	"github.com/RouteHub-Link/routehub-service-graphql/services"
 	"gorm.io/gorm"
 )
@@ -12,4 +13,5 @@ import (
 type Resolver struct {
 	DB               *gorm.DB
 	ServiceContainer *services.ServiceContainer
+	LoaderContainer  *loaders.LoaderContainer
 }

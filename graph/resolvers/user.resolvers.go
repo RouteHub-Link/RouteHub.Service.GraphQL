@@ -96,9 +96,9 @@ func (r *queryResolver) Me(ctx context.Context) (*database_models.User, error) {
 		return nil, gqlerror.Errorf("Access Denied")
 	}
 
-	userService := r.ServiceContainer.UserService
-
-	return userService.User(userSession.ID)
+	return r.LoaderContainer.User.Get(ctx, userSession.ID)
+	//userService := r.ServiceContainer.UserService
+	//return userService.User(userSession.ID)
 }
 
 // Users is the resolver for the users field.

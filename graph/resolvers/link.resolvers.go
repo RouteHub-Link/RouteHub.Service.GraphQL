@@ -20,7 +20,7 @@ import (
 
 // Creator is the resolver for the creator field.
 func (r *linkResolver) Creator(ctx context.Context, obj *database_models.Link) (*database_models.User, error) {
-	return r.ServiceContainer.UserService.User(obj.CreatedBy)
+	return r.LoaderContainer.User.Get(ctx, obj.CreatedBy)
 }
 
 // Platform is the resolver for the platform field.
@@ -65,7 +65,7 @@ func (r *linkCrawlResolver) Link(ctx context.Context, obj *database_models.LinkC
 
 // CrawledBy is the resolver for the crawledBy field.
 func (r *linkCrawlResolver) CrawledBy(ctx context.Context, obj *database_models.LinkCrawl) (*database_models.User, error) {
-	return r.ServiceContainer.UserService.User(obj.CreatedBy)
+	return r.LoaderContainer.User.Get(ctx, obj.CreatedBy)
 }
 
 // CreateLink is the resolver for the createLink field.
