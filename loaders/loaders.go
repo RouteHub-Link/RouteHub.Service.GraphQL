@@ -3,12 +3,16 @@ package loaders
 import (
 	"context"
 	"net/http"
+	"sync"
+	"time"
 
 	database_models "github.com/RouteHub-Link/routehub-service-graphql/database/models"
 	services_utils "github.com/RouteHub-Link/routehub-service-graphql/services/utils"
 	"github.com/google/uuid"
 	"github.com/graph-gophers/dataloader/v7"
 )
+
+type ctxKey string
 
 type Loaders struct {
 	User *dataloader.Loader[uuid.UUID, *database_models.User]
@@ -18,20 +22,30 @@ type LoaderContainer struct {
 	User *userLoader
 }
 
-type ctxKey string
+type cacheContainer struct {
+	User *services_utils.LRUExpirableCache[uuid.UUID, dataloader.Thunk[*database_models.User]]
+}
 
 const (
 	loadersKey = ctxKey("dataloaders")
 )
 
-func NewLoaders() *Loaders {
-	loaders := NewLoaderContainer()
+var (
+	loadersOnce sync.Once
+	loaders     *LoaderContainer
+	caches      *cacheContainer
+)
 
-	cache := &services_utils.LRUCache[uuid.UUID, *database_models.User]{Size: 100}
+func NewLoaders() *Loaders {
+	loadersOnce.Do(func() {
+		loaders = NewLoaderContainer()
+		caches = NewCacheContainer()
+	})
 
 	return &Loaders{
 		User: dataloader.NewBatchedLoader(loaders.User.Loader,
-			dataloader.WithCache[uuid.UUID, *database_models.User](cache),
+			dataloader.WithWait[uuid.UUID, *database_models.User](time.Millisecond),
+			dataloader.WithCache[uuid.UUID, *database_models.User](caches.User),
 		),
 	}
 }
@@ -39,6 +53,18 @@ func NewLoaders() *Loaders {
 func NewLoaderContainer() *LoaderContainer {
 	return &LoaderContainer{
 		User: &userLoader{},
+	}
+}
+
+func NewCacheContainer() *cacheContainer {
+	user := &services_utils.LRUExpirableCache[uuid.UUID, dataloader.Thunk[*database_models.User]]{}
+	user.Init()
+
+	// Simple LRU Cache
+	// cache := &services_utils.LRUCache[uuid.UUID, *database_models.User]{Size: 100}
+
+	return &cacheContainer{
+		User: user,
 	}
 }
 
@@ -53,13 +79,4 @@ func Middleware(next http.Handler) http.Handler {
 // For returns the dataloader for a given context
 func For(ctx context.Context) *Loaders {
 	return ctx.Value(loadersKey).(*Loaders)
-}
-
-// handleError creates array of result with the same error repeated for as many items requested
-func handleError[T any](itemsLength int, err error) []*dataloader.Result[T] {
-	result := make([]*dataloader.Result[T], itemsLength)
-	for i := 0; i < itemsLength; i++ {
-		result[i] = &dataloader.Result[T]{Error: err}
-	}
-	return result
 }

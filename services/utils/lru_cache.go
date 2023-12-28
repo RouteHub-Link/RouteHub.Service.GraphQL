@@ -40,7 +40,7 @@ func (c *LRUCache[K, V]) Get(_ context.Context, key K) (dataloader.Thunk[V], boo
 
 	v, ok := arcCache.Get(key)
 	if ok {
-		log.Printf("LRUCache.Get: %+v", v)
+		log.Printf("LRUCache.Get: %+v", key)
 		return v.(dataloader.Thunk[V]), ok
 	} else {
 		log.Printf("LRUCache.Get ok false: %+v", key)
