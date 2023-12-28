@@ -3,9 +3,9 @@ package loaders
 import (
 	"context"
 	"net/http"
-	"time"
 
 	database_models "github.com/RouteHub-Link/routehub-service-graphql/database/models"
+	services_utils "github.com/RouteHub-Link/routehub-service-graphql/services/utils"
 	"github.com/google/uuid"
 	"github.com/graph-gophers/dataloader/v7"
 )
@@ -26,8 +26,13 @@ const (
 
 func NewLoaders() *Loaders {
 	loaders := NewLoaderContainer()
+
+	cache := &services_utils.LRUCache[uuid.UUID, *database_models.User]{Size: 100}
+
 	return &Loaders{
-		User: dataloader.NewBatchedLoader(loaders.User.Loader, dataloader.WithWait[uuid.UUID, *database_models.User](time.Millisecond)),
+		User: dataloader.NewBatchedLoader(loaders.User.Loader,
+			dataloader.WithCache[uuid.UUID, *database_models.User](cache),
+		),
 	}
 }
 
