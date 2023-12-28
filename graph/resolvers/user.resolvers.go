@@ -18,38 +18,9 @@ import (
 	"github.com/vektah/gqlparser/gqlerror"
 )
 
-// RefreshToken is the resolver for the refreshToken field.
-func (r *mutationResolver) RefreshToken(ctx context.Context, input model.RefreshTokenInput) (string, error) {
-	panic(fmt.Errorf("not implemented: RefreshToken - refreshToken"))
-}
-
 // CreateUser is the resolver for the createUser field.
 func (r *mutationResolver) CreateUser(ctx context.Context, input model.UserInput) (*database_models.User, error) {
 	panic(fmt.Errorf("not implemented: CreateUser - createUser"))
-}
-
-// LoginUser is the resolver for the loginUser field.
-func (r *mutationResolver) LoginUser(ctx context.Context, input model.LoginInput) (*model.LoginPayload, error) {
-	userService := r.ServiceContainer.UserService
-
-	user, err := userService.Login(input)
-	if err != nil {
-		return nil, err
-	}
-
-	userSession := new(auth.UserSession)
-	userSession.ID = user.ID
-	userSession.Name = user.Fullname
-
-	token, err := auth.GenerateToken(userSession.ToClaims())
-
-	if err != nil {
-		return nil, err
-	}
-
-	return &model.LoginPayload{
-		Token: token,
-	}, nil
 }
 
 // InviteUser is the resolver for the inviteUser field.
@@ -72,21 +43,6 @@ func (r *mutationResolver) UpdateUserInvitation(ctx context.Context, input model
 	}
 
 	return invitation.Status, nil
-}
-
-// UpdateUserPassword is the resolver for the updateUserPassword field.
-func (r *mutationResolver) UpdateUserPassword(ctx context.Context, userID string, input model.UserUpdatePasswordInput) (*database_models.User, error) {
-	panic(fmt.Errorf("not implemented: UpdateUserPassword - updateUserPassword"))
-}
-
-// RequestPasswordReset is the resolver for the requestPasswordReset field.
-func (r *mutationResolver) RequestPasswordReset(ctx context.Context, input model.PasswordResetCreateInput) (*model.PasswordReset, error) {
-	panic(fmt.Errorf("not implemented: RequestPasswordReset - requestPasswordReset"))
-}
-
-// ResetPassword is the resolver for the resetPassword field.
-func (r *mutationResolver) ResetPassword(ctx context.Context, input model.PasswordResetUpdateInput) (*database_models.User, error) {
-	panic(fmt.Errorf("not implemented: ResetPassword - resetPassword"))
 }
 
 // Me is the resolver for the me field.

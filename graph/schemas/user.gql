@@ -29,21 +29,6 @@ type UserInvite {
   deletedAt: DateTime
 }
 
-type LoginPayload {
-  token: String!
-  refreshToken: String!
-}
-
-type PasswordReset {
-  id: UUID!
-  user: User!
-  token: String!
-  createdAt: DateTime!
-  expiresAt: DateTime!
-  updatedAt: DateTime
-  deletedAt: DateTime
-}
-
 type AccountPhone {
   number: String!
   countryCode: String!
@@ -78,41 +63,12 @@ input UpdateUserInviteInput {
   user: UserInput!
 }
 
-
-input LoginInput {
-  email: String!
-  password: String!
-}
-
-input RefreshTokenInput{
-  newToken: String!
-  newRefreshToken: String!
-}
-
 input UserInput {
   email: String!
   password: String!
   confirmPassword: String!
   fullname: String!
   phone: AccountPhoneInput!
-  clientInformation: ClientInformationInput!
-}
-
-input UserUpdatePasswordInput {
-  password: String!
-  confirmPassword: String!
-  clientInformation: ClientInformationInput!
-}
-
-input PasswordResetCreateInput {
-  email: String!
-  clientInformation: ClientInformationInput!
-}
-
-input PasswordResetUpdateInput {
-  token: String!
-  password: String!
-  confirmPassword: String!
   clientInformation: ClientInformationInput!
 }
 
@@ -127,12 +83,7 @@ extend type Query {
 }
 
 extend type Mutation {
-  refreshToken(input: RefreshTokenInput!): String! @auth
   createUser(input: UserInput!): User!
-  loginUser(input: LoginInput!): LoginPayload!
   inviteUser(input: UserInviteInput!): UserInvite! @auth
   updateUserInvitation(input: UpdateUserInviteInput!): InvitationStatus!
-  updateUserPassword(userId: ID!, input: UserUpdatePasswordInput!): User!
-  requestPasswordReset(input: PasswordResetCreateInput!): PasswordReset!
-  resetPassword(input: PasswordResetUpdateInput!): User!
 }

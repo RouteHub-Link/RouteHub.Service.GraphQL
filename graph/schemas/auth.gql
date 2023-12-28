@@ -1,0 +1,51 @@
+
+input LoginInput {
+  email: String!
+  password: String!
+}
+
+input RefreshTokenInput{
+  newToken: String!
+  newRefreshToken: String!
+}
+
+input UserUpdatePasswordInput {
+  password: String!
+  confirmPassword: String!
+  clientInformation: ClientInformationInput!
+}
+
+input PasswordResetCreateInput {
+  email: String!
+  clientInformation: ClientInformationInput!
+}
+
+input PasswordResetUpdateInput {
+  token: String!
+  password: String!
+  confirmPassword: String!
+  clientInformation: ClientInformationInput!
+}
+
+type LoginPayload {
+  token: String!
+  refreshToken: String!
+}
+
+type PasswordReset {
+  id: UUID!
+  user: User!
+  token: String!
+  createdAt: DateTime!
+  expiresAt: DateTime!
+  updatedAt: DateTime
+  deletedAt: DateTime
+}
+
+extend type Mutation {
+  loginUser(input: LoginInput!): LoginPayload!
+  refreshToken(input: RefreshTokenInput!): String! @auth
+  updateUserPassword(userId: ID!, input: UserUpdatePasswordInput!): User!
+  requestPasswordReset(input: PasswordResetCreateInput!): PasswordReset!
+  resetPassword(input: PasswordResetUpdateInput!): User!
+}

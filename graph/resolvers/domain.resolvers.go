@@ -61,8 +61,4 @@ func (r *mutationResolver) CreateDomain(ctx context.Context, input model.DomainC
 // Domain returns graph.DomainResolver implementation.
 func (r *Resolver) Domain() graph.DomainResolver { return &domainResolver{r} }
 
-// Mutation returns graph.MutationResolver implementation.
-func (r *Resolver) Mutation() graph.MutationResolver { return &mutationResolver{r} }
-
 type domainResolver struct{ *Resolver }
-type mutationResolver struct{ *Resolver }
