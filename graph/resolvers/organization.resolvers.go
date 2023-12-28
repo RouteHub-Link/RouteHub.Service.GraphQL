@@ -33,7 +33,12 @@ func (r *organizationResolver) Platforms(ctx context.Context, obj *database_mode
 
 // Users is the resolver for the users field.
 func (r *organizationResolver) Users(ctx context.Context, obj *database_models.Organization) ([]*database_models.User, error) {
-	return r.ServiceContainer.UserService.UsersByOrganization(obj.ID)
+	UserIdsByOrganization, err := r.ServiceContainer.UserService.UserIdsByOrganization(obj.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	return r.LoaderContainer.User.GetBatch(ctx, UserIdsByOrganization)
 }
 
 // Domains is the resolver for the domains field.
@@ -54,7 +59,7 @@ func (r *organizationResolver) Payments(ctx context.Context, obj *database_model
 
 // Organizations is the resolver for the organizations field.
 func (r *queryResolver) Organizations(ctx context.Context) ([]*database_models.Organization, error) {
-	panic(fmt.Errorf("not implemented: Organizations - organizations"))
+	return r.ServiceContainer.OrganizationService.GetOrganizations()
 }
 
 // Permissions is the resolver for the permissions field.

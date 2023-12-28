@@ -16,6 +16,7 @@ func Seed() {
 	database.DB.Model(&database_models.User{}).Count(&user_count)
 
 	var user *database_models.User
+	var user2 *database_models.User
 	if user_count == 0 {
 		pass := "admin"
 		mail := "runaho@r4l.com"
@@ -30,7 +31,16 @@ func Seed() {
 			Verified:     true,
 		}
 
+		user2 = &database_models.User{
+			ID:           uuid.MustParse("927bb153-ed0a-4686-b8d5-5f1ced408ae5"),
+			Email:        "test@r4l.com",
+			PasswordHash: password,
+			Fullname:     "Test",
+			Verified:     true,
+		}
+
 		database.DB.Create(user)
+		database.DB.Create(user2)
 	}
 
 	var organization_count int64
@@ -68,7 +78,15 @@ func Seed() {
 			Permissions:    database_enums.AllOrganizationPermission,
 		}
 
+		user2_Organization := &database_relations.OrganizationUser{
+			ID:             uuid.New(),
+			UserID:         user2.ID,
+			OrganizationID: organization.ID,
+			Permissions:    database_enums.AllOrganizationPermission,
+		}
+
 		database.DB.Create(user_Organization)
+		database.DB.Create(user2_Organization)
 	}
 
 	var domain_count int64

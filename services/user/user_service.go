@@ -42,6 +42,20 @@ func (u UserService) UsersByOrganization(organizationId uuid.UUID) (users []*dat
 	return
 }
 
+func (u UserService) UserIdsByOrganization(organizationId uuid.UUID) (userIds []uuid.UUID, err error) {
+	organizationUsers := []database_relations.OrganizationUser{}
+	err = u.DB.Where("organization_id = ?", organizationId).Find(&organizationUsers).Error
+	if err != nil {
+		return
+	}
+
+	for _, organizationUser := range organizationUsers {
+		userIds = append(userIds, organizationUser.UserID)
+	}
+
+	return
+}
+
 func (u UserService) OrganizationUser(userId uuid.UUID) (Organization []*database_models.Organization, err error) {
 	organizationUsers := []database_relations.OrganizationUser{}
 	err = u.DB.Where("user_id = ?", userId).Find(&organizationUsers).Error
