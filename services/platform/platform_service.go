@@ -59,6 +59,22 @@ func (ps PlatformService) GetPlatform(id uuid.UUID) (platform *database_models.P
 	return
 }
 
+func (ps PlatformService) GetPlatforms(ids []uuid.UUID) (platforms []*database_models.Platform, err error) {
+	err = ps.DB.Where("id IN (?)", ids).Find(&platforms).Error
+	return
+}
+
+func (ps PlatformService) GetPlatformOrganization(platformId uuid.UUID) (organization *database_models.Organization, err error) {
+	joinQuery := ps.DB.Model(&database_relations.OrganizationPlatform{}).Select("organization_id").Where("platform_id = ?", platformId)
+	err = ps.DB.Where("id = (?)", joinQuery).First(&organization).Error
+	return
+}
+
+func (ps PlatformService) GetPlatformByDomainId(domainId uuid.UUID) (platform *database_models.Platform, err error) {
+	err = ps.DB.Where("domain_id = ?", domainId).First(&platform).Error
+	return
+}
+
 func (ps PlatformService) GetPlatformsByOrganization(organizationId uuid.UUID) (platforms []*database_models.Platform, err error) {
 	joinQuery := ps.DB.Model(&database_relations.OrganizationPlatform{}).Select("platform_id").Where("organization_id = ?", organizationId)
 	err = ps.DB.Where("id IN (?)", joinQuery).Find(&platforms).Error
@@ -68,10 +84,5 @@ func (ps PlatformService) GetPlatformsByOrganization(organizationId uuid.UUID) (
 func (ps PlatformService) GetPlatformsByUser(userId uuid.UUID) (platforms []*database_models.Platform, err error) {
 	joinQuery := ps.DB.Model(&database_relations.PlatformUser{}).Select("platform_id").Where("user_id = ?", userId)
 	err = ps.DB.Where("id IN (?)", joinQuery).Find(&platforms).Error
-	return
-}
-
-func (ps PlatformService) GetPlatforms() (platforms []*database_models.Platform, err error) {
-	err = ps.DB.Find(&platforms).Error
 	return
 }

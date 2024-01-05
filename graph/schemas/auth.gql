@@ -4,11 +4,6 @@ input LoginInput {
   password: String!
 }
 
-input RefreshTokenInput{
-  newToken: String!
-  newRefreshToken: String!
-}
-
 input UserUpdatePasswordInput {
   password: String!
   confirmPassword: String!
@@ -29,7 +24,6 @@ input PasswordResetUpdateInput {
 
 type LoginPayload {
   token: String!
-  refreshToken: String!
 }
 
 type PasswordReset {
@@ -44,7 +38,6 @@ type PasswordReset {
 
 extend type Mutation {
   loginUser(input: LoginInput!): LoginPayload!
-  refreshToken(input: RefreshTokenInput!): String! @auth
   updateUserPassword(userId: ID!, input: UserUpdatePasswordInput!): User!
   requestPasswordReset(input: PasswordResetCreateInput!): PasswordReset!
   resetPassword(input: PasswordResetUpdateInput!): User!

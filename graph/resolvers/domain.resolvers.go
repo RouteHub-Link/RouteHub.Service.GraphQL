@@ -9,7 +9,6 @@ import (
 	"fmt"
 	"time"
 
-	database_enums "github.com/RouteHub-Link/routehub-service-graphql/database/enums"
 	database_models "github.com/RouteHub-Link/routehub-service-graphql/database/models"
 	"github.com/RouteHub-Link/routehub-service-graphql/graph"
 	"github.com/RouteHub-Link/routehub-service-graphql/graph/model"
@@ -17,22 +16,17 @@ import (
 
 // Organization is the resolver for the organization field.
 func (r *domainResolver) Organization(ctx context.Context, obj *database_models.Domain) (*database_models.Organization, error) {
-	panic(fmt.Errorf("not implemented: Organization - organization"))
+	return r.ServiceContainer.OrganizationService.GetOrganization(obj.OrganizationId)
 }
 
 // Platform is the resolver for the platform field.
 func (r *domainResolver) Platform(ctx context.Context, obj *database_models.Domain) (*database_models.Platform, error) {
-	panic(fmt.Errorf("not implemented: Platform - platform"))
+	return r.ServiceContainer.PlatformService.GetPlatformByDomainId(obj.ID)
 }
 
 // Verification is the resolver for the verification field.
 func (r *domainResolver) Verification(ctx context.Context, obj *database_models.Domain) ([]*model.DomainVerification, error) {
 	panic(fmt.Errorf("not implemented: Verification - verification"))
-}
-
-// State is the resolver for the state field.
-func (r *domainResolver) State(ctx context.Context, obj *database_models.Domain) (database_enums.StatusState, error) {
-	panic(fmt.Errorf("not implemented: State - state"))
 }
 
 // Analytics is the resolver for the analytics field.

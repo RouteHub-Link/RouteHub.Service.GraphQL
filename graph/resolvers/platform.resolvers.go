@@ -28,7 +28,7 @@ func (r *mutationResolver) CreatePlatform(ctx context.Context, input graph_input
 
 // Organization is the resolver for the organization field.
 func (r *platformResolver) Organization(ctx context.Context, obj *database_models.Platform) (*database_models.Organization, error) {
-	panic(fmt.Errorf("not implemented: Organization - organization"))
+	return r.ServiceContainer.PlatformService.GetPlatformOrganization(obj.ID)
 }
 
 // Domain is the resolver for the domain field.
@@ -74,7 +74,9 @@ func (r *platformResolver) PinnedLinks(ctx context.Context, obj *database_models
 
 // Platforms is the resolver for the platforms field.
 func (r *queryResolver) Platforms(ctx context.Context) ([]*database_models.Platform, error) {
-	return r.ServiceContainer.PlatformService.GetPlatforms()
+	userSession := auth.ForContext(ctx)
+
+	return r.ServiceContainer.PlatformService.GetPlatformsByUser(userSession.ID)
 }
 
 // Permissions is the resolver for the permissions field.

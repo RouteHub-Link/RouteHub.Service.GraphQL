@@ -31,8 +31,7 @@ func (lcs *LinkCrawlerService) Crawl(updateFromDatabase bool) (err error) {
 	lcs.Requested()
 
 	go func() {
-		// TODO ADD This job to a queue
-		// TODO Wait for queue to be processed
+		// TODO Can be implemented queue system
 		time.Sleep(10 * time.Second)
 
 		lcs.Started()
@@ -65,7 +64,7 @@ func (lcs *LinkCrawlerService) updateLink(link *database_models.Link) (err error
 		return
 	}
 
-	link.Status = database_enums.StatusStateActive
+	link.State = database_enums.StatusStateActive
 	err = lcs.DB.Save(&link).Error
 	return
 }

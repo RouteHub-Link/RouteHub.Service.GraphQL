@@ -86,3 +86,8 @@ func (u UserService) UpdateInvitation(updateUserInviteInput model.UpdateUserInvi
 
 	return
 }
+
+func (u UserService) GetInvitesByInvitedById(invitedById uuid.UUID) (userInvites []*database_relations.UserInvite, err error) {
+	err = u.DB.Where("invited_by_id = ?", invitedById).Find(&userInvites).Error
+	return
+}

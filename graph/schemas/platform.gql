@@ -65,7 +65,7 @@ input TemplateInput {
 
 
 extend type Query {
-  platforms: [Platform!]!
+  platforms: [Platform!]! @auth
 }
 
 extend type Mutation {

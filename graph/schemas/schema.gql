@@ -28,22 +28,11 @@ enum TicketSender {
   Admin
 }
 
-enum PaymentStatus {
-  PENDING
-  SUCCESS
-  FAILED
-}
-
 enum RedirectionOptions {
   TIMED
   NOT_AUTO_REDIRECT
   DIRECT_HTTP_REDIRECT
   CONFIRM_REDIRECT
-}
-
-enum PaymentPlan {
-  FREE
-  MONTHLY
 }
 
 enum PlatformPermission {

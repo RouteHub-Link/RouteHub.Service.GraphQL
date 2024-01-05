@@ -11,15 +11,8 @@ import (
 	database_enums "github.com/RouteHub-Link/routehub-service-graphql/database/enums"
 	database_models "github.com/RouteHub-Link/routehub-service-graphql/database/models"
 	database_relations "github.com/RouteHub-Link/routehub-service-graphql/database/relations"
-	database_types "github.com/RouteHub-Link/routehub-service-graphql/database/types"
 	"github.com/RouteHub-Link/routehub-service-graphql/graph"
-	"github.com/RouteHub-Link/routehub-service-graphql/graph/model"
 )
-
-// Organizations is the resolver for the Organizations field.
-func (r *industryResolver) Organizations(ctx context.Context, obj *database_types.Industry) ([]*database_models.Organization, error) {
-	panic(fmt.Errorf("not implemented: Organizations - Organizations"))
-}
 
 // Permissions is the resolver for the permissions field.
 func (r *organizationResolver) Permissions(ctx context.Context, obj *database_models.Organization) ([]database_enums.OrganizationPermission, error) {
@@ -47,16 +40,6 @@ func (r *organizationResolver) Domains(ctx context.Context, obj *database_models
 	return domainService.GetDomainsByOrganization(obj.ID)
 }
 
-// PaymentPlan is the resolver for the paymentPlan field.
-func (r *organizationResolver) PaymentPlan(ctx context.Context, obj *database_models.Organization) (model.PaymentPlan, error) {
-	panic(fmt.Errorf("not implemented: PaymentPlan - paymentPlan"))
-}
-
-// Payments is the resolver for the payments field.
-func (r *organizationResolver) Payments(ctx context.Context, obj *database_models.Organization) ([]*model.Payment, error) {
-	panic(fmt.Errorf("not implemented: Payments - payments"))
-}
-
 // Organizations is the resolver for the organizations field.
 func (r *queryResolver) Organizations(ctx context.Context) ([]*database_models.Organization, error) {
 	return r.ServiceContainer.OrganizationService.GetOrganizations()
@@ -68,9 +51,6 @@ func (r *organizationsWithPermissionsInputResolver) Permissions(ctx context.Cont
 	return nil
 }
 
-// Industry returns graph.IndustryResolver implementation.
-func (r *Resolver) Industry() graph.IndustryResolver { return &industryResolver{r} }
-
 // Organization returns graph.OrganizationResolver implementation.
 func (r *Resolver) Organization() graph.OrganizationResolver { return &organizationResolver{r} }
 
@@ -79,6 +59,5 @@ func (r *Resolver) OrganizationsWithPermissionsInput() graph.OrganizationsWithPe
 	return &organizationsWithPermissionsInputResolver{r}
 }
 
-type industryResolver struct{ *Resolver }
 type organizationResolver struct{ *Resolver }
 type organizationsWithPermissionsInputResolver struct{ *Resolver }

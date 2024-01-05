@@ -19,3 +19,8 @@ func (o OrganizationService) GetOrganizations() (organizations []*database_model
 	err = o.DB.Find(&organizations).Error
 	return
 }
+
+func (o OrganizationService) GetOrganizationsByIds(ids []uuid.UUID) (organizations []*database_models.Organization, err error) {
+	err = o.DB.Where("id IN ?", ids).Find(&organizations).Error
+	return
+}

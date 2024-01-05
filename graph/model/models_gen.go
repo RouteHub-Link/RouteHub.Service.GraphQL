@@ -131,8 +131,7 @@ type LoginInput struct {
 }
 
 type LoginPayload struct {
-	Token        string `json:"token"`
-	RefreshToken string `json:"refreshToken"`
+	Token string `json:"token"`
 }
 
 type MapEntry struct {
@@ -228,15 +227,6 @@ type PasswordResetUpdateInput struct {
 	ClientInformation *ClientInformationInput `json:"clientInformation"`
 }
 
-type Payment struct {
-	ID           uuid.UUID                     `json:"id"`
-	User         *database_models.User         `json:"user"`
-	Organization *database_models.Organization `json:"organization"`
-	Amount       float64                       `json:"amount"`
-	Date         string                        `json:"date"`
-	Status       PaymentStatus                 `json:"status"`
-}
-
 type Permission struct {
 	ID            uuid.UUID                       `json:"id"`
 	Name          string                          `json:"name"`
@@ -255,11 +245,6 @@ type PlatformDeployment struct {
 	CreatedAt time.Time                 `json:"createdAt"`
 	UpdatedAt *time.Time                `json:"updatedAt,omitempty"`
 	DeletedAt *time.Time                `json:"deletedAt,omitempty"`
-}
-
-type RefreshTokenInput struct {
-	NewToken        string `json:"newToken"`
-	NewRefreshToken string `json:"newRefreshToken"`
 }
 
 type SocialMediaInput struct {
@@ -428,89 +413,5 @@ func (e *DeploymentStatus) UnmarshalGQL(v interface{}) error {
 }
 
 func (e DeploymentStatus) MarshalGQL(w io.Writer) {
-	fmt.Fprint(w, strconv.Quote(e.String()))
-}
-
-type PaymentPlan string
-
-const (
-	PaymentPlanFree    PaymentPlan = "FREE"
-	PaymentPlanMonthly PaymentPlan = "MONTHLY"
-)
-
-var AllPaymentPlan = []PaymentPlan{
-	PaymentPlanFree,
-	PaymentPlanMonthly,
-}
-
-func (e PaymentPlan) IsValid() bool {
-	switch e {
-	case PaymentPlanFree, PaymentPlanMonthly:
-		return true
-	}
-	return false
-}
-
-func (e PaymentPlan) String() string {
-	return string(e)
-}
-
-func (e *PaymentPlan) UnmarshalGQL(v interface{}) error {
-	str, ok := v.(string)
-	if !ok {
-		return fmt.Errorf("enums must be strings")
-	}
-
-	*e = PaymentPlan(str)
-	if !e.IsValid() {
-		return fmt.Errorf("%s is not a valid PaymentPlan", str)
-	}
-	return nil
-}
-
-func (e PaymentPlan) MarshalGQL(w io.Writer) {
-	fmt.Fprint(w, strconv.Quote(e.String()))
-}
-
-type PaymentStatus string
-
-const (
-	PaymentStatusPending PaymentStatus = "PENDING"
-	PaymentStatusSuccess PaymentStatus = "SUCCESS"
-	PaymentStatusFailed  PaymentStatus = "FAILED"
-)
-
-var AllPaymentStatus = []PaymentStatus{
-	PaymentStatusPending,
-	PaymentStatusSuccess,
-	PaymentStatusFailed,
-}
-
-func (e PaymentStatus) IsValid() bool {
-	switch e {
-	case PaymentStatusPending, PaymentStatusSuccess, PaymentStatusFailed:
-		return true
-	}
-	return false
-}
-
-func (e PaymentStatus) String() string {
-	return string(e)
-}
-
-func (e *PaymentStatus) UnmarshalGQL(v interface{}) error {
-	str, ok := v.(string)
-	if !ok {
-		return fmt.Errorf("enums must be strings")
-	}
-
-	*e = PaymentStatus(str)
-	if !e.IsValid() {
-		return fmt.Errorf("%s is not a valid PaymentStatus", str)
-	}
-	return nil
-}
-
-func (e PaymentStatus) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }

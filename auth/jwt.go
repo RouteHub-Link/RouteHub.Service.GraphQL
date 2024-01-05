@@ -29,6 +29,7 @@ func GenerateToken(claims *jwt.MapClaims) (string, error) {
 	return tokenString, nil
 }
 
+// TODO JWK Check
 func ParseToken(tokenStr string) (jwt.MapClaims, error) {
 	token, err := jwt.Parse(tokenStr, func(token *jwt.Token) (interface{}, error) {
 		return SecretKey, nil

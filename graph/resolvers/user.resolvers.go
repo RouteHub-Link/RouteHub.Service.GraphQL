@@ -15,6 +15,7 @@ import (
 	"github.com/RouteHub-Link/routehub-service-graphql/graph"
 	"github.com/RouteHub-Link/routehub-service-graphql/graph/model"
 	graph_inputs "github.com/RouteHub-Link/routehub-service-graphql/graph/model/inputs"
+	"github.com/google/uuid"
 	"github.com/vektah/gqlparser/gqlerror"
 )
 
@@ -60,6 +61,12 @@ func (r *queryResolver) Users(ctx context.Context) ([]*database_models.User, err
 	return r.ServiceContainer.UserService.Users()
 }
 
+// Invites is the resolver for the invites field.
+func (r *queryResolver) Invites(ctx context.Context) ([]*database_relations.UserInvite, error) {
+	userSession := auth.ForContext(ctx)
+	return r.ServiceContainer.UserService.GetInvitesByInvitedById(userSession.ID)
+}
+
 // Organizations is the resolver for the Organizations field.
 func (r *userResolver) Organizations(ctx context.Context, obj *database_models.User) ([]*database_models.Organization, error) {
 	return r.ServiceContainer.UserService.OrganizationUser(obj.ID)
@@ -75,28 +82,35 @@ func (r *userResolver) Permissions(ctx context.Context, obj *database_models.Use
 	panic(fmt.Errorf("not implemented: Permissions - permissions"))
 }
 
-// Payments is the resolver for the payments field.
-func (r *userResolver) Payments(ctx context.Context, obj *database_models.User) ([]*model.Payment, error) {
-	panic(fmt.Errorf("not implemented: Payments - payments"))
-}
-
-// UserInvites is the resolver for the userInvites field.
-func (r *userResolver) UserInvites(ctx context.Context, obj *database_models.User) ([]*database_relations.UserInvite, error) {
-	panic(fmt.Errorf("not implemented: UserInvites - userInvites"))
+// Invites is the resolver for the invites field.
+func (r *userResolver) Invites(ctx context.Context, obj *database_models.User) ([]*database_relations.UserInvite, error) {
+	return r.ServiceContainer.UserService.GetInvitesByInvitedById(obj.ID)
 }
 
 // Organization is the resolver for the organization field.
-func (r *userInviteResolver) Organization(ctx context.Context, obj *database_relations.UserInvite) (*database_models.Organization, error) {
-	panic(fmt.Errorf("not implemented: Organization - organization"))
+func (r *userInviteResolver) Organization(ctx context.Context, obj *database_relations.UserInvite) ([]*database_models.Organization, error) {
+	organizationIds := make([]uuid.UUID, len(obj.OrganizationPermissions))
+	for _, organization := range obj.OrganizationPermissions {
+		organizationIds = append(organizationIds, organization.OrganizationID)
+	}
+
+	return r.ServiceContainer.OrganizationService.GetOrganizationsByIds(organizationIds)
 }
 
 // Platforms is the resolver for the platforms field.
 func (r *userInviteResolver) Platforms(ctx context.Context, obj *database_relations.UserInvite) ([]*database_models.Platform, error) {
-	panic(fmt.Errorf("not implemented: Platforms - platforms"))
+	// Could be implemented with dataloader
+	platformIds := make([]uuid.UUID, len(obj.PlatformsWithPermissions))
+	for i, platform := range obj.PlatformsWithPermissions {
+		platformIds[i] = platform.PlatformID
+	}
+
+	return r.ServiceContainer.PlatformService.GetPlatforms(platformIds)
 }
 
 // User is the resolver for the user field.
 func (r *userInviteResolver) User(ctx context.Context, obj *database_relations.UserInvite) (*database_models.User, error) {
+	// Return if the account has been created
 	panic(fmt.Errorf("not implemented: User - user"))
 }
 

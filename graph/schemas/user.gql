@@ -8,8 +8,7 @@ type User {
   organizations: [Organization!]!
   platforms: [Platform!]!
   permissions: [Permission!]!
-  payments: [Payment!]!
-  userInvites: [UserInvite!]!
+  invites: [UserInvite!]!
 
   createdAt: DateTime!
   updatedAt: DateTime
@@ -20,9 +19,9 @@ type UserInvite {
   id: UUID!
   email: String!
   code: String!
-  organization: Organization!
+  organization: [Organization]!
   platforms: [Platform!]!
-  user: User!
+  user: User
   status: InvitationStatus!
   createdAt: DateTime!
   updatedAt: DateTime
@@ -80,6 +79,7 @@ input ClientInformationInput {
 extend type Query {
   me: User! @auth
   users: [User!]!
+  invites: [UserInvite!]! @auth
 }
 
 extend type Mutation {

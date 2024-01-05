@@ -10,13 +10,10 @@ type Organization {
   socialMedias: [SocialMedia!]!
   users: [User!]!
   domains: [Domain!]!
-  paymentPlan: PaymentPlan!
-  payments: [Payment!]!
 }
 
 type Industry {
   name: String!
-  organizations: [Organization!]!
 }
 
 

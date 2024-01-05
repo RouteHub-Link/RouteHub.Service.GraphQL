@@ -1,6 +1,7 @@
 package services_domain
 
 import (
+	database_enums "github.com/RouteHub-Link/routehub-service-graphql/database/enums"
 	database_models "github.com/RouteHub-Link/routehub-service-graphql/database/models"
 
 	"github.com/RouteHub-Link/routehub-service-graphql/graph/model"
@@ -20,6 +21,7 @@ func (ds DomainService) CreateDomain(input model.DomainCreateInput) (domain data
 		Name:           input.Name,
 		OrganizationId: input.OrganizationID,
 		URL:            input.URL,
+		State:          database_enums.StatusStatePasive,
 	}
 
 	err = ds.DB.Create(&domain).Error
@@ -27,7 +29,6 @@ func (ds DomainService) CreateDomain(input model.DomainCreateInput) (domain data
 }
 
 func (ds DomainService) GetDomain(id uuid.UUID) (domain *database_models.Domain, err error) {
-
 	err = ds.DB.Where("id = ?", id).First(&domain).Error
 	return
 }

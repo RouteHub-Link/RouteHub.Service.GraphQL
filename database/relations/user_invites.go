@@ -10,7 +10,6 @@ import (
 type UserInvite struct {
 	ID                       uuid.UUID                      `gorm:"primaryKey;type:uuid;not null"`
 	Email                    string                         `gorm:"type:varchar(255);not null"`
-	OrganizationID           uuid.UUID                      `gorm:"type:uuid;not null;field:organization_id"`
 	InvitedByID              uuid.UUID                      `gorm:"type:uuid;not null;field:invited_by_id"`
 	OrganizationPermissions  []OrganizationsWithPermissions `gorm:"serializer:json;not null"`
 	PlatformsWithPermissions []PlatformsWithPermissions     `gorm:"serializer:json;not null"`

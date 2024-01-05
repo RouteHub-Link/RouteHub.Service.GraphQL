@@ -15,7 +15,7 @@ type Link struct {
 	Path              string                            `gorm:"type:varchar(255);not null;"`
 	OpenGraph         *database_types.OpenGraph         `json:"open_graph" gorm:"serializer:json;field:open_graph"`
 	RedirectionChoice database_enums.RedirectionOptions `json:"redirectionChoice" gorm:"serializer:json"`
-	Status            database_enums.StatusState        `json:"status" gorm:"serializer:json"`
+	State             database_enums.StatusState        `json:"State" gorm:"serializer:json"`
 
 	CreatedBy uuid.UUID  `gorm:"type:uuid;not null;"`
 	CreatedAt time.Time  `gorm:"autoCreateTime"`

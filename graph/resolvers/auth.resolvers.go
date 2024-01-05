@@ -38,11 +38,6 @@ func (r *mutationResolver) LoginUser(ctx context.Context, input model.LoginInput
 	}, nil
 }
 
-// RefreshToken is the resolver for the refreshToken field.
-func (r *mutationResolver) RefreshToken(ctx context.Context, input model.RefreshTokenInput) (string, error) {
-	panic(fmt.Errorf("not implemented: RefreshToken - refreshToken"))
-}
-
 // UpdateUserPassword is the resolver for the updateUserPassword field.
 func (r *mutationResolver) UpdateUserPassword(ctx context.Context, userID string, input model.UserUpdatePasswordInput) (*database_models.User, error) {
 	panic(fmt.Errorf("not implemented: UpdateUserPassword - updateUserPassword"))

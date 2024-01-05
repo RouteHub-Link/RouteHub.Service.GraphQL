@@ -1,0 +1,22 @@
+database:
+  host: route-hub-myhub.cockroachlabs.cloud
+  port: 26257
+  user: routehub
+  password: xxxx
+  database: r4lTestGraphQL
+  application_name: RouteHub-GraphQL
+  type:
+    migrate: true
+    seed: true
+    provider: embed
+graphql:
+  port: 8080
+  playground: false
+  dataloader:
+    wait: 1ms
+    cache: true
+    lrue:
+      size: 1000
+      expire: 10m
+
+

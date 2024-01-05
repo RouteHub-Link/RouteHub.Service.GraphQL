@@ -29,7 +29,7 @@ func (ls LinkService) CreateLink(input model.LinkCreateInput, userId uuid.UUID) 
 		Target:            input.Target,
 		Path:              *path,
 		RedirectionChoice: *input.RedirectionOptions,
-		Status:            database_enums.StatusStatePasive,
+		State:             database_enums.StatusStatePasive,
 		CreatedBy:         userId,
 		OpenGraph:         input.OpenGraph,
 	}
@@ -65,7 +65,7 @@ func (ls LinkService) GetLinksByPlatformId(platformId uuid.UUID) (link []*databa
 }
 
 func (ls LinkService) UpdateLinkStatus(link *database_models.Link, status database_enums.StatusState) (err error) {
-	link.Status = status
+	link.State = status
 	err = ls.DB.Save(&link).Error
 	return
 }

@@ -3,11 +3,11 @@ package main
 import (
 	"log"
 	"net/http"
-	"os"
 
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/RouteHub-Link/routehub-service-graphql/auth"
+	configuration "github.com/RouteHub-Link/routehub-service-graphql/config"
 	"github.com/RouteHub-Link/routehub-service-graphql/database"
 	"github.com/RouteHub-Link/routehub-service-graphql/directives"
 	"github.com/RouteHub-Link/routehub-service-graphql/graph"
@@ -16,14 +16,9 @@ import (
 	"github.com/RouteHub-Link/routehub-service-graphql/services"
 )
 
-const defaultPort = "8080"
+var applicationConfig = configuration.ConfigurationService{}.Get()
 
 func Serve() {
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = defaultPort
-	}
-
 	resolver := &Resolvers.Resolver{
 		DB:               database.DB,
 		ServiceContainer: services.NewServiceContainer(database.DB),
@@ -31,19 +26,20 @@ func Serve() {
 	}
 
 	config := graph.Config{Resolvers: resolver}
-	config.Directives.Auth = directives.AuthDirectiveHandler
-	config.Directives.OrganizationPermission = directives.OrganizationPermissionDirectiveHandler
-	config.Directives.PlatformPermission = directives.PlatformPermissionDirectiveHandler
-	config.Directives.DomainURLCheck = directives.DomainURLCheckDirectiveHandler
+	directives.Assign(&config)
 
 	var srv http.Handler = handler.NewDefaultServer(graph.NewExecutableSchema(config))
 
 	srv = auth.Middleware(srv)
 	srv = loaders.Middleware(srv)
 
-	http.Handle("/", playground.Handler("GraphQL playground", "/query"))
+	if applicationConfig.GraphQL.Playground {
+		http.Handle("/", playground.Handler("GraphQL playground", "/query"))
+		log.Printf("GraphQL playground enabled Connect to http://localhost:%s/ for GraphQL playground", applicationConfig.GraphQL.PortAsString)
+	}
+
 	http.Handle("/query", srv)
 
-	log.Printf("connect to http://localhost:%s/ for GraphQL playground", port)
-	log.Fatal(http.ListenAndServe(":"+port, nil))
+	log.Printf("You can interact with the GraphQL API using http://localhost:%s/query", applicationConfig.GraphQL.PortAsString)
+	log.Fatal(http.ListenAndServe(":"+applicationConfig.GraphQL.PortAsString, nil))
 }

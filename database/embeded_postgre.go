@@ -1,28 +1,32 @@
 package database
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
 
+	configuration "github.com/RouteHub-Link/routehub-service-graphql/config"
 	embeddedpostgres "github.com/fergusstrange/embedded-postgres"
 )
 
 var embeddedPostgres *embeddedpostgres.EmbeddedPostgres
 
 func RunEmbeddedPostgres() {
+	config = configuration.ConfigurationService{}.Get()
 	embeddedPostgres = embeddedpostgres.NewDatabase(
 		embeddedpostgres.DefaultConfig().
 			Database("postgres").
 			Username("postgres").
 			Password("1234").
-			Port(5432),
+			Port(config.Database.Port),
 	)
 	if err := embeddedPostgres.Start(); err != nil {
-		if err.Error() == "process already listening on port 5432" {
-			log.Printf("\nEmbedded Postgres already running on port 5432\n continueing...\n")
+		port := fmt.Sprint(config.Database.Port)
+		if err.Error() == "process already listening on port "+port {
+			log.Printf("\nEmbedded Postgres already running on port " + port + "\nContinueing old session...")
 			time.Sleep(3 * time.Second)
 			return
 		}

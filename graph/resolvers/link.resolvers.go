@@ -48,11 +48,6 @@ func (r *linkResolver) RedirectionOptions(ctx context.Context, obj *database_mod
 	return obj.RedirectionChoice, nil
 }
 
-// State is the resolver for the state field.
-func (r *linkResolver) State(ctx context.Context, obj *database_models.Link) (database_enums.StatusState, error) {
-	return obj.Status, nil
-}
-
 // Crawls is the resolver for the crawls field.
 func (r *linkResolver) Crawls(ctx context.Context, obj *database_models.Link) ([]*database_models.LinkCrawl, error) {
 	return r.ServiceContainer.LinkService.GetCrawls(obj.ID)
