@@ -22,8 +22,8 @@ It offers a range of functionalities catering to the specific needs of organizat
 - **Auth:** Customers can login, register and reset passwords.
 - **Organization:** Customers can create, update and delete organizations. `M2M relation with users.`
 - **Platform:** Customers can create, update and delete platforms. `M2M relation with organizations.`
-- **Domain:** Customers can create, update and delete domains. `M2O relation with platforms.`
-- **Link:** Customers can create, update and delete links. `M2O relation with domains.`
+- **Domain:** Customers can create, update and delete domains. `O2O relation with platforms.`
+- **Link:** Customers can create, update and delete links. `O2O relation with Platform.`
 - **Crawl:** Links can be crawled.
 - **Permissions:** Customers can invite another person to their organization and assign them custom permissions.
 
