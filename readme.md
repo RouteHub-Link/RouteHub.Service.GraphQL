@@ -27,7 +27,7 @@ This guide provides an overview of the settings in the `config/config.yaml` file
 - `dataloader`: Configuration for the GraphQL data loader.
   - `wait`: The maximum duration to wait before dispatching a batch load.
   - `cache`: If set to true, the data loader will cache data.
-  - `lrue`: Configuration for the Least Recently Used (LRU) cache.
+  - `lrue`: Configuration for the Least Recently Used (LRU) cache. (Does not related to wait)
     - `size`: The maximum number of items that can be stored in the cache.
     - `expire`: The duration after which an item in the cache will expire.
 
@@ -48,25 +48,25 @@ Brief project description goes here.
 - `/config`: Contains configuration files for the service.
   - `configuration.go`: Handles loading and parsing of configuration.
   - `config.yaml`: YAML configuration file.
-  - `provider_enum.go`: Enumerations for provider configurations.
+  - `provider_enum.go`: Enumerations for database provider configurations.
 
 - `/database`: Contains database related code.
   - `/configure`: Database configuration related code.
   - `/enums`: Enumerations used in the database.
   - `/models`: Database models.
   - `/relations`: Database relations.
-  - `/types`: Database Json Object Types.
+  - `/types`: Database JSON Object Types.
   - `connection.go`: Handles database connection.
   - `embeded_postgre.go`: Handles embedded PostgreSQL database.
-  - `mock.go`: Mock database for testing.
+  - `mock.go`: Mock data for testing.
   - `migrate.go`: Handles database migrations.
 
-- `/directives`: Contains directive related code.
-  - `domain_url_check.go`: Directive for domain URL check .
+- `/directives`: Contains graphql directive related code.
+  - `domain_url_check.go`: Directive for domain URL check. (Checks the domain from database, domain must be unique)
   - `organization_permission.go`: Directive for organization permission.
   - `auth_directive.go`: Directive for authentication.
-  - `assign.go`: Directive for assignment.
   - `platform_permission.go`: Directive for platform permission.
+  - `assign.go`: Directive middleware for assignment to graphql.
 
 - `/graph`: Contains GraphQL related code.
   - `/model`: GraphQL models.
