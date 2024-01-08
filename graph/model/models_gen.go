@@ -291,43 +291,6 @@ type TemplateInput struct {
 	State             database_enums.StatusState        `json:"state"`
 }
 
-type Ticket struct {
-	ID           uuid.UUID                     `json:"id"`
-	User         *database_models.User         `json:"user"`
-	Organization *database_models.Organization `json:"organization"`
-	Title        string                        `json:"title"`
-	Category     string                        `json:"category"`
-	Description  string                        `json:"description"`
-	Messages     []*TicketMessage              `json:"messages"`
-	Attachments  []string                      `json:"attachments,omitempty"`
-	Status       database_enums.TicketStatus   `json:"status"`
-	CreatedAt    time.Time                     `json:"createdAt"`
-	UpdatedAt    *time.Time                    `json:"updatedAt,omitempty"`
-	DeletedAt    *time.Time                    `json:"deletedAt,omitempty"`
-}
-
-type TicketInput struct {
-	Title       string   `json:"title"`
-	Category    string   `json:"category"`
-	Description string   `json:"description"`
-	Attachments []string `json:"attachments,omitempty"`
-}
-
-type TicketMessage struct {
-	ID        uuid.UUID                   `json:"id"`
-	Ticket    *Ticket                     `json:"ticket"`
-	Sender    database_enums.TicketSender `json:"sender"`
-	User      *database_models.User       `json:"user"`
-	Content   string                      `json:"content"`
-	CreatedAt time.Time                   `json:"createdAt"`
-	UpdatedAt *time.Time                  `json:"updatedAt,omitempty"`
-	DeletedAt *time.Time                  `json:"deletedAt,omitempty"`
-}
-
-type TicketMessageInput struct {
-	Content string `json:"content"`
-}
-
 type TimeFilter struct {
 	Equal    *time.Time   `json:"equal,omitempty"`
 	NotEqual *time.Time   `json:"notEqual,omitempty"`

@@ -17,6 +17,16 @@ It offers a range of functionalities catering to the specific needs of organizat
 - **SEO Crawling:** Shortened links are SEO-friendly and can be crawled by search engines.
 - **Customizable SEO & OG Tags:** Users can customize SEO tags Open Graph (OG) images for enhanced branding. for each link.
 
+## Key Handlers
+
+- **Auth:** Customers can login, register and reset passwords.
+- **Organization:** Customers can create, update and delete organizations. `M2M relation with users.`
+- **Platform:** Customers can create, update and delete platforms. `M2M relation with organizations.`
+- **Domain:** Customers can create, update and delete domains. `M2O relation with platforms.`
+- **Link:** Customers can create, update and delete links. `M2O relation with domains.`
+- **Crawl:** Links can be crawled.
+- **Permissions:** Customers can invite another person to their organization and assign them custom permissions.
+
 ## Configuration Guide
 
 This guide provides an overview of the settings in the `config/config.yaml` file.
