@@ -10,9 +10,12 @@ It offers a range of functionalities catering to the specific needs of organizat
 This project showcases various examples of using GO & Gqlgen for GraphQL development.
 You can easily adapt this project for your own needs or contribute to its improvement.
 However, due to my current workload, I cannot implement all the features that I have planned for this project.
+
 I also have a SSR example of this project that has similar functionality to this one. The idea is to use this GraphQL backend with two different frontend projects: a Dashboard and a Client.
 The Dashboard allows you to create and manage hubs using this project, while the Client is deployed for each hub and provides analytics and template integration.
-Currently, I have a Dashboard and a Client, but they are SSR go applications. The main goal is to make new applications with uses this GraphQL backend.
+Currently, I have a Dashboard and a Client, but they are SSR go applications. 
+
+The main goal is to make new applications with uses this GraphQL backend.
 
 ## Key Features
 
@@ -45,7 +48,7 @@ Currently, I have a Dashboard and a Client, but they are SSR go applications. Th
 - [x] **Permissions;** Every platform and organization has special permissions. Querys and mutations are protected with directives.
 - [x] **Platform:** Customers can create, update their platforms.
 - [x] **Domain:** Every Platform must has a domain for deployment and link shortening with hub deployment process.
-- [x] **Link:** Customers can create shorlink's with custom SEO tags and OG images.
+- [x] **Link:** Customers can create shortlink's with custom SEO tags and OG images.
 - [x] **Crawl:** Links will be crawled automatically and if user want's to recrawl can create a crawl request and monitor process in link query. Crawling process is made with colly web scraping framework.
 - [x] **Data loaders:** Data loaders are implemented for users.
 - [x] **LRU Expirable Cache:** LRU Cache is implemented for data loaders.
