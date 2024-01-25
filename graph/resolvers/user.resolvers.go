@@ -6,7 +6,6 @@ package graph
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/RouteHub-Link/routehub-service-graphql/auth"
 	database_enums "github.com/RouteHub-Link/routehub-service-graphql/database/enums"
@@ -20,8 +19,8 @@ import (
 )
 
 // CreateUser is the resolver for the createUser field.
-func (r *mutationResolver) CreateUser(ctx context.Context, input model.UserInput) (*database_models.User, error) {
-	panic(fmt.Errorf("not implemented: CreateUser - createUser"))
+func (r *mutationResolver) CreateUser(ctx context.Context, input model.UserCreateInput) (*database_models.User, error) {
+	return r.ServiceContainer.UserService.CreateUser(input)
 }
 
 // InviteUser is the resolver for the inviteUser field.
@@ -77,11 +76,6 @@ func (r *userResolver) Platforms(ctx context.Context, obj *database_models.User)
 	return r.ServiceContainer.PlatformService.GetPlatformsByUser(obj.ID)
 }
 
-// Permissions is the resolver for the permissions field.
-func (r *userResolver) Permissions(ctx context.Context, obj *database_models.User) ([]*model.Permission, error) {
-	panic(fmt.Errorf("not implemented: Permissions - permissions"))
-}
-
 // Invites is the resolver for the invites field.
 func (r *userResolver) Invites(ctx context.Context, obj *database_models.User) ([]*database_relations.UserInvite, error) {
 	return r.ServiceContainer.UserService.GetInvitesByInvitedById(obj.ID)
@@ -110,8 +104,19 @@ func (r *userInviteResolver) Platforms(ctx context.Context, obj *database_relati
 
 // User is the resolver for the user field.
 func (r *userInviteResolver) User(ctx context.Context, obj *database_relations.UserInvite) (*database_models.User, error) {
-	// Return if the account has been created
-	panic(fmt.Errorf("not implemented: User - user"))
+	userId, err := r.ServiceContainer.UserService.GetInvitedUserByInvitation(*obj)
+	if err != nil || userId == nil {
+		return nil, gqlerror.Errorf("User cannot be accessed %v", err)
+	}
+
+	return r.LoaderContainer.User.Get(ctx, *userId)
+}
+
+// Permissions is the resolver for the permissions field.
+func (r *platformsWithPermissionsInputResolver) Permissions(ctx context.Context, obj *database_relations.PlatformsWithPermissions, data []database_enums.PlatformPermission) error {
+	// ? these are actually inputs inside inputs so we should not be doing anything here unless we want to make them a main input
+
+	return nil
 }
 
 // User returns graph.UserResolver implementation.
@@ -120,5 +125,11 @@ func (r *Resolver) User() graph.UserResolver { return &userResolver{r} }
 // UserInvite returns graph.UserInviteResolver implementation.
 func (r *Resolver) UserInvite() graph.UserInviteResolver { return &userInviteResolver{r} }
 
+// PlatformsWithPermissionsInput returns graph.PlatformsWithPermissionsInputResolver implementation.
+func (r *Resolver) PlatformsWithPermissionsInput() graph.PlatformsWithPermissionsInputResolver {
+	return &platformsWithPermissionsInputResolver{r}
+}
+
 type userResolver struct{ *Resolver }
 type userInviteResolver struct{ *Resolver }
+type platformsWithPermissionsInputResolver struct{ *Resolver }

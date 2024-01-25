@@ -6,17 +6,32 @@ package graph
 
 import (
 	"context"
-	"fmt"
 
+	"github.com/RouteHub-Link/routehub-service-graphql/auth"
 	database_enums "github.com/RouteHub-Link/routehub-service-graphql/database/enums"
 	database_models "github.com/RouteHub-Link/routehub-service-graphql/database/models"
 	database_relations "github.com/RouteHub-Link/routehub-service-graphql/database/relations"
 	"github.com/RouteHub-Link/routehub-service-graphql/graph"
+	"github.com/RouteHub-Link/routehub-service-graphql/graph/model"
 )
+
+// CreateOrganization is the resolver for the createOrganization field.
+func (r *mutationResolver) CreateOrganization(ctx context.Context, input model.OrganizationCreateInput) (*database_models.Organization, error) {
+	userSession := auth.ForContext(ctx)
+
+	return r.ServiceContainer.OrganizationService.CreateOrganization(userSession.ID, &input)
+}
+
+// UpdateOrganization is the resolver for the updateOrganization field.
+func (r *mutationResolver) UpdateOrganization(ctx context.Context, input model.OrganizationUpdateInput) (*database_models.Organization, error) {
+	return r.ServiceContainer.OrganizationService.UpdateOrganization(input)
+}
 
 // Permissions is the resolver for the permissions field.
 func (r *organizationResolver) Permissions(ctx context.Context, obj *database_models.Organization) ([]database_enums.OrganizationPermission, error) {
-	panic(fmt.Errorf("not implemented: Permissions - permissions"))
+	userSession := auth.ForContext(ctx)
+
+	return r.ServiceContainer.OrganizationPermissionService.GetOrganizationPermissions(userSession.ID, obj.ID)
 }
 
 // Platforms is the resolver for the platforms field.
@@ -47,7 +62,7 @@ func (r *queryResolver) Organizations(ctx context.Context) ([]*database_models.O
 
 // Permissions is the resolver for the permissions field.
 func (r *organizationsWithPermissionsInputResolver) Permissions(ctx context.Context, obj *database_relations.OrganizationsWithPermissions, data []database_enums.OrganizationPermission) error {
-	// TODO check the organizations i guess user has permisison or just remove this
+	// ? these are actually inputs inside inputs so we should not be doing anything here unless we want to make them a main input
 	return nil
 }
 

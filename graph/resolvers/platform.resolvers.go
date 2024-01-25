@@ -11,7 +11,6 @@ import (
 	"github.com/RouteHub-Link/routehub-service-graphql/auth"
 	database_enums "github.com/RouteHub-Link/routehub-service-graphql/database/enums"
 	database_models "github.com/RouteHub-Link/routehub-service-graphql/database/models"
-	database_relations "github.com/RouteHub-Link/routehub-service-graphql/database/relations"
 	"github.com/RouteHub-Link/routehub-service-graphql/graph"
 	"github.com/RouteHub-Link/routehub-service-graphql/graph/model"
 	graph_inputs "github.com/RouteHub-Link/routehub-service-graphql/graph/model/inputs"
@@ -39,7 +38,9 @@ func (r *platformResolver) Domain(ctx context.Context, obj *database_models.Plat
 
 // Permissions is the resolver for the permissions field.
 func (r *platformResolver) Permissions(ctx context.Context, obj *database_models.Platform) ([]database_enums.PlatformPermission, error) {
-	panic(fmt.Errorf("not implemented: Permissions - permissions"))
+	userSession := auth.ForContext(ctx)
+
+	return r.ServiceContainer.PlatformPermissionService.GetPlatformPermissions(userSession.ID, obj.ID)
 }
 
 // Deployments is the resolver for the deployments field.
@@ -79,19 +80,7 @@ func (r *queryResolver) Platforms(ctx context.Context) ([]*database_models.Platf
 	return r.ServiceContainer.PlatformService.GetPlatformsByUser(userSession.ID)
 }
 
-// Permissions is the resolver for the permissions field.
-func (r *platformsWithPermissionsInputResolver) Permissions(ctx context.Context, obj *database_relations.PlatformsWithPermissions, data []database_enums.PlatformPermission) error {
-	// TODO check the platform i guess user has permisison or just remove this
-	return nil
-}
-
 // Platform returns graph.PlatformResolver implementation.
 func (r *Resolver) Platform() graph.PlatformResolver { return &platformResolver{r} }
 
-// PlatformsWithPermissionsInput returns graph.PlatformsWithPermissionsInputResolver implementation.
-func (r *Resolver) PlatformsWithPermissionsInput() graph.PlatformsWithPermissionsInputResolver {
-	return &platformsWithPermissionsInputResolver{r}
-}
-
 type platformResolver struct{ *Resolver }
-type platformsWithPermissionsInputResolver struct{ *Resolver }

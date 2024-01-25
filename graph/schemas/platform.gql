@@ -1,22 +1,42 @@
-
+"""
+This is a platform schema. A platform is an HUB.
+A HUB is a place where you can create links and manage them.
+Hub has settings like redirection choice, default seo options aka open graph, and templates.
+Templates are used to inside of the client application. When someone opens short link if the redirection choice is client side then client application renders the template with redirection option specified designs.
+Deployments are not implemented yet but idea is when the platform created or updated user can see the deployment status and even rollback or retry.
+Analytics are actually definitely not gonna be inside of this project client application is handles the analytics and this field actually shoul resolve the client application.
+Pinned links are the links that pinned by the organization. These links should be listed on client application homepage.
+"""
 type Platform {
   id: UUID!
+  "This is a simple name of the platform nothing special."
   name: String!
+  "Default SEO options for the client application."
   openGraph: OpenGraph!
+  "Default redirection options for the client application behavior."
   redirectionChoice: RedirectionOptions!
+  "Owner of the platform."
   organization: Organization!
+  "This is the domain that platform is using for shortlinks and deployments."
   domain: Domain!
+  "This field resolves the requested user permissions for the platform."
   permissions: [PlatformPermission!]!
+  "Deployments are not implemented yet but idea is when the platform created or updated user can see the deployment status and even rollback or retry."
   deployments: [PlatformDeployment!]!
+  "These links are created for shortening & also crawling process can be viewed here."
   links: [Link!]!
+  "Analytics are actually definitely not gonna be inside of this project client application is handles the analytics and this field actually shoul resolve the client application."
   analytics: [AnalyticReport]!
   analyticReports: AnalyticReports!
   status: StatusState!
+  "Templates are used to inside of the client application. When someone opens short link if the redirection choice is client side then client application renders the template with redirection option specified designs."
   templates: [Template!]!
+  "Pinned links are the links that pinned by the organization. These links should be listed on client application homepage."
   pinnedLinks: [Link!]!
 }
 
 
+"If the user want's to create a platform, must has PLATFORM_CREATE permission for that organization."
 input PlatformCreateInput @organizationPermission(permission: PLATFORM_CREATE) {
   organizationId: UUID!
   domainId: UUID!
@@ -26,6 +46,7 @@ input PlatformCreateInput @organizationPermission(permission: PLATFORM_CREATE) {
   templates: [TemplateInput]
 }
 
+"Platform deployment is not implemented"
 type PlatformDeployment {
   id: UUID!
   platform: Platform!
@@ -35,11 +56,6 @@ type PlatformDeployment {
   createdAt: DateTime!
   updatedAt: DateTime
   deletedAt: DateTime
-}
-
-input PlatformsWithPermissionsInput {
-  platformId: UUID!
-  permissions: [PlatformPermission!]!
 }
 
 type Template {
@@ -65,9 +81,11 @@ input TemplateInput {
 
 
 extend type Query {
+  "This query can retrive user related platforms via organization relations."
   platforms: [Platform!]! @auth
 }
 
 extend type Mutation {
+  "This mutation is used for creating a platform for an organization."
   createPlatform(input: PlatformCreateInput!): Platform! @auth
 }

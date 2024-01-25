@@ -1,3 +1,7 @@
+"""
+The metrics are not implemented.
+"""
+
 
 type AnalyticReports {
   todayObservations: [ObservationAnalytic!]!

@@ -32,5 +32,6 @@ type DomainVerification {
 }
 
 extend type Mutation {
+  "This mutation is used for creating a domain for an organization. *(Plan is After an domain is created and verified it can be used to create a platform & deployment process.)"
   createDomain(input: DomainCreateInput!): Domain! @auth
 }

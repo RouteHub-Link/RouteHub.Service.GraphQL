@@ -7,7 +7,6 @@ type User {
   phone: AccountPhone!
   organizations: [Organization!]!
   platforms: [Platform!]!
-  permissions: [Permission!]!
   invites: [UserInvite!]!
 
   createdAt: DateTime!
@@ -51,6 +50,11 @@ input UserInviteInput {
   platformsWithPermissions: [PlatformsWithPermissionsInput!]!
 }
 
+input PlatformsWithPermissionsInput {
+  platformId: UUID!
+  permissions: [PlatformPermission!]!
+}
+
 input AccountPhoneInput {
   number: String!
   countryCode: String!
@@ -59,16 +63,17 @@ input AccountPhoneInput {
 input UpdateUserInviteInput {
   code: String!
   status: InvitationStatus!
-  user: UserInput!
+  user: UserCreateInput!
 }
 
-input UserInput {
+input UserCreateInput {
   email: String!
   password: String!
   confirmPassword: String!
   fullname: String!
   phone: AccountPhoneInput!
   clientInformation: ClientInformationInput!
+  organization: OrganizationCreateInput
 }
 
 input ClientInformationInput {
@@ -77,13 +82,26 @@ input ClientInformationInput {
 }
 
 extend type Query {
+  "Retruns the authorized user."
   me: User! @auth
+  "Returns all the users debug only this method should not be in the production without any super admin directive."
   users: [User!]!
+  "Returns all the invited users by the authorized person. Invitation could be any organization with in inviter permissions."
   invites: [UserInvite!]! @auth
 }
 
 extend type Mutation {
-  createUser(input: UserInput!): User!
+  """
+  This mutation is used to create a new user.
+  If the organization is provided, new organization will be created for the user.
+  """
+  createUser(input: UserCreateInput!): User!
+  """
+  This mutation is used for inviting a user to an organization. 
+  Authorized person can invite a user to multiple organizations with custom permissions.
+  """
   inviteUser(input: UserInviteInput!): UserInvite! @auth
+
+  "This mutattion used by invited person and invited person can accept or reject the invitation. If the user accepted, user field will be filled with user."
   updateUserInvitation(input: UpdateUserInviteInput!): InvitationStatus!
 }

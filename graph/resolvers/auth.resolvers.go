@@ -6,10 +6,8 @@ package graph
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/RouteHub-Link/routehub-service-graphql/auth"
-	database_models "github.com/RouteHub-Link/routehub-service-graphql/database/models"
 	"github.com/RouteHub-Link/routehub-service-graphql/graph"
 	"github.com/RouteHub-Link/routehub-service-graphql/graph/model"
 )
@@ -36,21 +34,6 @@ func (r *mutationResolver) LoginUser(ctx context.Context, input model.LoginInput
 	return &model.LoginPayload{
 		Token: token,
 	}, nil
-}
-
-// UpdateUserPassword is the resolver for the updateUserPassword field.
-func (r *mutationResolver) UpdateUserPassword(ctx context.Context, userID string, input model.UserUpdatePasswordInput) (*database_models.User, error) {
-	panic(fmt.Errorf("not implemented: UpdateUserPassword - updateUserPassword"))
-}
-
-// RequestPasswordReset is the resolver for the requestPasswordReset field.
-func (r *mutationResolver) RequestPasswordReset(ctx context.Context, input model.PasswordResetCreateInput) (*model.PasswordReset, error) {
-	panic(fmt.Errorf("not implemented: RequestPasswordReset - requestPasswordReset"))
-}
-
-// ResetPassword is the resolver for the resetPassword field.
-func (r *mutationResolver) ResetPassword(ctx context.Context, input model.PasswordResetUpdateInput) (*database_models.User, error) {
-	panic(fmt.Errorf("not implemented: ResetPassword - resetPassword"))
 }
 
 // Mutation returns graph.MutationResolver implementation.

@@ -129,5 +129,3 @@ Brief project description goes here.
 - `.gitignore`: Specifies intentionally untracked files to ignore when using Git.
 
 Please note that after any changes to the GraphQL schema, you must run `go run -mod=mod github.com/99designs/gqlgen` to regenerate the necessary code.
-
-

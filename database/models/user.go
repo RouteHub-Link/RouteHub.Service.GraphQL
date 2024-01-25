@@ -19,3 +19,7 @@ type User struct {
 	UpdatedAt    *time.Time                   `json:"updatedAt,omitempty" gorm:"autoUpdateTime:milli"`
 	DeletedAt    *time.Time                   `json:"deletedAt,omitempty" gorm:"index"`
 }
+
+func (User) TableName() string {
+	return "users"
+}

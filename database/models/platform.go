@@ -23,6 +23,10 @@ type Platform struct {
 	DeletedAt *time.Time `json:"deletedAt,omitempty" gorm:"index"`
 }
 
+func (Platform) TableName() string {
+	return "platforms"
+}
+
 /*
 type Platform struct {
 	ID                uuid.UUID                           `json:"id"`

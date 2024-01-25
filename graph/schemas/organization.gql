@@ -23,7 +23,7 @@ type SocialMedia {
   icon: String!
 }
 
-input OrganizationInput {
+input OrganizationCreateInput {
   name: String!
   website: String!
   description: String!
@@ -36,6 +36,16 @@ input OrganizationsWithPermissionsInput {
   permissions: [OrganizationPermission!]!
 }
 
+"If the user want's to update the organization, must has ORGANIZATION_UPDATE permission."
+input OrganizationUpdateInput @organizationPermission(permission: ORGANIZATION_UPDATE) {
+  organizationId: UUID!
+  name: String!
+  website: String!
+  description: String!
+  location: String!
+  socialMedias: [SocialMediaInput!]!
+}
+
 input SocialMediaInput {
   name: String!
   url: String!
@@ -45,4 +55,11 @@ input SocialMediaInput {
 
 extend type Query {
   organizations: [Organization!]! @auth
+}
+
+extend type Mutation {
+  "Authorized person create first/another organization."
+  createOrganization(input: OrganizationCreateInput!): Organization! @auth
+  "Authorized person could update the organization. It's mostly used for updating the organization created by the registration process."
+  updateOrganization(input: OrganizationUpdateInput!): Organization! @auth
 }

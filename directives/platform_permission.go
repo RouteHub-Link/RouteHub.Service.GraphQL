@@ -2,14 +2,13 @@ package directives
 
 import (
 	"context"
-	"log"
 
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/RouteHub-Link/routehub-service-graphql/auth"
 	"github.com/RouteHub-Link/routehub-service-graphql/database"
 	database_enums "github.com/RouteHub-Link/routehub-service-graphql/database/enums"
 	database_models "github.com/RouteHub-Link/routehub-service-graphql/database/models"
-	database_relations "github.com/RouteHub-Link/routehub-service-graphql/database/relations"
+	services_platform "github.com/RouteHub-Link/routehub-service-graphql/services/platform"
 	"github.com/google/uuid"
 	"github.com/vektah/gqlparser/gqlerror"
 )
@@ -26,20 +25,34 @@ func PlatformPermissionDirectiveHandler(ctx context.Context, obj interface{}, ne
 		return nil, err
 	}
 
-	var platformUser database_relations.PlatformUser
-	err = db.Where("user_id = ? AND platform_id = ?", userSession.ID, platformUUID).First(&platformUser).Error
-	if err != nil {
-		return nil, gqlerror.Errorf("Access Denied")
+	platformPermissionService := services_platform.PlatformPermissionService{DB: db}
+	hasPermission, err := platformPermissionService.GetUserHasPermission(userSession.ID, *platformUUID, permission)
+
+	if hasPermission {
+		return next(ctx)
+	} else if err != nil {
+		return nil, err
 	}
 
-	log.Printf("\n \norganizationUser: %+v\narg permission : %+v", platformUser, permission)
-
-	for _, organization_user_permission := range platformUser.Permissions {
-		if organization_user_permission == permission {
-			return next(ctx)
-		}
-	}
 	return nil, gqlerror.Errorf("Access Denied")
+	/*
+	   var platformUser database_relations.PlatformUser
+	   err = db.Where("user_id = ? AND platform_id = ?", userSession.ID, platformUUID).First(&platformUser).Error
+
+	   	if err != nil {
+	   		return nil, gqlerror.Errorf("Access Denied")
+	   	}
+
+	   log.Printf("\n \norganizationUser: %+v\narg permission : %+v", platformUser, permission)
+
+	   	for _, organization_user_permission := range platformUser.Permissions {
+	   		if organization_user_permission == permission {
+	   			return next(ctx)
+	   		}
+	   	}
+
+	   return nil, gqlerror.Errorf("Access Denied")
+	*/
 }
 
 func getPlatformId(obj interface{}) (*uuid.UUID, error) {

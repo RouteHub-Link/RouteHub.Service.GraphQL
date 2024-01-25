@@ -1,9 +1,9 @@
 database:
-  host: route-hub-myhub.cockroachlabs.cloud
+  host: route-hub
   port: 26257
   user: routehub
   password: xxxx
-  database: r4lTestGraphQL
+  database: RouteHub
   application_name: RouteHub-GraphQL
   type:
     migrate: true
@@ -18,5 +18,3 @@ graphql:
     lrue:
       size: 1000
       expire: 10m
-
-

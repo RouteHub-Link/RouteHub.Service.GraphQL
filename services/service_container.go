@@ -10,19 +10,23 @@ import (
 )
 
 type ServiceContainer struct {
-	UserService         *services_user.UserService
-	DomainService       *services_domain.DomainService
-	PlatformService     *services_platform.PlatformService
-	LinkService         *services_link.LinkService
-	OrganizationService *services_organization.OrganizationService
+	UserService                   *services_user.UserService
+	DomainService                 *services_domain.DomainService
+	PlatformService               *services_platform.PlatformService
+	LinkService                   *services_link.LinkService
+	OrganizationService           *services_organization.OrganizationService
+	PlatformPermissionService     *services_platform.PlatformPermissionService
+	OrganizationPermissionService *services_organization.OrganizationPermissionService
 }
 
 func NewServiceContainer(db *gorm.DB) *ServiceContainer {
 	return &ServiceContainer{
-		UserService:         &services_user.UserService{DB: db},
-		DomainService:       &services_domain.DomainService{DB: db},
-		PlatformService:     &services_platform.PlatformService{DB: db},
-		LinkService:         &services_link.LinkService{DB: db},
-		OrganizationService: &services_organization.OrganizationService{DB: db},
+		UserService:                   &services_user.UserService{DB: db},
+		DomainService:                 &services_domain.DomainService{DB: db},
+		PlatformService:               &services_platform.PlatformService{DB: db},
+		LinkService:                   &services_link.LinkService{DB: db},
+		OrganizationService:           &services_organization.OrganizationService{DB: db},
+		PlatformPermissionService:     &services_platform.PlatformPermissionService{DB: db},
+		OrganizationPermissionService: &services_organization.OrganizationPermissionService{DB: db},
 	}
 }

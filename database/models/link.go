@@ -11,6 +11,7 @@ import (
 type Link struct {
 	ID                uuid.UUID                         `gorm:"type:uuid;primary_key;"`
 	PlatformID        uuid.UUID                         `gorm:"type:uuid;not null;field:platform_id"`
+	Platform          *Platform                         `json:"platform" gorm:"foreignKey:PlatformID;references:id"`
 	Target            string                            `gorm:"type:varchar(255);not null;"`
 	Path              string                            `gorm:"type:varchar(255);not null;"`
 	OpenGraph         *database_types.OpenGraph         `json:"open_graph" gorm:"serializer:json;field:open_graph"`

@@ -1,44 +1,17 @@
 
+"This input is used to loging a user."
 input LoginInput {
   email: String!
   password: String!
 }
 
-input UserUpdatePasswordInput {
-  password: String!
-  confirmPassword: String!
-  clientInformation: ClientInformationInput!
-}
-
-input PasswordResetCreateInput {
-  email: String!
-  clientInformation: ClientInformationInput!
-}
-
-input PasswordResetUpdateInput {
-  token: String!
-  password: String!
-  confirmPassword: String!
-  clientInformation: ClientInformationInput!
-}
-
+"Payload returned after a user is logged in."
 type LoginPayload {
   token: String!
 }
 
-type PasswordReset {
-  id: UUID!
-  user: User!
-  token: String!
-  createdAt: DateTime!
-  expiresAt: DateTime!
-  updatedAt: DateTime
-  deletedAt: DateTime
-}
 
 extend type Mutation {
+  "This mutation is used to login a user. After a user is logged in a token is returned. This token is simple auth token does not has any checks other than simple validation is not good for production."
   loginUser(input: LoginInput!): LoginPayload!
-  updateUserPassword(userId: ID!, input: UserUpdatePasswordInput!): User!
-  requestPasswordReset(input: PasswordResetCreateInput!): PasswordReset!
-  resetPassword(input: PasswordResetUpdateInput!): User!
 }

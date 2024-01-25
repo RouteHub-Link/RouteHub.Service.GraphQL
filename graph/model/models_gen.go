@@ -30,6 +30,7 @@ type AnalyticReport struct {
 	Useragents   []*MetricAnalytics      `json:"useragents"`
 }
 
+// The metrics are not implemented.
 type AnalyticReports struct {
 	TodayObservations     []*ObservationAnalytic `json:"todayObservations"`
 	YesterdayObservations []*ObservationAnalytic `json:"yesterdayObservations"`
@@ -50,6 +51,7 @@ type ClientInformationInput struct {
 	IP        string `json:"ip"`
 }
 
+// If a user wants to crawl a link, must has LINK_UPDATE permission for that platform.
 type CrawlRequestInput struct {
 	LinkID uuid.UUID `json:"linkId"`
 }
@@ -112,6 +114,7 @@ type IntFilter struct {
 	IsNull   *bool `json:"isNull,omitempty"`
 }
 
+// If a user wants to create a link, must has LINK_CREATE permission for that platform.
 type LinkCreateInput struct {
 	Target             string                             `json:"target"`
 	Path               *string                            `json:"path,omitempty"`
@@ -125,11 +128,13 @@ type LinkFilter struct {
 	Domain   *UUIDFilter `json:"domain,omitempty"`
 }
 
+// This input is used to loging a user.
 type LoginInput struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
 }
 
+// Payload returned after a user is logged in.
 type LoginPayload struct {
 	Token string `json:"token"`
 }
@@ -197,7 +202,7 @@ type ObservationInput struct {
 	Success           bool                              `json:"success"`
 }
 
-type OrganizationInput struct {
+type OrganizationCreateInput struct {
 	Name         string              `json:"name"`
 	Website      string              `json:"website"`
 	Description  string              `json:"description"`
@@ -205,26 +210,14 @@ type OrganizationInput struct {
 	SocialMedias []*SocialMediaInput `json:"socialMedias"`
 }
 
-type PasswordReset struct {
-	ID        uuid.UUID             `json:"id"`
-	User      *database_models.User `json:"user"`
-	Token     string                `json:"token"`
-	CreatedAt time.Time             `json:"createdAt"`
-	ExpiresAt time.Time             `json:"expiresAt"`
-	UpdatedAt *time.Time            `json:"updatedAt,omitempty"`
-	DeletedAt *time.Time            `json:"deletedAt,omitempty"`
-}
-
-type PasswordResetCreateInput struct {
-	Email             string                  `json:"email"`
-	ClientInformation *ClientInformationInput `json:"clientInformation"`
-}
-
-type PasswordResetUpdateInput struct {
-	Token             string                  `json:"token"`
-	Password          string                  `json:"password"`
-	ConfirmPassword   string                  `json:"confirmPassword"`
-	ClientInformation *ClientInformationInput `json:"clientInformation"`
+// If the user want's to update the organization, must has ORGANIZATION_UPDATE permission.
+type OrganizationUpdateInput struct {
+	OrganizationID uuid.UUID           `json:"organizationId"`
+	Name           string              `json:"name"`
+	Website        string              `json:"website"`
+	Description    string              `json:"description"`
+	Location       string              `json:"location"`
+	SocialMedias   []*SocialMediaInput `json:"socialMedias"`
 }
 
 type Permission struct {
@@ -236,6 +229,7 @@ type Permission struct {
 	Platforms     []*database_models.Platform     `json:"platforms"`
 }
 
+// Platform deployment is not implemented
 type PlatformDeployment struct {
 	ID        uuid.UUID                 `json:"id"`
 	Platform  *database_models.Platform `json:"platform"`
@@ -318,22 +312,17 @@ type UUIDFilter struct {
 type UpdateUserInviteInput struct {
 	Code   string                          `json:"code"`
 	Status database_enums.InvitationStatus `json:"status"`
-	User   *UserInput                      `json:"user"`
+	User   *UserCreateInput                `json:"user"`
 }
 
-type UserInput struct {
-	Email             string                  `json:"email"`
-	Password          string                  `json:"password"`
-	ConfirmPassword   string                  `json:"confirmPassword"`
-	Fullname          string                  `json:"fullname"`
-	Phone             *AccountPhoneInput      `json:"phone"`
-	ClientInformation *ClientInformationInput `json:"clientInformation"`
-}
-
-type UserUpdatePasswordInput struct {
-	Password          string                  `json:"password"`
-	ConfirmPassword   string                  `json:"confirmPassword"`
-	ClientInformation *ClientInformationInput `json:"clientInformation"`
+type UserCreateInput struct {
+	Email             string                   `json:"email"`
+	Password          string                   `json:"password"`
+	ConfirmPassword   string                   `json:"confirmPassword"`
+	Fullname          string                   `json:"fullname"`
+	Phone             *AccountPhoneInput       `json:"phone"`
+	ClientInformation *ClientInformationInput  `json:"clientInformation"`
+	Organization      *OrganizationCreateInput `json:"organization,omitempty"`
 }
 
 type DeploymentStatus string

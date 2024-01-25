@@ -7,7 +7,7 @@ import (
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/RouteHub-Link/routehub-service-graphql/auth"
-	configuration "github.com/RouteHub-Link/routehub-service-graphql/config"
+	Configuration "github.com/RouteHub-Link/routehub-service-graphql/config"
 	"github.com/RouteHub-Link/routehub-service-graphql/database"
 	"github.com/RouteHub-Link/routehub-service-graphql/directives"
 	"github.com/RouteHub-Link/routehub-service-graphql/graph"
@@ -16,7 +16,7 @@ import (
 	"github.com/RouteHub-Link/routehub-service-graphql/services"
 )
 
-var applicationConfig = configuration.ConfigurationService{}.Get()
+var applicationConfig = Configuration.ConfigurationService{}.Get()
 
 func Serve() {
 	resolver := &Resolvers.Resolver{

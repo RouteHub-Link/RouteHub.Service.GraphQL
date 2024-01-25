@@ -20,8 +20,6 @@ func (u UserService) InviteUser(input graph_inputs.UserInviteInput, invitedById 
 		id = uuid.New().String()
 	}
 
-	// TODO: Check the organizationId, invitedById, and platformsWithAccess in platform id's to make sure they are valid
-
 	userInvite = &database_relations.UserInvite{
 		ID:                       uuid.New(),
 		Email:                    input.Email,
@@ -90,4 +88,15 @@ func (u UserService) UpdateInvitation(updateUserInviteInput model.UpdateUserInvi
 func (u UserService) GetInvitesByInvitedById(invitedById uuid.UUID) (userInvites []*database_relations.UserInvite, err error) {
 	err = u.DB.Where("invited_by_id = ?", invitedById).Find(&userInvites).Error
 	return
+}
+
+func (u UserService) GetInvitedUserByInvitation(invitation database_relations.UserInvite) (userId *uuid.UUID, err error) {
+	if invitation.Status != database_enums.InvitationStatusAccepted {
+		return nil, errors.New("invitation is not accepted")
+	}
+
+	user := &database_models.User{}
+	err = u.DB.Where("email = ?", invitation.Email).First(&user).Error
+
+	return &user.ID, err
 }

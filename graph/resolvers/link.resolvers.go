@@ -6,7 +6,7 @@ package graph
 
 import (
 	"context"
-	"fmt"
+	"time"
 
 	"github.com/RouteHub-Link/routehub-service-graphql/auth"
 	database_enums "github.com/RouteHub-Link/routehub-service-graphql/database/enums"
@@ -23,11 +23,6 @@ func (r *linkResolver) Creator(ctx context.Context, obj *database_models.Link) (
 	return r.LoaderContainer.User.Get(ctx, obj.CreatedBy)
 }
 
-// Platform is the resolver for the platform field.
-func (r *linkResolver) Platform(ctx context.Context, obj *database_models.Link) (*database_models.Platform, error) {
-	return r.ServiceContainer.PlatformService.GetPlatform(obj.PlatformID)
-}
-
 // Domain is the resolver for the domain field.
 func (r *linkResolver) Domain(ctx context.Context, obj *database_models.Link) (*database_models.Domain, error) {
 	return r.ServiceContainer.DomainService.GetDomainByPlatformId(obj.PlatformID)
@@ -35,7 +30,24 @@ func (r *linkResolver) Domain(ctx context.Context, obj *database_models.Link) (*
 
 // Analytics is the resolver for the analytics field.
 func (r *linkResolver) Analytics(ctx context.Context, obj *database_models.Link) ([]*model.MetricAnalytics, error) {
-	panic(fmt.Errorf("not implemented: Analytics - analytics"))
+	mock := []*model.MetricAnalytics{
+		{
+			Feeder:       "Facebook",
+			TotalHits:    100,
+			TotalSuccess: 50,
+			TotalFailed:  50,
+			StartAt:      time.Now().Add(-time.Hour * (24 * 7)),
+			EndAt:        time.Now(),
+		},
+		{
+			Feeder:       "X",
+			TotalHits:    300,
+			TotalSuccess: 200,
+			TotalFailed:  100,
+			StartAt:      time.Now().Add(-time.Hour * (24 * 7)),
+			EndAt:        time.Now(),
+		}}
+	return mock, nil
 }
 
 // OpenGraph is the resolver for the openGraph field.
@@ -92,16 +104,16 @@ func (r *mutationResolver) RequestCrawl(ctx context.Context, input model.CrawlRe
 
 // Links is the resolver for the links field.
 func (r *queryResolver) Links(ctx context.Context, first *int, after *string, last *int, before *string, orderBy map[string]interface{}, where *model.LinkFilter) (*relay.Connection[database_models.Link], error) {
-	pagingOptions := relay.PaginateOption{
+	linkName := database_models.Link{}.TableName()
+
+	return relay.Paginate[database_models.Link](r.DB, where, orderBy, relay.PaginateOption{
 		First:      first,
 		After:      after,
 		Last:       last,
 		Before:     before,
-		Table:      database_models.Link{}.TableName(),
+		Table:      linkName,
 		PrimaryKey: "id",
-	}
-
-	return relay.Paginate[database_models.Link](r.DB, where, orderBy, pagingOptions)
+	})
 }
 
 // Link returns graph.LinkResolver implementation.
@@ -116,3 +128,13 @@ func (r *Resolver) Query() graph.QueryResolver { return &queryResolver{r} }
 type linkResolver struct{ *Resolver }
 type linkCrawlResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
+
+// !!! WARNING !!!
+// The code below was going to be deleted when updating resolvers. It has been copied here so you have
+// one last chance to move it out of harms way if you want. There are two reasons this happens:
+//   - When renaming or deleting a resolver the old code will be put in here. You can safely delete
+//     it when you're done.
+//   - You have helper methods in this file. Move them out to keep these resolver files clean.
+func (r *linkResolver) Platform(ctx context.Context, obj *database_models.Link) (*database_models.Platform, error) {
+	return r.ServiceContainer.PlatformService.GetPlatform(obj.PlatformID)
+}
