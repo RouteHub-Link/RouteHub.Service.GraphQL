@@ -1,4 +1,5 @@
 # RouteHUB GraphQL Backend Service
+![Design](https://github.com/RouteHub-Link/RouteHub.Service.GraphQL/assets/16222645/e747f0af-8e52-4309-9cf0-169f6c3cd750)
 
 ## About the Project
 
