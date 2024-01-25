@@ -54,6 +54,7 @@ input SocialMediaInput {
 
 
 extend type Query {
+  "Gets all of the organizations that is not production query must has super admin directive."
   organizations: [Organization!]! @auth
 }
 

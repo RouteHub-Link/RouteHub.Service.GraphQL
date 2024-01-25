@@ -34,7 +34,7 @@ func Serve() {
 	srv = loaders.Middleware(srv)
 
 	if applicationConfig.GraphQL.Playground {
-		http.Handle("/", playground.Handler("GraphQL playground", "/query"))
+		http.Handle("/", playground.ApolloSandboxHandler("GraphQL playground", "/query"))
 		log.Printf("GraphQL playground enabled Connect to http://localhost:%s/ for GraphQL playground", applicationConfig.GraphQL.PortAsString)
 	}
 

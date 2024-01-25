@@ -32,7 +32,15 @@ func (r *linkResolver) Domain(ctx context.Context, obj *database_models.Link) (*
 func (r *linkResolver) Analytics(ctx context.Context, obj *database_models.Link) ([]*model.MetricAnalytics, error) {
 	mock := []*model.MetricAnalytics{
 		{
-			Feeder:       "Facebook",
+			Feeder:       "Not Implemented (Mock)",
+			TotalHits:    300,
+			TotalSuccess: 123,
+			TotalFailed:  177,
+			StartAt:      time.Now().Add(-time.Hour * (24 * 3)),
+			EndAt:        time.Now(),
+		},
+		{
+			Feeder:       "Facebook (Mock)",
 			TotalHits:    100,
 			TotalSuccess: 50,
 			TotalFailed:  50,
@@ -40,11 +48,11 @@ func (r *linkResolver) Analytics(ctx context.Context, obj *database_models.Link)
 			EndAt:        time.Now(),
 		},
 		{
-			Feeder:       "X",
+			Feeder:       "X (Mock)",
 			TotalHits:    300,
 			TotalSuccess: 200,
 			TotalFailed:  100,
-			StartAt:      time.Now().Add(-time.Hour * (24 * 7)),
+			StartAt:      time.Now().Add(-time.Hour * (12 * 7)),
 			EndAt:        time.Now(),
 		}}
 	return mock, nil
@@ -106,6 +114,7 @@ func (r *mutationResolver) RequestCrawl(ctx context.Context, input model.CrawlRe
 func (r *queryResolver) Links(ctx context.Context, first *int, after *string, last *int, before *string, orderBy map[string]interface{}, where *model.LinkFilter) (*relay.Connection[database_models.Link], error) {
 	linkName := database_models.Link{}.TableName()
 
+	// If the cursor is "<uuid.UUID Value>" Check this link ; https://github.com/cloudmatelabs/gorm-gqlgen-relay/pull/2
 	return relay.Paginate[database_models.Link](r.DB, where, orderBy, relay.PaginateOption{
 		First:      first,
 		After:      after,
@@ -128,13 +137,3 @@ func (r *Resolver) Query() graph.QueryResolver { return &queryResolver{r} }
 type linkResolver struct{ *Resolver }
 type linkCrawlResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
-
-// !!! WARNING !!!
-// The code below was going to be deleted when updating resolvers. It has been copied here so you have
-// one last chance to move it out of harms way if you want. There are two reasons this happens:
-//   - When renaming or deleting a resolver the old code will be put in here. You can safely delete
-//     it when you're done.
-//   - You have helper methods in this file. Move them out to keep these resolver files clean.
-func (r *linkResolver) Platform(ctx context.Context, obj *database_models.Link) (*database_models.Platform, error) {
-	return r.ServiceContainer.PlatformService.GetPlatform(obj.PlatformID)
-}

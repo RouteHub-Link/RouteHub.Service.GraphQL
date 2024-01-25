@@ -11,7 +11,7 @@ database:
     provider: embed
 graphql:
   port: 8080
-  playground: false
+  playground: true
   dataloader:
     wait: 1ms
     cache: true

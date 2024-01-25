@@ -5,6 +5,15 @@
 This project is a B2B Link Shortener platform designed to empower businesses by providing a customizable and feature-rich solution for URL shortening.
 It offers a range of functionalities catering to the specific needs of organizations, allowing them to enhance brand visibility and control over their short links.
 
+## About Open Source
+
+This project showcases various examples of using GO & Gqlgen for GraphQL development.
+You can easily adapt this project for your own needs or contribute to its improvement.
+However, due to my current workload, I cannot implement all the features that I have planned for this project.
+I also have a SSR example of this project that has similar functionality to this one. The idea is to use this GraphQL backend with two different frontend projects: a Dashboard and a Client.
+The Dashboard allows you to create and manage hubs using this project, while the Client is deployed for each hub and provides analytics and template integration.
+Currently, I have a Dashboard and a Client, but they are SSR go applications. The main goal is to make new applications with uses this GraphQL backend.
+
 ## Key Features
 
 - **Custom Domains:** Users can add and manage custom domains for personalized shortening.
@@ -26,6 +35,42 @@ It offers a range of functionalities catering to the specific needs of organizat
 - **Link:** Customers can create, update and delete links. `O2O relation with Platform.`
 - **Crawl:** Links can be crawled.
 - **Permissions:** Customers can invite another person to their organization and assign them custom permissions.
+
+## Implemented
+
+- [x] **Auth:** Customers can login, register.
+- [x] **Organization:** Customers can create, update organizations. `M2M relation with users.`
+- [x] **User Invitation:** Customers can invite another person to their organization `M2M`.
+- [x] **User Invitation Acceptance:** Invited persons can accept or decline invitations.
+- [x] **Permissions;** Every platform and organization has special permissions. Querys and mutations are protected with directives.
+- [x] **Platform:** Customers can create, update their platforms.
+- [x] **Domain:** Every Platform must has a domain for deployment and link shortening with hub deployment process.
+- [x] **Link:** Customers can create shorlink's with custom SEO tags and OG images.
+- [x] **Crawl:** Links will be crawled automatically and if user want's to recrawl can create a crawl request and monitor process in link query. Crawling process is made with colly web scraping framework.
+- [x] **Data loaders:** Data loaders are implemented for users.
+- [x] **LRU Expirable Cache:** LRU Cache is implemented for data loaders.
+- [x] **Application Configuration:** Application configuration is implemented with yaml file.
+- [x] **Database Migration / Seeding / Multiple Provider:** Database migration and seeding is implemented with gorm and embeded postgre / postgresql or mysql database.
+- [x] **GraphQL Playground:** GraphQL playground is implemented for development and testing is also configurable.
+- [x] **GraphQL Directives:** GraphQL directives are implemented for authentication, domain url check, platform and organization permissions.
+- [x] **GraphQL Relay:** GraphQL Relay is implemented for pagination and filtering purposes. `Link Conncetion.`
+- [x] **Service Container:** Service container is implemented for accessing services in resolvers.
+- [x] **Data Access Layer:** Data access layer is implemented for accessing database models in services.
+- [x] **Data Loader Services;** Data loader services are implemented for accessing data loaders in services.
+- [x] **Custom Url Validation with Configuration:** Custom url validation is implemented with configuration at utils/url_validator.go.
+
+## Not Implemented
+
+- [ ] **Analytics:** Link analytics are not implemented.
+- [ ] **Deployments:** Platform Deployments are not implemented.
+- [ ] **Link Pinning;** Link pinning for home page of platform is not implemented.
+- [ ] **Queing:** Queing for crawling is not implemented.
+- [ ] **User Verification:** User verification is not implemented.
+- [ ] **Domain Ownership Verification:** Domain verification is not implemented.
+- [ ] **Platform Redirection Templates:** Platform redirection page html templates are not implemented.
+- [ ] **JWT RSA:** JWT RSA is not implemented.
+- [ ] **Super Admin:** Super admin is not implemented. Some querys is not protected with directives.
+- [ ] **File Upload:** File upload is not implemented for og image uploads.
 
 ## Configuration Guide
 
