@@ -10,39 +10,9 @@ import (
 	"github.com/knadh/koanf/v2"
 )
 
-type DatabaseConfig struct {
-	Host            string             `koanf:"host"`
-	Port            uint32             `koanf:"port"`
-	PortAsString    string             `koanf:"port"`
-	User            string             `koanf:"user"`
-	Password        string             `koanf:"password"`
-	Database        string             `koanf:"database"`
-	ApplicationName string             `koanf:"application_name"`
-	Type            DatabaseTypeConfig `koanf:"type"`
-	Seed            *Seed              `koanf:"seed"`
-}
-
-type Seed struct {
-	Admin        SeedAdmin        `koanf:"admin"`
-	Organization SeedOrganization `koanf:"organization"`
-	Domain       SeedDomain       `koanf:"domain"`
-}
-
-type SeedAdmin struct {
-	Email    string `koanf:"email"`
-	Password string `koanf:"password"`
-}
-
-type SeedOrganization struct {
-	Name        string `koanf:"name"`
-	Description string `koanf:"description"`
-	Url         string `koanf:"url"`
-}
-
-type SeedDomain struct {
-	Name        string `koanf:"name"`
-	Description string `koanf:"description"`
-	Url         string `koanf:"url"`
+type ApplicationConfig struct {
+	GraphQL  GraphqlConfig  `koanf:"graphql"`
+	Database DatabaseConfig `koanf:"database"`
 }
 
 type GraphqlConfig struct {
@@ -63,15 +33,21 @@ type LrueConfig struct {
 	Expire time.Duration `koanf:"expire"`
 }
 
+type DatabaseConfig struct {
+	Host            string             `koanf:"host"`
+	Port            uint32             `koanf:"port"`
+	PortAsString    string             `koanf:"port"`
+	User            string             `koanf:"user"`
+	Password        string             `koanf:"password"`
+	Database        string             `koanf:"database"`
+	ApplicationName string             `koanf:"application_name"`
+	Type            DatabaseTypeConfig `koanf:"type"`
+	Seed            *Seed              `koanf:"seed"`
+}
 type DatabaseTypeConfig struct {
 	Migrate  bool     `koanf:"migrate"`
 	Seed     bool     `koanf:"seed"`
 	Provider Provider `koanf:"provider"`
-}
-
-type ApplicationConfig struct {
-	Database DatabaseConfig `koanf:"database"`
-	GraphQL  GraphqlConfig  `koanf:"graphql"`
 }
 
 type ConfigurationService struct {
