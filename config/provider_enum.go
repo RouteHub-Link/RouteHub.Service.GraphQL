@@ -11,18 +11,16 @@ type Provider string
 const (
 	Postgres Provider = "postgres"
 	Embed    Provider = "embed"
-	Mysql    Provider = "mysql"
 )
 
 var AllProviders = []Provider{
 	Postgres,
 	Embed,
-	Mysql,
 }
 
 func (e Provider) IsValid() bool {
 	switch e {
-	case Postgres, Embed, Mysql:
+	case Postgres, Embed:
 		return true
 	}
 	return false

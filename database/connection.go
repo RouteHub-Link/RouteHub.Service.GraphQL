@@ -42,8 +42,6 @@ func connectionSelector() {
 		setupPostgres(gormConfig, config)
 	case configuration.Embed:
 		setupEmbeded(gormConfig, config)
-	case configuration.Mysql:
-		setupMysql(gormConfig, config)
 	default:
 		log.Fatal("Database provider not implemented")
 	}
@@ -79,15 +77,6 @@ func setupEmbeded(gormConfig *gorm.Config, config *configuration.ApplicationConf
 		postgres.Open("host=127.0.0.1 user=postgres password=1234 dbname=postgres port="+config.Database.PortAsString+" sslmode=disable TimeZone=UTC"),
 		gormConfig,
 	)
-	if err != nil {
-		log.Fatal(err)
-	}
-	DB = db
-}
-
-func setupMysql(gormConfig *gorm.Config, config *configuration.ApplicationConfig) {
-	dsn := config.Database.User + ":" + config.Database.Password + "@tcp(" + config.Database.Host + ":" + config.Database.PortAsString + ")/" + config.Database.Database + "?charset=utf8mb4&parseTime=True&loc=Local"
-	db, err := gorm.Open(postgres.Open(dsn), gormConfig)
 	if err != nil {
 		log.Fatal(err)
 	}
