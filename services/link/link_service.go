@@ -1,6 +1,7 @@
 package services_link
 
 import (
+	"github.com/RouteHub-Link/routehub-service-graphql/database"
 	database_enums "github.com/RouteHub-Link/routehub-service-graphql/database/enums"
 	database_models "github.com/RouteHub-Link/routehub-service-graphql/database/models"
 	"github.com/RouteHub-Link/routehub-service-graphql/graph/model"
@@ -35,22 +36,19 @@ func (ls LinkService) CreateLink(input model.LinkCreateInput, userId uuid.UUID) 
 	}
 
 	err = ls.DB.Create(&link).Error
-
-	linkCrawlerService := &LinkCrawlerService{DB: ls.DB, link: link, user: &database_models.User{ID: userId}}
-	linkCrawlerService.Crawl(true)
-
-	return
-}
-
-func (ls LinkService) RequestCrawl(linkId uuid.UUID, userId uuid.UUID) (link *database_models.Link, err error) {
-	link, err = ls.GetLinkById(linkId)
 	if err != nil {
 		return
 	}
 
-	linkCrawlerService := &LinkCrawlerService{DB: ls.DB, link: link, user: &database_models.User{ID: userId}}
-	err = linkCrawlerService.Crawl(true)
+	return
+}
 
+func (ls LinkService) SaveCrawlRequest(link *database_models.Link, userId uuid.UUID) (crawlId uuid.UUID, err error) {
+	crawl := &database_models.LinkCrawl{}
+	crawl.Requested(link, userId, nil)
+	err = database.DB.Create(crawl).Error
+
+	crawlId = crawl.ID
 	return
 }
 
@@ -72,5 +70,10 @@ func (ls LinkService) UpdateLinkStatus(link *database_models.Link, status databa
 
 func (ls LinkService) GetCrawls(linkId uuid.UUID) (crawls []*database_models.LinkCrawl, err error) {
 	err = ls.DB.Where("link_id = ?", linkId).Find(&crawls).Error
+	return
+}
+
+func (ls LinkService) GetCrawlById(id uuid.UUID) (crawl *database_models.LinkCrawl, err error) {
+	err = ls.DB.First(&crawl, id).Error
 	return
 }

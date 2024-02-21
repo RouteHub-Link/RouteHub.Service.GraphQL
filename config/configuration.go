@@ -13,6 +13,7 @@ import (
 type ApplicationConfig struct {
 	GraphQL  GraphqlConfig  `koanf:"graphql"`
 	Database DatabaseConfig `koanf:"database"`
+	Redis    RedisConfig    `koanf:"redis"`
 }
 
 type GraphqlConfig struct {
@@ -48,6 +49,10 @@ type DatabaseTypeConfig struct {
 	Migrate  bool     `koanf:"migrate"`
 	Seed     bool     `koanf:"seed"`
 	Provider Provider `koanf:"provider"`
+}
+
+type RedisConfig struct {
+	Addres string `koanf:"addr"`
 }
 
 type ConfigurationService struct {

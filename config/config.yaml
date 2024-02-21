@@ -21,6 +21,9 @@ database:
       name: RouteHub Public Shortener
       url: https://s.r4l.cc
 
+redis:
+  addr: 0.0.0.0:6379
+
 graphql:
   port: 8081
   playground: true
