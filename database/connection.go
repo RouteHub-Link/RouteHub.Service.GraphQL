@@ -27,6 +27,10 @@ func Init() {
 	}
 
 	if config.Database.Type.Seed {
+		if config.Database.Seed == nil {
+			log.Fatal("Seed data not found in config")
+		}
+
 		Seed()
 	}
 }

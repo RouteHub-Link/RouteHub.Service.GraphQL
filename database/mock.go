@@ -10,14 +10,16 @@ import (
 )
 
 func Seed() {
+	seedData := config.Database.Seed
+
 	var user_count int64
 	DB.Model(&database_models.User{}).Count(&user_count)
 
 	var user *database_models.User
 	var user2 *database_models.User
 	if user_count == 0 {
-		pass := "admin"
-		mail := "runaho@r4l.com"
+		pass := seedData.Admin.Password
+		mail := seedData.Admin.Email
 		hash, _ := bcrypt.GenerateFromPassword([]byte(pass), bcrypt.MinCost)
 		password := string(hash)
 
@@ -25,7 +27,7 @@ func Seed() {
 			ID:           uuid.MustParse("927bb153-ed0a-4686-b8d5-5f1ced408ae4"),
 			Email:        mail,
 			PasswordHash: password,
-			Fullname:     "Runaho",
+			Fullname:     "Admin",
 			Verified:     true,
 		}
 
@@ -48,10 +50,10 @@ func Seed() {
 	if organization_count == 0 {
 		organization = &database_models.Organization{
 			ID:          uuid.MustParse("4e3b2a19-603c-4537-889e-04e64b3a8168"),
-			Name:        "RouteHub",
-			Website:     "https://routehub.link",
-			Description: "RouteHub is a platform that connects Organizations and talents in the tech industry.",
-			Location:    "Jakarta, Indonesia",
+			Name:        seedData.Organization.Name,
+			Website:     seedData.Organization.Url,
+			Description: seedData.Organization.Description,
+			Location:    "Web",
 			Industry: []*database_types.Industry{
 				{Name: "Software Development"}, {Name: "Information Technology"},
 			},
@@ -94,9 +96,9 @@ func Seed() {
 	if domain_count == 0 {
 		domain = &database_models.Domain{
 			ID:             uuid.MustParse("71a61b35-b143-4ba3-9345-22f829eedfd5"),
-			Name:           "RouteHub Public Shortener",
+			Name:           seedData.Domain.Name,
 			OrganizationId: organization.ID,
-			URL:            "https://s.r4l.cc",
+			URL:            seedData.Domain.Url,
 			State:          database_enums.StatusStateActive,
 		}
 
@@ -134,7 +136,7 @@ func Seed() {
 
 		platform = &database_models.Platform{
 			ID:                uuid.MustParse("12058bdf-8940-43b3-bd90-13487e4c8fc4"),
-			Name:              "RouteHub Public Shortener",
+			Name:              "First Platform",
 			DomainId:          domain.ID,
 			RedirectionChoice: database_enums.RedirectionOptionsTimed,
 			OpenGraph:         og,
