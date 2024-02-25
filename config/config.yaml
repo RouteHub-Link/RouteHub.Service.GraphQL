@@ -9,8 +9,23 @@ database:
     migrate: true
     seed: true
     provider: embed
+  seed:
+    admin:
+      email: admin@r4l.com
+      password: admin
+    organization:
+      name: RouteHub
+      description: RouteHub is a GraphQL API for managing routes
+      url: https://www.routehub.link
+    domain:
+      name: RouteHub Public Shortener
+      url: https://s.r4l.cc
+
+redis:
+  addr: 0.0.0.0:6379
+
 graphql:
-  port: 8080
+  port: 8081
   playground: true
   dataloader:
     wait: 1ms

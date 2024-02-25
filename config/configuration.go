@@ -10,15 +10,10 @@ import (
 	"github.com/knadh/koanf/v2"
 )
 
-type DatabaseConfig struct {
-	Host            string             `koanf:"host"`
-	Port            uint32             `koanf:"port"`
-	PortAsString    string             `koanf:"port"`
-	User            string             `koanf:"user"`
-	Password        string             `koanf:"password"`
-	Database        string             `koanf:"database"`
-	ApplicationName string             `koanf:"application_name"`
-	Type            DatabaseTypeConfig `koanf:"type"`
+type ApplicationConfig struct {
+	GraphQL  GraphqlConfig  `koanf:"graphql"`
+	Database DatabaseConfig `koanf:"database"`
+	Redis    RedisConfig    `koanf:"redis"`
 }
 
 type GraphqlConfig struct {
@@ -39,15 +34,25 @@ type LrueConfig struct {
 	Expire time.Duration `koanf:"expire"`
 }
 
+type DatabaseConfig struct {
+	Host            string             `koanf:"host"`
+	Port            uint32             `koanf:"port"`
+	PortAsString    string             `koanf:"port"`
+	User            string             `koanf:"user"`
+	Password        string             `koanf:"password"`
+	Database        string             `koanf:"database"`
+	ApplicationName string             `koanf:"application_name"`
+	Type            DatabaseTypeConfig `koanf:"type"`
+	Seed            *Seed              `koanf:"seed"`
+}
 type DatabaseTypeConfig struct {
 	Migrate  bool     `koanf:"migrate"`
 	Seed     bool     `koanf:"seed"`
 	Provider Provider `koanf:"provider"`
 }
 
-type ApplicationConfig struct {
-	Database DatabaseConfig `koanf:"database"`
-	GraphQL  GraphqlConfig  `koanf:"graphql"`
+type RedisConfig struct {
+	Addres string `koanf:"addr"`
 }
 
 type ConfigurationService struct {

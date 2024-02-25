@@ -14,6 +14,7 @@ import (
 	database_types "github.com/RouteHub-Link/routehub-service-graphql/database/types"
 	"github.com/RouteHub-Link/routehub-service-graphql/graph"
 	"github.com/RouteHub-Link/routehub-service-graphql/graph/model"
+	"github.com/RouteHub-Link/routehub-service-graphql/worker"
 	"github.com/cloudmatelabs/gorm-gqlgen-relay/relay"
 	"github.com/vektah/gqlparser/gqlerror"
 )
@@ -90,7 +91,22 @@ func (r *mutationResolver) CreateLink(ctx context.Context, input model.LinkCreat
 		return nil, gqlerror.Errorf("Access Denied")
 	}
 
-	return r.ServiceContainer.LinkService.CreateLink(input, userSession.ID)
+	link, err := r.ServiceContainer.LinkService.CreateLink(input, userSession.ID)
+	if err != nil {
+		return nil, gqlerror.Errorf("Process Failed %s", err.Error())
+	}
+
+	crawlId, err := r.ServiceContainer.LinkService.SaveCrawlRequest(link, userSession.ID)
+	if err != nil {
+		return nil, gqlerror.Errorf("Process Failed %s", err.Error())
+	}
+
+	_, e := r.ServiceContainer.WorkerService.NewCrawlURL(worker.CrawlURLPayload{LinkId: link.ID, CrawlId: crawlId, LinkUrl: link.Target})
+	if e != nil {
+		return nil, gqlerror.Errorf("Process Failed %s", e.Error())
+	}
+
+	return link, nil
 }
 
 // RequestCrawl is the resolver for the requestCrawl field.
@@ -100,9 +116,19 @@ func (r *mutationResolver) RequestCrawl(ctx context.Context, input model.CrawlRe
 		return nil, gqlerror.Errorf("Access Denied")
 	}
 
-	link, err := r.ServiceContainer.LinkService.RequestCrawl(input.LinkID, userSession.ID)
+	link, err := r.ServiceContainer.LinkService.GetLinkById(input.LinkID)
 	if err != nil {
 		return nil, gqlerror.Errorf("Process Failed %s", err.Error())
+	}
+
+	crawlId, err := r.ServiceContainer.LinkService.SaveCrawlRequest(link, userSession.ID)
+	if err != nil {
+		return nil, gqlerror.Errorf("Process Failed %s", err.Error())
+	}
+
+	_, e := r.ServiceContainer.WorkerService.NewCrawlURL(worker.CrawlURLPayload{LinkId: input.LinkID, CrawlId: crawlId, LinkUrl: link.Target})
+	if e != nil {
+		return nil, gqlerror.Errorf("Process Failed %s", e.Error())
 	}
 
 	crawls, err := r.ServiceContainer.LinkService.GetCrawls(link.ID)
