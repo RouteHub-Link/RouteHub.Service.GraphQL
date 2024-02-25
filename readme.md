@@ -58,13 +58,13 @@ Currently, I have a Dashboard and a Client, but they are SSR go applications. Th
 - [x] **Data Access Layer:** Data access layer is implemented for accessing database models in services.
 - [x] **Data Loader Services;** Data loader services are implemented for accessing data loaders in services.
 - [x] **Custom Url Validation with Configuration:** Custom url validation is implemented with configuration at utils/url_validator.go.
+- [x] **Queing:** Queing for crawling is not implemented.
 
 ## Not Implemented
 
 - [ ] **Analytics:** Link analytics are not implemented.
 - [ ] **Deployments:** Platform Deployments are not implemented.
 - [ ] **Link Pinning;** Link pinning for home page of platform is not implemented.
-- [ ] **Queing:** Queing for crawling is not implemented.
 - [ ] **User Verification:** User verification is not implemented.
 - [ ] **Domain Ownership Verification:** Domain verification is not implemented.
 - [ ] **Platform Redirection Templates:** Platform redirection page html templates are not implemented.
@@ -74,7 +74,13 @@ Currently, I have a Dashboard and a Client, but they are SSR go applications. Th
 
 ## Configuration Guide
 
-This guide provides an overview of the settings in the `config/config.yaml` file.
+### Environment Configuration
+
+- This app uses the `config/config.yaml` file for configuration. You can adjust the settings in this file according to your environment.
+- Requires a Redis server for [https://github.com/hibiken/asynq](asynq).
+- Requires a PostgreSQL server for database operations and migrations.
+- For local development, you can use the embedded PostgreSQL option. This will start an embedded PostgreSQL server for you.
+- (Optional) Makefile is implemented for redis, postgresql container creation and serving the service.
 
 ### Database Configuration
 
@@ -88,6 +94,10 @@ This guide provides an overview of the settings in the `config/config.yaml` file
   - `migrate`: If set to true, the database schema will be migrated upon application startup.
   - `seed`: If set to true, the database will be seeded with initial data upon application startup.
   - `provider`: The database provider. Set this to `embed` for an embedded database.
+- `seed`: Configuration for database seeding.
+  - `admin`: Admin User data
+  - `organization`: Default Organization data
+  - `domain`: Default Domain data
 
 ### GraphQL Configuration
 
@@ -99,6 +109,10 @@ This guide provides an overview of the settings in the `config/config.yaml` file
   - `lrue`: Configuration for the Least Recently Used (LRU) cache. (Does not related to wait)
     - `size`: The maximum number of items that can be stored in the cache.
     - `expire`: The duration after which an item in the cache will expire.
+
+### Queue Configuration
+
+ - `redis`: Configuration for the asynq.
 
 Please adjust these settings according to your needs and environment.
 
