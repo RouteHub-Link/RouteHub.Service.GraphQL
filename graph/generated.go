@@ -188,16 +188,18 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
-		CreateDomain         func(childComplexity int, input model.DomainCreateInput) int
-		CreateLink           func(childComplexity int, input model.LinkCreateInput) int
-		CreateOrganization   func(childComplexity int, input model.OrganizationCreateInput) int
-		CreatePlatform       func(childComplexity int, input graph_inputs.PlatformCreateInput) int
-		CreateUser           func(childComplexity int, input model.UserCreateInput) int
-		InviteUser           func(childComplexity int, input graph_inputs.UserInviteInput) int
-		LoginUser            func(childComplexity int, input model.LoginInput) int
-		RequestCrawl         func(childComplexity int, input model.CrawlRequestInput) int
-		UpdateOrganization   func(childComplexity int, input model.OrganizationUpdateInput) int
-		UpdateUserInvitation func(childComplexity int, input model.UpdateUserInviteInput) int
+		AddToPinnedLinks      func(childComplexity int, input model.PinnedLinkInput) int
+		CreateDomain          func(childComplexity int, input model.DomainCreateInput) int
+		CreateLink            func(childComplexity int, input model.LinkCreateInput) int
+		CreateOrganization    func(childComplexity int, input model.OrganizationCreateInput) int
+		CreatePlatform        func(childComplexity int, input graph_inputs.PlatformCreateInput) int
+		CreateUser            func(childComplexity int, input model.UserCreateInput) int
+		InviteUser            func(childComplexity int, input graph_inputs.UserInviteInput) int
+		LoginUser             func(childComplexity int, input model.LoginInput) int
+		RemoveFromPinnedLinks func(childComplexity int, input model.PinnedLinkInput) int
+		RequestCrawl          func(childComplexity int, input model.CrawlRequestInput) int
+		UpdateOrganization    func(childComplexity int, input model.OrganizationUpdateInput) int
+		UpdateUserInvitation  func(childComplexity int, input model.UpdateUserInviteInput) int
 	}
 
 	ObservationAnalytic struct {
@@ -384,6 +386,8 @@ type MutationResolver interface {
 	CreateDomain(ctx context.Context, input model.DomainCreateInput) (*database_models.Domain, error)
 	CreateLink(ctx context.Context, input model.LinkCreateInput) (*database_models.Link, error)
 	RequestCrawl(ctx context.Context, input model.CrawlRequestInput) (*database_models.LinkCrawl, error)
+	AddToPinnedLinks(ctx context.Context, input model.PinnedLinkInput) (*database_models.Link, error)
+	RemoveFromPinnedLinks(ctx context.Context, input model.PinnedLinkInput) (*database_models.Link, error)
 	CreateOrganization(ctx context.Context, input model.OrganizationCreateInput) (*database_models.Organization, error)
 	UpdateOrganization(ctx context.Context, input model.OrganizationUpdateInput) (*database_models.Organization, error)
 	CreatePlatform(ctx context.Context, input graph_inputs.PlatformCreateInput) (*database_models.Platform, error)
@@ -1015,6 +1019,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.MetricAnalytics.TotalSuccess(childComplexity), true
 
+	case "Mutation.addToPinnedLinks":
+		if e.complexity.Mutation.AddToPinnedLinks == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_addToPinnedLinks_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.AddToPinnedLinks(childComplexity, args["input"].(model.PinnedLinkInput)), true
+
 	case "Mutation.createDomain":
 		if e.complexity.Mutation.CreateDomain == nil {
 			break
@@ -1098,6 +1114,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.LoginUser(childComplexity, args["input"].(model.LoginInput)), true
+
+	case "Mutation.removeFromPinnedLinks":
+		if e.complexity.Mutation.RemoveFromPinnedLinks == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_removeFromPinnedLinks_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.RemoveFromPinnedLinks(childComplexity, args["input"].(model.PinnedLinkInput)), true
 
 	case "Mutation.requestCrawl":
 		if e.complexity.Mutation.RequestCrawl == nil {
@@ -1983,6 +2011,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputUpdateUserInviteInput,
 		ec.unmarshalInputUserCreateInput,
 		ec.unmarshalInputUserInviteInput,
+		ec.unmarshalInputpinnedLinkInput,
 	)
 	first := true
 
@@ -2137,6 +2166,21 @@ func (ec *executionContext) dir_platformPermission_args(ctx context.Context, raw
 	return args, nil
 }
 
+func (ec *executionContext) field_Mutation_addToPinnedLinks_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.PinnedLinkInput
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalNpinnedLinkInput2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐPinnedLinkInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Mutation_createDomain_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -2234,6 +2278,21 @@ func (ec *executionContext) field_Mutation_loginUser_args(ctx context.Context, r
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
 		arg0, err = ec.unmarshalNLoginInput2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐLoginInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_removeFromPinnedLinks_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.PinnedLinkInput
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalNpinnedLinkInput2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐPinnedLinkInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -6800,6 +6859,216 @@ func (ec *executionContext) fieldContext_Mutation_requestCrawl(ctx context.Conte
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_requestCrawl_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_addToPinnedLinks(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_addToPinnedLinks(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Mutation().AddToPinnedLinks(rctx, fc.Args["input"].(model.PinnedLinkInput))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Auth == nil {
+				return nil, errors.New("directive auth is not implemented")
+			}
+			return ec.directives.Auth(ctx, nil, directive0)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*database_models.Link); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/RouteHub-Link/routehub-service-graphql/database/models.Link`, tmp)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*database_models.Link)
+	fc.Result = res
+	return ec.marshalNLink2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋmodelsᚐLink(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_addToPinnedLinks(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Link_id(ctx, field)
+			case "target":
+				return ec.fieldContext_Link_target(ctx, field)
+			case "path":
+				return ec.fieldContext_Link_path(ctx, field)
+			case "creator":
+				return ec.fieldContext_Link_creator(ctx, field)
+			case "platform":
+				return ec.fieldContext_Link_platform(ctx, field)
+			case "domain":
+				return ec.fieldContext_Link_domain(ctx, field)
+			case "analytics":
+				return ec.fieldContext_Link_analytics(ctx, field)
+			case "openGraph":
+				return ec.fieldContext_Link_openGraph(ctx, field)
+			case "redirectionOptions":
+				return ec.fieldContext_Link_redirectionOptions(ctx, field)
+			case "state":
+				return ec.fieldContext_Link_state(ctx, field)
+			case "crawls":
+				return ec.fieldContext_Link_crawls(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Link_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Link_updatedAt(ctx, field)
+			case "deletedAt":
+				return ec.fieldContext_Link_deletedAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Link", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_addToPinnedLinks_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_removeFromPinnedLinks(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_removeFromPinnedLinks(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Mutation().RemoveFromPinnedLinks(rctx, fc.Args["input"].(model.PinnedLinkInput))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Auth == nil {
+				return nil, errors.New("directive auth is not implemented")
+			}
+			return ec.directives.Auth(ctx, nil, directive0)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*database_models.Link); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/RouteHub-Link/routehub-service-graphql/database/models.Link`, tmp)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*database_models.Link)
+	fc.Result = res
+	return ec.marshalNLink2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋmodelsᚐLink(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_removeFromPinnedLinks(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Link_id(ctx, field)
+			case "target":
+				return ec.fieldContext_Link_target(ctx, field)
+			case "path":
+				return ec.fieldContext_Link_path(ctx, field)
+			case "creator":
+				return ec.fieldContext_Link_creator(ctx, field)
+			case "platform":
+				return ec.fieldContext_Link_platform(ctx, field)
+			case "domain":
+				return ec.fieldContext_Link_domain(ctx, field)
+			case "analytics":
+				return ec.fieldContext_Link_analytics(ctx, field)
+			case "openGraph":
+				return ec.fieldContext_Link_openGraph(ctx, field)
+			case "redirectionOptions":
+				return ec.fieldContext_Link_redirectionOptions(ctx, field)
+			case "state":
+				return ec.fieldContext_Link_state(ctx, field)
+			case "crawls":
+				return ec.fieldContext_Link_crawls(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Link_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Link_updatedAt(ctx, field)
+			case "deletedAt":
+				return ec.fieldContext_Link_deletedAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Link", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_removeFromPinnedLinks_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -17467,6 +17736,52 @@ func (ec *executionContext) unmarshalInputUserInviteInput(ctx context.Context, o
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputpinnedLinkInput(ctx context.Context, obj interface{}) (model.PinnedLinkInput, error) {
+	var it model.PinnedLinkInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"linkId"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "linkId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("linkId"))
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalNUUID2githubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				permission, err := ec.unmarshalNPlatformPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐPlatformPermission(ctx, "PLATFORM_UPDATE")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.PlatformPermission == nil {
+					return nil, errors.New("directive platformPermission is not implemented")
+				}
+				return ec.directives.PlatformPermission(ctx, obj, directive0, permission)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(uuid.UUID); ok {
+				it.LinkID = data
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be github.com/google/uuid.UUID`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		}
+	}
+
+	return it, nil
+}
+
 // endregion **************************** input.gotpl *****************************
 
 // region    ************************** interface.gotpl ***************************
@@ -18752,6 +19067,20 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		case "requestCrawl":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_requestCrawl(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "addToPinnedLinks":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_addToPinnedLinks(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "removeFromPinnedLinks":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_removeFromPinnedLinks(ctx, field)
 			})
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
@@ -22523,6 +22852,11 @@ func (ec *executionContext) marshalN__TypeKind2string(ctx context.Context, sel a
 		}
 	}
 	return res
+}
+
+func (ec *executionContext) unmarshalNpinnedLinkInput2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐPinnedLinkInput(ctx context.Context, v interface{}) (model.PinnedLinkInput, error) {
+	res, err := ec.unmarshalInputpinnedLinkInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) marshalOAnalyticReport2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐAnalyticReport(ctx context.Context, sel ast.SelectionSet, v *model.AnalyticReport) graphql.Marshaler {

@@ -15,6 +15,7 @@ type Platform struct {
 	CreatedBy         uuid.UUID                         `gorm:"type:uuid;not null;"`
 	DomainId          uuid.UUID                         `gorm:"type:uuid;not null;field:domain_id"`
 	OpenGraph         *database_types.OpenGraph         `json:"openGraph" gorm:"serializer:json"`
+	PinnedLinks       *[]database_types.PinnedLink      `json:"pinnedLinks" gorm:"serializer:json"`
 	RedirectionChoice database_enums.RedirectionOptions `json:"redirectionChoice" gorm:"serializer:json"`
 	Status            database_enums.StatusState        `json:"status" gorm:"serializer:json"`
 
@@ -25,6 +26,19 @@ type Platform struct {
 
 func (Platform) TableName() string {
 	return "platforms"
+}
+
+func (p *Platform) GetPinnedLinksAsIds() []uuid.UUID {
+	ids := make([]uuid.UUID, 0)
+	if p.PinnedLinks == nil {
+		return ids
+	}
+
+	for _, pinnedLink := range *p.PinnedLinks {
+		ids = append(ids, pinnedLink.LinkID)
+	}
+
+	return ids
 }
 
 /*

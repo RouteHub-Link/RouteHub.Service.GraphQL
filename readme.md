@@ -59,12 +59,12 @@ Currently, I have a Dashboard and a Client, but they are SSR go applications. Th
 - [x] **Data Loader Services;** Data loader services are implemented for accessing data loaders in services.
 - [x] **Custom Url Validation with Configuration:** Custom url validation is implemented with configuration at utils/url_validator.go.
 - [x] **Queing:** Queing for crawling is not implemented.
+- [x] **Link Pinning;** Link pinning for home page of platform is not implemented.
 
 ## Not Implemented
 
 - [ ] **Analytics:** Link analytics are not implemented.
 - [ ] **Deployments:** Platform Deployments are not implemented.
-- [ ] **Link Pinning;** Link pinning for home page of platform is not implemented.
 - [ ] **User Verification:** User verification is not implemented.
 - [ ] **Domain Ownership Verification:** Domain verification is not implemented.
 - [ ] **Platform Redirection Templates:** Platform redirection page html templates are not implemented.
@@ -112,7 +112,7 @@ Currently, I have a Dashboard and a Client, but they are SSR go applications. Th
 
 ### Queue Configuration
 
- - `redis`: Configuration for the asynq.
+- `redis`: Configuration for the asynq.
 
 Please adjust these settings according to your needs and environment.
 

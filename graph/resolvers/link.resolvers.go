@@ -136,6 +136,37 @@ func (r *mutationResolver) RequestCrawl(ctx context.Context, input model.CrawlRe
 	return crawls[len(crawls)-1], err
 }
 
+// AddToPinnedLinks is the resolver for the addToPinnedLinks field.
+func (r *mutationResolver) AddToPinnedLinks(ctx context.Context, input model.PinnedLinkInput) (*database_models.Link, error) {
+	link, err := r.ServiceContainer.LinkService.GetLinkById(input.LinkID)
+	if err != nil {
+		return nil, gqlerror.Errorf("Process Failed %s", err.Error())
+	}
+
+	userSession := auth.ForContext(ctx)
+	err = r.ServiceContainer.LinkService.AddToPinnedLinks(link.PlatformID, link.ID, userSession.ID)
+	if err != nil {
+		return nil, gqlerror.Errorf("Process Failed %s", err.Error())
+	}
+
+	return link, nil
+}
+
+// RemoveFromPinnedLinks is the resolver for the removeFromPinnedLinks field.
+func (r *mutationResolver) RemoveFromPinnedLinks(ctx context.Context, input model.PinnedLinkInput) (*database_models.Link, error) {
+	link, err := r.ServiceContainer.LinkService.GetLinkById(input.LinkID)
+	if err != nil {
+		return nil, gqlerror.Errorf("Process Failed %s", err.Error())
+	}
+
+	err = r.ServiceContainer.LinkService.RemoveFromPinnedLinks(link.PlatformID, link.ID)
+	if err != nil {
+		return nil, gqlerror.Errorf("Process Failed %s", err.Error())
+	}
+
+	return link, nil
+}
+
 // Links is the resolver for the links field.
 func (r *queryResolver) Links(ctx context.Context, first *int, after *string, last *int, before *string, orderBy map[string]interface{}, where *model.LinkFilter) (*relay.Connection[database_models.Link], error) {
 	linkName := database_models.Link{}.TableName()

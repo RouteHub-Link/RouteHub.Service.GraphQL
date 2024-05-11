@@ -331,6 +331,10 @@ type UserCreateInput struct {
 	Organization      *OrganizationCreateInput `json:"organization,omitempty"`
 }
 
+type PinnedLinkInput struct {
+	LinkID uuid.UUID `json:"linkId"`
+}
+
 type DeploymentStatus string
 
 const (

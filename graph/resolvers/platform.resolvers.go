@@ -70,7 +70,9 @@ func (r *platformResolver) Templates(ctx context.Context, obj *database_models.P
 
 // PinnedLinks is the resolver for the pinnedLinks field.
 func (r *platformResolver) PinnedLinks(ctx context.Context, obj *database_models.Platform) ([]*database_models.Link, error) {
-	panic(fmt.Errorf("not implemented: PinnedLinks - pinnedLinks"))
+	pinnedLinks := obj.GetPinnedLinksAsIds()
+
+	return r.ServiceContainer.LinkService.GetLinksByIds(pinnedLinks)
 }
 
 // Platforms is the resolver for the platforms field.
