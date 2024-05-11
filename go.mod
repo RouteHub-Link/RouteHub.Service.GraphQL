@@ -1,6 +1,6 @@
 module github.com/RouteHub-Link/routehub-service-graphql
 
-go 1.20
+go 1.22.1
 
 require (
 	github.com/99designs/gqlgen v0.17.41
@@ -12,6 +12,7 @@ require (
 	github.com/graph-gophers/dataloader/v7 v7.1.0
 	github.com/hashicorp/golang-lru v1.0.2
 	github.com/hashicorp/golang-lru/v2 v2.0.7
+	github.com/hibiken/asynq v0.24.1
 	github.com/knadh/koanf/parsers/yaml v0.1.0
 	github.com/knadh/koanf/providers/file v0.1.0
 	github.com/knadh/koanf/v2 v2.0.1
@@ -38,7 +39,6 @@ require (
 	github.com/golang/groupcache v0.0.0-20200121045136-8c9f03a8e57e // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/gorilla/websocket v1.5.0 // indirect
-	github.com/hibiken/asynq v0.24.1 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20221227161230-091c0ba34f0a // indirect
 	github.com/jackc/pgx/v5 v5.4.3 // indirect
@@ -46,7 +46,6 @@ require (
 	github.com/jinzhu/now v1.1.5 // indirect
 	github.com/kennygrant/sanitize v1.2.4 // indirect
 	github.com/knadh/koanf/maps v0.1.1 // indirect
-	github.com/kr/text v0.2.0 // indirect
 	github.com/lib/pq v1.10.4 // indirect
 	github.com/mitchellh/copystructure v1.2.0 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
