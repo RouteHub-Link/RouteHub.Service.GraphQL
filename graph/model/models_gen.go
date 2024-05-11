@@ -175,6 +175,9 @@ type MetricAnalytics struct {
 	EndAt        time.Time `json:"endAt"`
 }
 
+type Mutation struct {
+}
+
 type ObservationAnalytic struct {
 	ID                uuid.UUID                         `json:"id"`
 	Link              *database_models.Link             `json:"link"`
@@ -239,6 +242,9 @@ type PlatformDeployment struct {
 	CreatedAt time.Time                 `json:"createdAt"`
 	UpdatedAt *time.Time                `json:"updatedAt,omitempty"`
 	DeletedAt *time.Time                `json:"deletedAt,omitempty"`
+}
+
+type Query struct {
 }
 
 type SocialMediaInput struct {
