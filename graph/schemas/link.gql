@@ -118,6 +118,10 @@ input OpenGraphXInput {
   creator: String!
 }
 
+input pinnedLinkInput @platformPermission(permission: PLATFORM_UPDATE){
+  linkId: UUID!
+}
+
 
 extend type Query{
   "Returns the link connection with sorting and filtering options."
@@ -136,4 +140,7 @@ extend type Mutation {
   createLink(input: LinkCreateInput!): Link! @auth
   "This mutation is used for requesting a crawl for a link. Link crawling status can be checked in link query with crawls field."
   requestCrawl(input: CrawlRequestInput!): LinkCrawl! @auth
+
+  addToPinnedLinks(input: pinnedLinkInput!): Link! @auth
+  removeFromPinnedLinks(input: pinnedLinkInput!): Link! @auth
 }
