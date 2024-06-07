@@ -11,6 +11,7 @@ import (
 type LinkCrawl struct {
 	ID          uuid.UUID                  `json:"id"`
 	LinkId      uuid.UUID                  `json:"link" gorm:"type:uuid;not null;field:link_id"`
+	TaskId      uuid.UUID                  `json:"task,omitempty" gorm:"type:uuid;"`
 	Target      string                     `json:"target,omitempty" gorm:"not null;"`
 	CrawlStatus database_enums.CrawlStatus `json:"crawlStatus,omitempty" gorm:"serializer:json;not null;field:crawl_status"`
 	Logs        []*database_types.Log      `json:"logs,omitempty" gorm:"serializer:json;not null;"`

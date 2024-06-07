@@ -17,6 +17,7 @@ type Link struct {
 	OpenGraph         *database_types.OpenGraph         `json:"open_graph" gorm:"serializer:json;field:open_graph"`
 	RedirectionChoice database_enums.RedirectionOptions `json:"redirectionChoice" gorm:"serializer:json"`
 	State             database_enums.StatusState        `json:"State" gorm:"serializer:json"`
+	ValidationTaskID  uuid.UUID                         `gorm:"type:uuid;field:validation_task_id"`
 
 	CreatedBy uuid.UUID  `gorm:"type:uuid;not null;"`
 	CreatedAt time.Time  `gorm:"autoCreateTime"`

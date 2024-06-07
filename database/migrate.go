@@ -18,5 +18,6 @@ func Migrate(db *gorm.DB) {
 		&database_models.Platform{},
 		&database_models.Link{},
 		&database_models.LinkCrawl{},
+		&database_models.LinkValidation{},
 	)
 }

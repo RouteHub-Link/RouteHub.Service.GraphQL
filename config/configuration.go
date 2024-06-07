@@ -14,6 +14,7 @@ type ApplicationConfig struct {
 	GraphQL  GraphqlConfig  `koanf:"graphql"`
 	Database DatabaseConfig `koanf:"database"`
 	Redis    RedisConfig    `koanf:"redis"`
+	Services ServicesConfig `koanf:"services"`
 }
 
 type GraphqlConfig struct {
@@ -53,6 +54,10 @@ type DatabaseTypeConfig struct {
 
 type RedisConfig struct {
 	Addres string `koanf:"addr"`
+}
+
+type ServicesConfig struct {
+	DomainUtilsHost string `koanf:"domain_utils_host"`
 }
 
 type ConfigurationService struct {
