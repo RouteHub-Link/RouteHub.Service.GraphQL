@@ -14,7 +14,7 @@ However, due to my current workload, I cannot implement all the features that I 
 
 I also have a SSR example of this project that has similar functionality to this one. The idea is to use this GraphQL backend with two different frontend projects: a Dashboard and a Client.
 The Dashboard allows you to create and manage hubs using this project, while the Client is deployed for each hub and provides analytics and template integration.
-Currently, I have a Dashboard and a Client, but they are SSR go applications. 
+Currently, I have a Dashboard and a Client, but they are SSR go applications.
 
 The main goal is to make new applications with uses this GraphQL backend.
 
@@ -50,7 +50,7 @@ The main goal is to make new applications with uses this GraphQL backend.
 - [x] **Platform:** Customers can create, update their platforms.
 - [x] **Domain:** Every Platform must has a domain for deployment and link shortening with hub deployment process.
 - [x] **Link:** Customers can create shortlink's with custom SEO tags and OG images.
-- [x] **Crawl:** Links will be crawled automatically and if user want's to recrawl can create a crawl request and monitor process in link query. Crawling process is made with colly web scraping framework.
+- [x] **Crawl:** Links will be crawled by the crawl request and if user want's to recrawl can create a crawl request and monitor process in link query. Crawling process is made with colly web scraping framework. link must be validated before crawling.
 - [x] **Data loaders:** Data loaders are implemented for users.
 - [x] **LRU Expirable Cache:** LRU Cache is implemented for data loaders.
 - [x] **Application Configuration:** Application configuration is implemented with yaml file.
@@ -61,16 +61,17 @@ The main goal is to make new applications with uses this GraphQL backend.
 - [x] **Service Container:** Service container is implemented for accessing services in resolvers.
 - [x] **Data Access Layer:** Data access layer is implemented for accessing database models in services.
 - [x] **Data Loader Services;** Data loader services are implemented for accessing data loaders in services.
-- [x] **Custom Url Validation with Configuration:** Custom url validation is implemented with configuration at utils/url_validator.go.
-- [x] **Queing:** Queing for crawling is not implemented.
+- [x] **Custom Url Validation with Configuration:** For url validation we created a custom validation package with custimizable configuration. (RouteHub-Link/DomainUtils/validator)[https://pkg.go.dev/github.com/RouteHub-Link/DomainUtils/validator]
+- [x] **Crawler Queing:** Queing for crawling is not implemented. not needed for now. we have a queue for validation and that's enough for now.
+- [x] **Validation Queue:** Validation queue is implemented for validating links. You can monitor it with asynqmon also validation process immediately starts after link creation. (DomainUtils Usage Serving Modes)[https://github.com/RouteHub-Link/DomainUtils?tab=readme-ov-file#usage]
 - [x] **Link Pinning;** Link pinning for home page of platform is not implemented.
 
 ## Not Implemented
 
+- [ ] **Domain Ownership Verification:** Domain verification is not implemented.
+- [ ] **User Verification:** User verification is not implemented.
 - [ ] **Analytics:** Link analytics are not implemented.
 - [ ] **Deployments:** Platform Deployments are not implemented.
-- [ ] **User Verification:** User verification is not implemented.
-- [ ] **Domain Ownership Verification:** Domain verification is not implemented.
 - [ ] **Platform Redirection Templates:** Platform redirection page html templates are not implemented.
 - [ ] **JWT RSA:** JWT RSA is not implemented.
 - [ ] **Super Admin:** Super admin is not implemented. Some querys is not protected with directives.
@@ -81,13 +82,15 @@ The main goal is to make new applications with uses this GraphQL backend.
 ### Environment Configuration
 
 - This app uses the `config/config.yaml` file for configuration. You can adjust the settings in this file according to your environment.
-- Requires a Redis server for [https://github.com/hibiken/asynq](asynq).
+- Requires a Domain Utils Server aka : [Routehub Link Domain Utils](https://github.com/RouteHub-Link/DomainUtils). You can use the provided docker-compose file for local development.
 - Requires a PostgreSQL server for database operations and migrations.
 - For local development, you can use the embedded PostgreSQL option. This will start an embedded PostgreSQL server for you.
 - (Optional) Makefile is implemented for redis, postgresql container creation and serving the service.
 
 ### Database Configuration
 
+- `services`:
+    - `domain_utils_host`: http://localhost:9001 The domain utils server host.
 - `host`: The hostname of your database server.
 - `port`: The port number on which your database server is listening.
 - `user`: The username for your database.
@@ -113,12 +116,6 @@ The main goal is to make new applications with uses this GraphQL backend.
   - `lrue`: Configuration for the Least Recently Used (LRU) cache. (Does not related to wait)
     - `size`: The maximum number of items that can be stored in the cache.
     - `expire`: The duration after which an item in the cache will expire.
-
-### Queue Configuration
-
-- `redis`: Configuration for the asynq.
-
-Please adjust these settings according to your needs and environment.
 
 ## Project Structure
 

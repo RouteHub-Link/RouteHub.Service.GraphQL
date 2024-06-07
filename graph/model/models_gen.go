@@ -120,7 +120,7 @@ type LinkCreateInput struct {
 	Path               *string                            `json:"path,omitempty"`
 	PlatformID         uuid.UUID                          `json:"platformId"`
 	RedirectionOptions *database_enums.RedirectionOptions `json:"redirectionOptions,omitempty"`
-	OpenGraph          *database_types.OpenGraph          `json:"openGraph"`
+	OpenGraph          *database_types.OpenGraph          `json:"openGraph,omitempty"`
 }
 
 type LinkFilter struct {

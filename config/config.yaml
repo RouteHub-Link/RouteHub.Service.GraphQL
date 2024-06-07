@@ -1,3 +1,6 @@
+services:
+  domain_utils_host: http://localhost:9001
+
 database:
   host: route-hub
   port: 26257

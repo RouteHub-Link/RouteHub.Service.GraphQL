@@ -6,16 +6,21 @@ package graph
 
 import (
 	"context"
+	"fmt"
+	"log"
 	"time"
 
+	"github.com/RouteHub-Link/DomainUtils/validator"
 	"github.com/RouteHub-Link/routehub-service-graphql/auth"
 	database_enums "github.com/RouteHub-Link/routehub-service-graphql/database/enums"
 	database_models "github.com/RouteHub-Link/routehub-service-graphql/database/models"
 	database_types "github.com/RouteHub-Link/routehub-service-graphql/database/types"
 	"github.com/RouteHub-Link/routehub-service-graphql/graph"
 	"github.com/RouteHub-Link/routehub-service-graphql/graph/model"
+	services_domain_utils "github.com/RouteHub-Link/routehub-service-graphql/services/domain_utils"
 	"github.com/RouteHub-Link/routehub-service-graphql/worker"
 	"github.com/cloudmatelabs/gorm-gqlgen-relay/relay"
+	"github.com/google/uuid"
 	"github.com/vektah/gqlparser/gqlerror"
 )
 
@@ -69,6 +74,16 @@ func (r *linkResolver) RedirectionOptions(ctx context.Context, obj *database_mod
 	return obj.RedirectionChoice, nil
 }
 
+// Validations is the resolver for the validations field.
+func (r *linkResolver) Validations(ctx context.Context, obj *database_models.Link) ([]*database_models.LinkValidation, error) {
+	return r.ServiceContainer.LinkValidationService.GetLinkValidationsByLinkId(obj.ID)
+}
+
+// LastValidation is the resolver for the lastValidation field.
+func (r *linkResolver) LastValidation(ctx context.Context, obj *database_models.Link) (*database_models.LinkValidation, error) {
+	return r.ServiceContainer.LinkValidationService.GetLinkValidationByLinkId(obj.ID)
+}
+
 // Crawls is the resolver for the crawls field.
 func (r *linkResolver) Crawls(ctx context.Context, obj *database_models.Link) ([]*database_models.LinkCrawl, error) {
 	return r.ServiceContainer.LinkService.GetCrawls(obj.ID)
@@ -84,6 +99,11 @@ func (r *linkCrawlResolver) CrawledBy(ctx context.Context, obj *database_models.
 	return r.LoaderContainer.User.Get(ctx, obj.CreatedBy)
 }
 
+// CreatedBy is the resolver for the createdBy field.
+func (r *linkValidationResolver) CreatedBy(ctx context.Context, obj *database_models.LinkValidation) (*database_models.User, error) {
+	panic(fmt.Errorf("not implemented: CreatedBy - createdBy"))
+}
+
 // CreateLink is the resolver for the createLink field.
 func (r *mutationResolver) CreateLink(ctx context.Context, input model.LinkCreateInput) (*database_models.Link, error) {
 	userSession := auth.ForContext(ctx)
@@ -91,20 +111,50 @@ func (r *mutationResolver) CreateLink(ctx context.Context, input model.LinkCreat
 		return nil, gqlerror.Errorf("Access Denied")
 	}
 
-	link, err := r.ServiceContainer.LinkService.CreateLink(input, userSession.ID)
+	log.Printf("CreateLink: %+v", input)
+
+	var _validator = validator.DefaultValidator()
+	isValid, err := _validator.ValidateURL(input.Target)
+
+	if !isValid || err != nil {
+		gqlError := gqlerror.Errorf("Invalid URL")
+		if err != nil {
+			gqlError = gqlerror.Errorf("Invalid URL %s", err.Error())
+		}
+		return nil, gqlError
+	}
+
+	payload := services_domain_utils.SiteValidationPayload{Link: input.Target}
+	validationTaskId, err := r.ServiceContainer.DomainUtilsService.PostValidateSite(&payload)
 	if err != nil {
 		return nil, gqlerror.Errorf("Process Failed %s", err.Error())
 	}
 
-	crawlId, err := r.ServiceContainer.LinkService.SaveCrawlRequest(link, userSession.ID)
+	validationTaskUUID, err := uuid.Parse(validationTaskId)
+	if err != nil {
+		return nil, gqlerror.Errorf("ID: %s Process Failed %s", validationTaskId, err.Error())
+	}
+
+	link, err := r.ServiceContainer.LinkService.CreateLink(input, userSession.ID, validationTaskUUID)
 	if err != nil {
 		return nil, gqlerror.Errorf("Process Failed %s", err.Error())
 	}
 
-	_, e := r.ServiceContainer.WorkerService.NewCrawlURL(worker.CrawlURLPayload{LinkId: link.ID, CrawlId: crawlId, LinkUrl: link.Target})
-	if e != nil {
-		return nil, gqlerror.Errorf("Process Failed %s", e.Error())
+	_, err = r.ServiceContainer.LinkValidationService.Validate(userSession.ID, link)
+	if err != nil {
+		return nil, gqlerror.Errorf("Process Failed %s", err.Error())
 	}
+
+	//_, err := r.ServiceContainer.LinkService.SaveCrawlRequest(link, userSession.ID)
+	//if err != nil {
+	//	return nil, gqlerror.Errorf("Process Failed %s", err.Error())
+	//}
+
+	// subscribe to the crawl request and start the process
+	//_, e := r.ServiceContainer.WorkerService.NewCrawlURL(worker.CrawlURLPayload{LinkId: link.ID, CrawlId: crawlId, LinkUrl: link.Target})
+	//if e != nil {
+	//	return nil, gqlerror.Errorf("Process Failed %s", e.Error())
+	//}
 
 	return link, nil
 }
@@ -121,12 +171,21 @@ func (r *mutationResolver) RequestCrawl(ctx context.Context, input model.CrawlRe
 		return nil, gqlerror.Errorf("Process Failed %s", err.Error())
 	}
 
+	validation, err := r.ServiceContainer.LinkValidationService.GetLinkValidationByLink(link)
+	if err != nil {
+		return nil, gqlerror.Errorf("Process Failed %s", err.Error())
+	}
+
+	if validation.CompletedAt == nil {
+		return nil, gqlerror.Errorf("Validation is not completed crawling is not allowed for unvalidated links!")
+	}
+
 	crawlId, err := r.ServiceContainer.LinkService.SaveCrawlRequest(link, userSession.ID)
 	if err != nil {
 		return nil, gqlerror.Errorf("Process Failed %s", err.Error())
 	}
 
-	_, e := r.ServiceContainer.WorkerService.NewCrawlURL(worker.CrawlURLPayload{LinkId: input.LinkID, CrawlId: crawlId, LinkUrl: link.Target})
+	e := r.ServiceContainer.WorkerService.NewCrawlURL(worker.CrawlURLPayload{LinkId: input.LinkID, CrawlId: crawlId, LinkUrl: link.Target})
 	if e != nil {
 		return nil, gqlerror.Errorf("Process Failed %s", e.Error())
 	}
@@ -188,9 +247,13 @@ func (r *Resolver) Link() graph.LinkResolver { return &linkResolver{r} }
 // LinkCrawl returns graph.LinkCrawlResolver implementation.
 func (r *Resolver) LinkCrawl() graph.LinkCrawlResolver { return &linkCrawlResolver{r} }
 
+// LinkValidation returns graph.LinkValidationResolver implementation.
+func (r *Resolver) LinkValidation() graph.LinkValidationResolver { return &linkValidationResolver{r} }
+
 // Query returns graph.QueryResolver implementation.
 func (r *Resolver) Query() graph.QueryResolver { return &queryResolver{r} }
 
 type linkResolver struct{ *Resolver }
 type linkCrawlResolver struct{ *Resolver }
+type linkValidationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }

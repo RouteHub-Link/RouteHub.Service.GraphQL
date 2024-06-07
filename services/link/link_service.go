@@ -15,7 +15,7 @@ type LinkService struct {
 	DB *gorm.DB
 }
 
-func (ls LinkService) CreateLink(input model.LinkCreateInput, userId uuid.UUID) (link *database_models.Link, err error) {
+func (ls LinkService) CreateLink(input model.LinkCreateInput, userId uuid.UUID, validationTaskId uuid.UUID) (link *database_models.Link, err error) {
 	path := input.Path
 	if path == nil {
 		genPath, err := gonanoid.New(6)
@@ -28,6 +28,7 @@ func (ls LinkService) CreateLink(input model.LinkCreateInput, userId uuid.UUID) 
 	link = &database_models.Link{
 		ID:                uuid.New(),
 		PlatformID:        input.PlatformID,
+		ValidationTaskID:  validationTaskId,
 		Target:            input.Target,
 		Path:              *path,
 		RedirectionChoice: *input.RedirectionOptions,

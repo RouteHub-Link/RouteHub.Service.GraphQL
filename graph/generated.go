@@ -50,6 +50,7 @@ type ResolverRoot interface {
 	Domain() DomainResolver
 	Link() LinkResolver
 	LinkCrawl() LinkCrawlResolver
+	LinkValidation() LinkValidationResolver
 	Mutation() MutationResolver
 	Organization() OrganizationResolver
 	Platform() PlatformResolver
@@ -134,6 +135,7 @@ type ComplexityRoot struct {
 		DeletedAt          func(childComplexity int) int
 		Domain             func(childComplexity int) int
 		ID                 func(childComplexity int) int
+		LastValidation     func(childComplexity int) int
 		OpenGraph          func(childComplexity int) int
 		Path               func(childComplexity int) int
 		Platform           func(childComplexity int) int
@@ -141,6 +143,7 @@ type ComplexityRoot struct {
 		State              func(childComplexity int) int
 		Target             func(childComplexity int) int
 		UpdatedAt          func(childComplexity int) int
+		Validations        func(childComplexity int) int
 	}
 
 	LinkConnection struct {
@@ -166,6 +169,18 @@ type ComplexityRoot struct {
 	LinkEdge struct {
 		Cursor func(childComplexity int) int
 		Node   func(childComplexity int) int
+	}
+
+	LinkValidation struct {
+		CompletedAt   func(childComplexity int) int
+		CreatedAt     func(childComplexity int) int
+		CreatedBy     func(childComplexity int) int
+		Error         func(childComplexity int) int
+		IsValid       func(childComplexity int) int
+		LastCheckedAt func(childComplexity int) int
+		Message       func(childComplexity int) int
+		NextProcessAt func(childComplexity int) int
+		UpdatedAt     func(childComplexity int) int
 	}
 
 	Log struct {
@@ -374,12 +389,17 @@ type LinkResolver interface {
 	OpenGraph(ctx context.Context, obj *database_models.Link) ([]*database_types.OpenGraph, error)
 	RedirectionOptions(ctx context.Context, obj *database_models.Link) (database_enums.RedirectionOptions, error)
 
+	Validations(ctx context.Context, obj *database_models.Link) ([]*database_models.LinkValidation, error)
+	LastValidation(ctx context.Context, obj *database_models.Link) (*database_models.LinkValidation, error)
 	Crawls(ctx context.Context, obj *database_models.Link) ([]*database_models.LinkCrawl, error)
 }
 type LinkCrawlResolver interface {
 	Link(ctx context.Context, obj *database_models.LinkCrawl) (*database_models.Link, error)
 
 	CrawledBy(ctx context.Context, obj *database_models.LinkCrawl) (*database_models.User, error)
+}
+type LinkValidationResolver interface {
+	CreatedBy(ctx context.Context, obj *database_models.LinkValidation) (*database_models.User, error)
 }
 type MutationResolver interface {
 	LoginUser(ctx context.Context, input model.LoginInput) (*model.LoginPayload, error)
@@ -788,6 +808,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Link.ID(childComplexity), true
 
+	case "Link.lastValidation":
+		if e.complexity.Link.LastValidation == nil {
+			break
+		}
+
+		return e.complexity.Link.LastValidation(childComplexity), true
+
 	case "Link.openGraph":
 		if e.complexity.Link.OpenGraph == nil {
 			break
@@ -836,6 +863,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Link.UpdatedAt(childComplexity), true
+
+	case "Link.validations":
+		if e.complexity.Link.Validations == nil {
+			break
+		}
+
+		return e.complexity.Link.Validations(childComplexity), true
 
 	case "LinkConnection.edges":
 		if e.complexity.LinkConnection.Edges == nil {
@@ -948,6 +982,69 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.LinkEdge.Node(childComplexity), true
+
+	case "LinkValidation.completedAt":
+		if e.complexity.LinkValidation.CompletedAt == nil {
+			break
+		}
+
+		return e.complexity.LinkValidation.CompletedAt(childComplexity), true
+
+	case "LinkValidation.createdAt":
+		if e.complexity.LinkValidation.CreatedAt == nil {
+			break
+		}
+
+		return e.complexity.LinkValidation.CreatedAt(childComplexity), true
+
+	case "LinkValidation.createdBy":
+		if e.complexity.LinkValidation.CreatedBy == nil {
+			break
+		}
+
+		return e.complexity.LinkValidation.CreatedBy(childComplexity), true
+
+	case "LinkValidation.error":
+		if e.complexity.LinkValidation.Error == nil {
+			break
+		}
+
+		return e.complexity.LinkValidation.Error(childComplexity), true
+
+	case "LinkValidation.isValid":
+		if e.complexity.LinkValidation.IsValid == nil {
+			break
+		}
+
+		return e.complexity.LinkValidation.IsValid(childComplexity), true
+
+	case "LinkValidation.lastCheckedAt":
+		if e.complexity.LinkValidation.LastCheckedAt == nil {
+			break
+		}
+
+		return e.complexity.LinkValidation.LastCheckedAt(childComplexity), true
+
+	case "LinkValidation.message":
+		if e.complexity.LinkValidation.Message == nil {
+			break
+		}
+
+		return e.complexity.LinkValidation.Message(childComplexity), true
+
+	case "LinkValidation.NextProcessAt":
+		if e.complexity.LinkValidation.NextProcessAt == nil {
+			break
+		}
+
+		return e.complexity.LinkValidation.NextProcessAt(childComplexity), true
+
+	case "LinkValidation.updatedAt":
+		if e.complexity.LinkValidation.UpdatedAt == nil {
+			break
+		}
+
+		return e.complexity.LinkValidation.UpdatedAt(childComplexity), true
 
 	case "Log.createdAt":
 		if e.complexity.Log.CreatedAt == nil {
@@ -2735,6 +2832,10 @@ func (ec *executionContext) fieldContext_AnalyticReport_link(_ context.Context, 
 				return ec.fieldContext_Link_redirectionOptions(ctx, field)
 			case "state":
 				return ec.fieldContext_Link_state(ctx, field)
+			case "validations":
+				return ec.fieldContext_Link_validations(ctx, field)
+			case "lastValidation":
+				return ec.fieldContext_Link_lastValidation(ctx, field)
 			case "crawls":
 				return ec.fieldContext_Link_crawls(ctx, field)
 			case "createdAt":
@@ -5041,6 +5142,128 @@ func (ec *executionContext) fieldContext_Link_state(_ context.Context, field gra
 	return fc, nil
 }
 
+func (ec *executionContext) _Link_validations(ctx context.Context, field graphql.CollectedField, obj *database_models.Link) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Link_validations(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Link().Validations(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*database_models.LinkValidation)
+	fc.Result = res
+	return ec.marshalOLinkValidation2ᚕᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋmodelsᚐLinkValidationᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Link_validations(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Link",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "isValid":
+				return ec.fieldContext_LinkValidation_isValid(ctx, field)
+			case "message":
+				return ec.fieldContext_LinkValidation_message(ctx, field)
+			case "error":
+				return ec.fieldContext_LinkValidation_error(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_LinkValidation_createdAt(ctx, field)
+			case "lastCheckedAt":
+				return ec.fieldContext_LinkValidation_lastCheckedAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_LinkValidation_updatedAt(ctx, field)
+			case "NextProcessAt":
+				return ec.fieldContext_LinkValidation_NextProcessAt(ctx, field)
+			case "completedAt":
+				return ec.fieldContext_LinkValidation_completedAt(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_LinkValidation_createdBy(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type LinkValidation", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Link_lastValidation(ctx context.Context, field graphql.CollectedField, obj *database_models.Link) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Link_lastValidation(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Link().LastValidation(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*database_models.LinkValidation)
+	fc.Result = res
+	return ec.marshalOLinkValidation2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋmodelsᚐLinkValidation(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Link_lastValidation(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Link",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "isValid":
+				return ec.fieldContext_LinkValidation_isValid(ctx, field)
+			case "message":
+				return ec.fieldContext_LinkValidation_message(ctx, field)
+			case "error":
+				return ec.fieldContext_LinkValidation_error(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_LinkValidation_createdAt(ctx, field)
+			case "lastCheckedAt":
+				return ec.fieldContext_LinkValidation_lastCheckedAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_LinkValidation_updatedAt(ctx, field)
+			case "NextProcessAt":
+				return ec.fieldContext_LinkValidation_NextProcessAt(ctx, field)
+			case "completedAt":
+				return ec.fieldContext_LinkValidation_completedAt(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_LinkValidation_createdBy(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type LinkValidation", field.Name)
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Link_crawls(ctx context.Context, field graphql.CollectedField, obj *database_models.Link) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Link_crawls(ctx, field)
 	if err != nil {
@@ -5530,6 +5753,10 @@ func (ec *executionContext) fieldContext_LinkCrawl_link(_ context.Context, field
 				return ec.fieldContext_Link_redirectionOptions(ctx, field)
 			case "state":
 				return ec.fieldContext_Link_state(ctx, field)
+			case "validations":
+				return ec.fieldContext_Link_validations(ctx, field)
+			case "lastValidation":
+				return ec.fieldContext_Link_lastValidation(ctx, field)
 			case "crawls":
 				return ec.fieldContext_Link_crawls(ctx, field)
 			case "createdAt":
@@ -6044,6 +6271,10 @@ func (ec *executionContext) fieldContext_LinkEdge_node(_ context.Context, field 
 				return ec.fieldContext_Link_redirectionOptions(ctx, field)
 			case "state":
 				return ec.fieldContext_Link_state(ctx, field)
+			case "validations":
+				return ec.fieldContext_Link_validations(ctx, field)
+			case "lastValidation":
+				return ec.fieldContext_Link_lastValidation(ctx, field)
 			case "crawls":
 				return ec.fieldContext_Link_crawls(ctx, field)
 			case "createdAt":
@@ -6054,6 +6285,410 @@ func (ec *executionContext) fieldContext_LinkEdge_node(_ context.Context, field 
 				return ec.fieldContext_Link_deletedAt(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Link", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _LinkValidation_isValid(ctx context.Context, field graphql.CollectedField, obj *database_models.LinkValidation) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_LinkValidation_isValid(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.IsValid, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_LinkValidation_isValid(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "LinkValidation",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _LinkValidation_message(ctx context.Context, field graphql.CollectedField, obj *database_models.LinkValidation) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_LinkValidation_message(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Message, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_LinkValidation_message(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "LinkValidation",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _LinkValidation_error(ctx context.Context, field graphql.CollectedField, obj *database_models.LinkValidation) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_LinkValidation_error(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Error, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_LinkValidation_error(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "LinkValidation",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _LinkValidation_createdAt(ctx context.Context, field graphql.CollectedField, obj *database_models.LinkValidation) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_LinkValidation_createdAt(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CreatedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(time.Time)
+	fc.Result = res
+	return ec.marshalNDateTime2timeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_LinkValidation_createdAt(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "LinkValidation",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type DateTime does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _LinkValidation_lastCheckedAt(ctx context.Context, field graphql.CollectedField, obj *database_models.LinkValidation) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_LinkValidation_lastCheckedAt(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.LastCheckedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*time.Time)
+	fc.Result = res
+	return ec.marshalODateTime2ᚖtimeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_LinkValidation_lastCheckedAt(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "LinkValidation",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type DateTime does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _LinkValidation_updatedAt(ctx context.Context, field graphql.CollectedField, obj *database_models.LinkValidation) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_LinkValidation_updatedAt(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.UpdatedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*time.Time)
+	fc.Result = res
+	return ec.marshalODateTime2ᚖtimeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_LinkValidation_updatedAt(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "LinkValidation",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type DateTime does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _LinkValidation_NextProcessAt(ctx context.Context, field graphql.CollectedField, obj *database_models.LinkValidation) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_LinkValidation_NextProcessAt(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.NextProcessAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*time.Time)
+	fc.Result = res
+	return ec.marshalODateTime2ᚖtimeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_LinkValidation_NextProcessAt(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "LinkValidation",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type DateTime does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _LinkValidation_completedAt(ctx context.Context, field graphql.CollectedField, obj *database_models.LinkValidation) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_LinkValidation_completedAt(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CompletedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*time.Time)
+	fc.Result = res
+	return ec.marshalODateTime2ᚖtimeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_LinkValidation_completedAt(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "LinkValidation",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type DateTime does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _LinkValidation_createdBy(ctx context.Context, field graphql.CollectedField, obj *database_models.LinkValidation) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_LinkValidation_createdBy(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.LinkValidation().CreatedBy(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*database_models.User)
+	fc.Result = res
+	return ec.marshalNUser2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋmodelsᚐUser(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_LinkValidation_createdBy(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "LinkValidation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_User_id(ctx, field)
+			case "avatar":
+				return ec.fieldContext_User_avatar(ctx, field)
+			case "email":
+				return ec.fieldContext_User_email(ctx, field)
+			case "fullname":
+				return ec.fieldContext_User_fullname(ctx, field)
+			case "verified":
+				return ec.fieldContext_User_verified(ctx, field)
+			case "phone":
+				return ec.fieldContext_User_phone(ctx, field)
+			case "organizations":
+				return ec.fieldContext_User_organizations(ctx, field)
+			case "platforms":
+				return ec.fieldContext_User_platforms(ctx, field)
+			case "invites":
+				return ec.fieldContext_User_invites(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_User_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_User_updatedAt(ctx, field)
+			case "deletedAt":
+				return ec.fieldContext_User_deletedAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
 		},
 	}
 	return fc, nil
@@ -6740,6 +7375,10 @@ func (ec *executionContext) fieldContext_Mutation_createLink(ctx context.Context
 				return ec.fieldContext_Link_redirectionOptions(ctx, field)
 			case "state":
 				return ec.fieldContext_Link_state(ctx, field)
+			case "validations":
+				return ec.fieldContext_Link_validations(ctx, field)
+			case "lastValidation":
+				return ec.fieldContext_Link_lastValidation(ctx, field)
 			case "crawls":
 				return ec.fieldContext_Link_crawls(ctx, field)
 			case "createdAt":
@@ -6944,6 +7583,10 @@ func (ec *executionContext) fieldContext_Mutation_addToPinnedLinks(ctx context.C
 				return ec.fieldContext_Link_redirectionOptions(ctx, field)
 			case "state":
 				return ec.fieldContext_Link_state(ctx, field)
+			case "validations":
+				return ec.fieldContext_Link_validations(ctx, field)
+			case "lastValidation":
+				return ec.fieldContext_Link_lastValidation(ctx, field)
 			case "crawls":
 				return ec.fieldContext_Link_crawls(ctx, field)
 			case "createdAt":
@@ -7049,6 +7692,10 @@ func (ec *executionContext) fieldContext_Mutation_removeFromPinnedLinks(ctx cont
 				return ec.fieldContext_Link_redirectionOptions(ctx, field)
 			case "state":
 				return ec.fieldContext_Link_state(ctx, field)
+			case "validations":
+				return ec.fieldContext_Link_validations(ctx, field)
+			case "lastValidation":
+				return ec.fieldContext_Link_lastValidation(ctx, field)
 			case "crawls":
 				return ec.fieldContext_Link_crawls(ctx, field)
 			case "createdAt":
@@ -7714,6 +8361,10 @@ func (ec *executionContext) fieldContext_ObservationAnalytic_link(_ context.Cont
 				return ec.fieldContext_Link_redirectionOptions(ctx, field)
 			case "state":
 				return ec.fieldContext_Link_state(ctx, field)
+			case "validations":
+				return ec.fieldContext_Link_validations(ctx, field)
+			case "lastValidation":
+				return ec.fieldContext_Link_lastValidation(ctx, field)
 			case "crawls":
 				return ec.fieldContext_Link_crawls(ctx, field)
 			case "createdAt":
@@ -10576,6 +11227,10 @@ func (ec *executionContext) fieldContext_Platform_links(_ context.Context, field
 				return ec.fieldContext_Link_redirectionOptions(ctx, field)
 			case "state":
 				return ec.fieldContext_Link_state(ctx, field)
+			case "validations":
+				return ec.fieldContext_Link_validations(ctx, field)
+			case "lastValidation":
+				return ec.fieldContext_Link_lastValidation(ctx, field)
 			case "crawls":
 				return ec.fieldContext_Link_crawls(ctx, field)
 			case "createdAt":
@@ -10882,6 +11537,10 @@ func (ec *executionContext) fieldContext_Platform_pinnedLinks(_ context.Context,
 				return ec.fieldContext_Link_redirectionOptions(ctx, field)
 			case "state":
 				return ec.fieldContext_Link_state(ctx, field)
+			case "validations":
+				return ec.fieldContext_Link_validations(ctx, field)
+			case "lastValidation":
+				return ec.fieldContext_Link_lastValidation(ctx, field)
 			case "crawls":
 				return ec.fieldContext_Link_crawls(ctx, field)
 			case "createdAt":
@@ -16203,7 +16862,7 @@ func (ec *executionContext) unmarshalInputLinkCreateInput(ctx context.Context, o
 		case "openGraph":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("openGraph"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
-				return ec.unmarshalNOpenGraphInput2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐOpenGraph(ctx, v)
+				return ec.unmarshalOOpenGraphInput2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐOpenGraph(ctx, v)
 			}
 			directive1 := func(ctx context.Context) (interface{}, error) {
 				permission, err := ec.unmarshalNPlatformPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐPlatformPermission(ctx, "LINK_CREATE")
@@ -18572,6 +19231,72 @@ func (ec *executionContext) _Link(ctx context.Context, sel ast.SelectionSet, obj
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
+		case "validations":
+			field := field
+
+			innerFunc := func(ctx context.Context, _ *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Link_validations(ctx, field, obj)
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "lastValidation":
+			field := field
+
+			innerFunc := func(ctx context.Context, _ *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Link_lastValidation(ctx, field, obj)
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "crawls":
 			field := field
 
@@ -18849,6 +19574,98 @@ func (ec *executionContext) _LinkEdge(ctx context.Context, sel ast.SelectionSet,
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var linkValidationImplementors = []string{"LinkValidation"}
+
+func (ec *executionContext) _LinkValidation(ctx context.Context, sel ast.SelectionSet, obj *database_models.LinkValidation) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, linkValidationImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("LinkValidation")
+		case "isValid":
+			out.Values[i] = ec._LinkValidation_isValid(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "message":
+			out.Values[i] = ec._LinkValidation_message(ctx, field, obj)
+		case "error":
+			out.Values[i] = ec._LinkValidation_error(ctx, field, obj)
+		case "createdAt":
+			out.Values[i] = ec._LinkValidation_createdAt(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "lastCheckedAt":
+			out.Values[i] = ec._LinkValidation_lastCheckedAt(ctx, field, obj)
+		case "updatedAt":
+			out.Values[i] = ec._LinkValidation_updatedAt(ctx, field, obj)
+		case "NextProcessAt":
+			out.Values[i] = ec._LinkValidation_NextProcessAt(ctx, field, obj)
+		case "completedAt":
+			out.Values[i] = ec._LinkValidation_completedAt(ctx, field, obj)
+		case "createdBy":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._LinkValidation_createdBy(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -21629,6 +22446,16 @@ func (ec *executionContext) marshalNLinkEdge2ᚖgithubᚗcomᚋcloudmatelabsᚋg
 	return ec._LinkEdge(ctx, sel, v)
 }
 
+func (ec *executionContext) marshalNLinkValidation2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋmodelsᚐLinkValidation(ctx context.Context, sel ast.SelectionSet, v *database_models.LinkValidation) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._LinkValidation(ctx, sel, v)
+}
+
 func (ec *executionContext) marshalNLog2ᚕᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐLogᚄ(ctx context.Context, sel ast.SelectionSet, v []*database_types.Log) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
@@ -23132,6 +23959,60 @@ func (ec *executionContext) unmarshalOLinkFilter2ᚖgithubᚗcomᚋRouteHubᚑLi
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
+func (ec *executionContext) marshalOLinkValidation2ᚕᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋmodelsᚐLinkValidationᚄ(ctx context.Context, sel ast.SelectionSet, v []*database_models.LinkValidation) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNLinkValidation2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋmodelsᚐLinkValidation(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalOLinkValidation2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋmodelsᚐLinkValidation(ctx context.Context, sel ast.SelectionSet, v *database_models.LinkValidation) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._LinkValidation(ctx, sel, v)
+}
+
 func (ec *executionContext) unmarshalOMap2map(ctx context.Context, v interface{}) (map[string]interface{}, error) {
 	if v == nil {
 		return nil, nil
@@ -23254,6 +24135,14 @@ func (ec *executionContext) marshalOOpenGraph2ᚖgithubᚗcomᚋRouteHubᚑLink�
 		return graphql.Null
 	}
 	return ec._OpenGraph(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalOOpenGraphInput2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐOpenGraph(ctx context.Context, v interface{}) (*database_types.OpenGraph, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputOpenGraphInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) marshalOOpenGraphX2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐOpenGraphX(ctx context.Context, sel ast.SelectionSet, v *database_types.OpenGraphX) graphql.Marshaler {
