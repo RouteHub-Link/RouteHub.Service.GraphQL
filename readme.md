@@ -61,9 +61,9 @@ The main goal is to make new applications with uses this GraphQL backend.
 - [x] **Service Container:** Service container is implemented for accessing services in resolvers.
 - [x] **Data Access Layer:** Data access layer is implemented for accessing database models in services.
 - [x] **Data Loader Services;** Data loader services are implemented for accessing data loaders in services.
-- [x] **Custom Url Validation with Configuration:** For url validation we created a custom validation package with custimizable configuration. (RouteHub-Link/DomainUtils/validator)[https://pkg.go.dev/github.com/RouteHub-Link/DomainUtils/validator]
+- [x] **Custom Url Validation with Configuration:** For url validation we created a custom validation package with custimizable configuration. [RouteHub-Link/DomainUtils/validator](https://pkg.go.dev/github.com/RouteHub-Link/DomainUtils/validator)
 - [x] **Crawler Queing:** Queing for crawling is not implemented. not needed for now. we have a queue for validation and that's enough for now.
-- [x] **Validation Queue:** Validation queue is implemented for validating links. You can monitor it with asynqmon also validation process immediately starts after link creation. (DomainUtils Usage Serving Modes)[https://github.com/RouteHub-Link/DomainUtils?tab=readme-ov-file#usage]
+- [x] **Validation Queue:** Validation queue is implemented for validating links. You can monitor it with asynqmon also validation process immediately starts after link creation. [DomainUtils Usage Serving Modes](https://github.com/RouteHub-Link/DomainUtils?tab=readme-ov-file#usage)
 - [x] **Link Pinning;** Link pinning for home page of platform is not implemented.
 
 ## Not Implemented
