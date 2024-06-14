@@ -18,7 +18,7 @@ require (
 	github.com/knadh/koanf/v2 v2.1.1
 	github.com/matoous/go-nanoid/v2 v2.0.0
 	github.com/vektah/gqlparser v1.3.1
-	github.com/vektah/gqlparser/v2 v2.5.11
+	github.com/vektah/gqlparser/v2 v2.5.15
 	golang.org/x/crypto v0.23.0
 	gorm.io/driver/postgres v1.5.4
 	gorm.io/gorm v1.25.5
