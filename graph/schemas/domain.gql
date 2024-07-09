@@ -4,7 +4,10 @@ type Domain {
   url: String!
   organization: Organization!
   platform: Platform
-  verification: [DomainVerification]!
+  "Link validation history."
+  verifications: [DNSVerification!]
+  "Last validation of the link."
+  lastVerification: DNSVerification
   state: StatusState!
   analytics: [MetricAnalytics!]!
   analyticReports: AnalyticReports!
@@ -21,17 +24,21 @@ input DomainCreateInput @domainURLCheck {
   clientInformation: ClientInformationInput!
 }
 
-type DomainVerification {
-  id: UUID!
-  domain: Domain!
-  status: DNSStatus!
-  logs: [Log!]!
-  createdAt: DateTime!
-  updatedAt: DateTime
-  deletedAt: DateTime
+type DNSVerification {
+    isValid: Boolean!
+    message: String
+    error: String
+    createdAt: DateTime!
+    lastCheckedAt: DateTime
+    updatedAt: DateTime
+    nextProcessAt: DateTime
+    completedAt: DateTime
+    createdBy: User!
 }
 
 extend type Mutation {
   "This mutation is used for creating a domain for an organization. *(Plan is After an domain is created and verified it can be used to create a platform & deployment process.)"
   createDomain(input: DomainCreateInput!): Domain! @auth
+  "This mutation is used for verifying a domain. *(Plan is After an domain is created and verified it can be used to create a platform & deployment process.)" 
+  newDomainVerification(domainId: UUID!, forced: Boolean): DNSVerification! @auth
 }

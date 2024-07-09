@@ -63,16 +63,6 @@ type DomainCreateInput struct {
 	ClientInformation *ClientInformationInput `json:"clientInformation"`
 }
 
-type DomainVerification struct {
-	ID        uuid.UUID                `json:"id"`
-	Domain    *database_models.Domain  `json:"domain"`
-	Status    database_enums.DNSStatus `json:"status"`
-	Logs      []*database_types.Log    `json:"logs"`
-	CreatedAt time.Time                `json:"createdAt"`
-	UpdatedAt *time.Time               `json:"updatedAt,omitempty"`
-	DeletedAt *time.Time               `json:"deletedAt,omitempty"`
-}
-
 type FloatFilter struct {
 	Equal    *float64  `json:"equal,omitempty"`
 	NotEqual *float64  `json:"notEqual,omitempty"`

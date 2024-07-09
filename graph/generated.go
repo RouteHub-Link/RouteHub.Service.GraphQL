@@ -47,6 +47,7 @@ type Config struct {
 }
 
 type ResolverRoot interface {
+	DNSVerification() DNSVerificationResolver
 	Domain() DomainResolver
 	Link() LinkResolver
 	LinkCrawl() LinkCrawlResolver
@@ -97,6 +98,18 @@ type ComplexityRoot struct {
 		YesterdayObservations func(childComplexity int) int
 	}
 
+	DNSVerification struct {
+		CompletedAt   func(childComplexity int) int
+		CreatedAt     func(childComplexity int) int
+		CreatedBy     func(childComplexity int) int
+		Error         func(childComplexity int) int
+		IsValid       func(childComplexity int) int
+		LastCheckedAt func(childComplexity int) int
+		Message       func(childComplexity int) int
+		NextProcessAt func(childComplexity int) int
+		UpdatedAt     func(childComplexity int) int
+	}
+
 	Domain struct {
 		AnalyticReports       func(childComplexity int) int
 		Analytics             func(childComplexity int) int
@@ -104,23 +117,14 @@ type ComplexityRoot struct {
 		DeletedAt             func(childComplexity int) int
 		ID                    func(childComplexity int) int
 		LastDNSVerificationAt func(childComplexity int) int
+		LastVerification      func(childComplexity int) int
 		Name                  func(childComplexity int) int
 		Organization          func(childComplexity int) int
 		Platform              func(childComplexity int) int
 		State                 func(childComplexity int) int
 		URL                   func(childComplexity int) int
 		UpdatedAt             func(childComplexity int) int
-		Verification          func(childComplexity int) int
-	}
-
-	DomainVerification struct {
-		CreatedAt func(childComplexity int) int
-		DeletedAt func(childComplexity int) int
-		Domain    func(childComplexity int) int
-		ID        func(childComplexity int) int
-		Logs      func(childComplexity int) int
-		Status    func(childComplexity int) int
-		UpdatedAt func(childComplexity int) int
+		Verifications         func(childComplexity int) int
 	}
 
 	Industry struct {
@@ -211,6 +215,7 @@ type ComplexityRoot struct {
 		CreateUser            func(childComplexity int, input model.UserCreateInput) int
 		InviteUser            func(childComplexity int, input graph_inputs.UserInviteInput) int
 		LoginUser             func(childComplexity int, input model.LoginInput) int
+		NewDomainVerification func(childComplexity int, domainID uuid.UUID, forced *bool) int
 		RemoveFromPinnedLinks func(childComplexity int, input model.PinnedLinkInput) int
 		RequestCrawl          func(childComplexity int, input model.CrawlRequestInput) int
 		UpdateOrganization    func(childComplexity int, input model.OrganizationUpdateInput) int
@@ -372,10 +377,14 @@ type ComplexityRoot struct {
 	}
 }
 
+type DNSVerificationResolver interface {
+	CreatedBy(ctx context.Context, obj *database_models.DNSVerification) (*database_models.User, error)
+}
 type DomainResolver interface {
 	Organization(ctx context.Context, obj *database_models.Domain) (*database_models.Organization, error)
 	Platform(ctx context.Context, obj *database_models.Domain) (*database_models.Platform, error)
-	Verification(ctx context.Context, obj *database_models.Domain) ([]*model.DomainVerification, error)
+	Verifications(ctx context.Context, obj *database_models.Domain) ([]*database_models.DNSVerification, error)
+	LastVerification(ctx context.Context, obj *database_models.Domain) (*database_models.DNSVerification, error)
 
 	Analytics(ctx context.Context, obj *database_models.Domain) ([]*model.MetricAnalytics, error)
 	AnalyticReports(ctx context.Context, obj *database_models.Domain) (*model.AnalyticReports, error)
@@ -404,6 +413,7 @@ type LinkValidationResolver interface {
 type MutationResolver interface {
 	LoginUser(ctx context.Context, input model.LoginInput) (*model.LoginPayload, error)
 	CreateDomain(ctx context.Context, input model.DomainCreateInput) (*database_models.Domain, error)
+	NewDomainVerification(ctx context.Context, domainID uuid.UUID, forced *bool) (*database_models.DNSVerification, error)
 	CreateLink(ctx context.Context, input model.LinkCreateInput) (*database_models.Link, error)
 	RequestCrawl(ctx context.Context, input model.CrawlRequestInput) (*database_models.LinkCrawl, error)
 	AddToPinnedLinks(ctx context.Context, input model.PinnedLinkInput) (*database_models.Link, error)
@@ -612,6 +622,69 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.AnalyticReports.YesterdayObservations(childComplexity), true
 
+	case "DNSVerification.completedAt":
+		if e.complexity.DNSVerification.CompletedAt == nil {
+			break
+		}
+
+		return e.complexity.DNSVerification.CompletedAt(childComplexity), true
+
+	case "DNSVerification.createdAt":
+		if e.complexity.DNSVerification.CreatedAt == nil {
+			break
+		}
+
+		return e.complexity.DNSVerification.CreatedAt(childComplexity), true
+
+	case "DNSVerification.createdBy":
+		if e.complexity.DNSVerification.CreatedBy == nil {
+			break
+		}
+
+		return e.complexity.DNSVerification.CreatedBy(childComplexity), true
+
+	case "DNSVerification.error":
+		if e.complexity.DNSVerification.Error == nil {
+			break
+		}
+
+		return e.complexity.DNSVerification.Error(childComplexity), true
+
+	case "DNSVerification.isValid":
+		if e.complexity.DNSVerification.IsValid == nil {
+			break
+		}
+
+		return e.complexity.DNSVerification.IsValid(childComplexity), true
+
+	case "DNSVerification.lastCheckedAt":
+		if e.complexity.DNSVerification.LastCheckedAt == nil {
+			break
+		}
+
+		return e.complexity.DNSVerification.LastCheckedAt(childComplexity), true
+
+	case "DNSVerification.message":
+		if e.complexity.DNSVerification.Message == nil {
+			break
+		}
+
+		return e.complexity.DNSVerification.Message(childComplexity), true
+
+	case "DNSVerification.nextProcessAt":
+		if e.complexity.DNSVerification.NextProcessAt == nil {
+			break
+		}
+
+		return e.complexity.DNSVerification.NextProcessAt(childComplexity), true
+
+	case "DNSVerification.updatedAt":
+		if e.complexity.DNSVerification.UpdatedAt == nil {
+			break
+		}
+
+		return e.complexity.DNSVerification.UpdatedAt(childComplexity), true
+
 	case "Domain.analyticReports":
 		if e.complexity.Domain.AnalyticReports == nil {
 			break
@@ -653,6 +726,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Domain.LastDNSVerificationAt(childComplexity), true
+
+	case "Domain.lastVerification":
+		if e.complexity.Domain.LastVerification == nil {
+			break
+		}
+
+		return e.complexity.Domain.LastVerification(childComplexity), true
 
 	case "Domain.name":
 		if e.complexity.Domain.Name == nil {
@@ -696,61 +776,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Domain.UpdatedAt(childComplexity), true
 
-	case "Domain.verification":
-		if e.complexity.Domain.Verification == nil {
+	case "Domain.verifications":
+		if e.complexity.Domain.Verifications == nil {
 			break
 		}
 
-		return e.complexity.Domain.Verification(childComplexity), true
-
-	case "DomainVerification.createdAt":
-		if e.complexity.DomainVerification.CreatedAt == nil {
-			break
-		}
-
-		return e.complexity.DomainVerification.CreatedAt(childComplexity), true
-
-	case "DomainVerification.deletedAt":
-		if e.complexity.DomainVerification.DeletedAt == nil {
-			break
-		}
-
-		return e.complexity.DomainVerification.DeletedAt(childComplexity), true
-
-	case "DomainVerification.domain":
-		if e.complexity.DomainVerification.Domain == nil {
-			break
-		}
-
-		return e.complexity.DomainVerification.Domain(childComplexity), true
-
-	case "DomainVerification.id":
-		if e.complexity.DomainVerification.ID == nil {
-			break
-		}
-
-		return e.complexity.DomainVerification.ID(childComplexity), true
-
-	case "DomainVerification.logs":
-		if e.complexity.DomainVerification.Logs == nil {
-			break
-		}
-
-		return e.complexity.DomainVerification.Logs(childComplexity), true
-
-	case "DomainVerification.status":
-		if e.complexity.DomainVerification.Status == nil {
-			break
-		}
-
-		return e.complexity.DomainVerification.Status(childComplexity), true
-
-	case "DomainVerification.updatedAt":
-		if e.complexity.DomainVerification.UpdatedAt == nil {
-			break
-		}
-
-		return e.complexity.DomainVerification.UpdatedAt(childComplexity), true
+		return e.complexity.Domain.Verifications(childComplexity), true
 
 	case "Industry.name":
 		if e.complexity.Industry.Name == nil {
@@ -1032,7 +1063,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.LinkValidation.Message(childComplexity), true
 
-	case "LinkValidation.NextProcessAt":
+	case "LinkValidation.nextProcessAt":
 		if e.complexity.LinkValidation.NextProcessAt == nil {
 			break
 		}
@@ -1211,6 +1242,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.LoginUser(childComplexity, args["input"].(model.LoginInput)), true
+
+	case "Mutation.newDomainVerification":
+		if e.complexity.Mutation.NewDomainVerification == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_newDomainVerification_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.NewDomainVerification(childComplexity, args["domainId"].(uuid.UUID), args["forced"].(*bool)), true
 
 	case "Mutation.removeFromPinnedLinks":
 		if e.complexity.Mutation.RemoveFromPinnedLinks == nil {
@@ -2383,6 +2426,30 @@ func (ec *executionContext) field_Mutation_loginUser_args(ctx context.Context, r
 	return args, nil
 }
 
+func (ec *executionContext) field_Mutation_newDomainVerification_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 uuid.UUID
+	if tmp, ok := rawArgs["domainId"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("domainId"))
+		arg0, err = ec.unmarshalNUUID2githubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["domainId"] = arg0
+	var arg1 *bool
+	if tmp, ok := rawArgs["forced"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("forced"))
+		arg1, err = ec.unmarshalOBoolean2ᚖbool(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["forced"] = arg1
+	return args, nil
+}
+
 func (ec *executionContext) field_Mutation_removeFromPinnedLinks_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -2900,8 +2967,10 @@ func (ec *executionContext) fieldContext_AnalyticReport_domain(_ context.Context
 				return ec.fieldContext_Domain_organization(ctx, field)
 			case "platform":
 				return ec.fieldContext_Domain_platform(ctx, field)
-			case "verification":
-				return ec.fieldContext_Domain_verification(ctx, field)
+			case "verifications":
+				return ec.fieldContext_Domain_verifications(ctx, field)
+			case "lastVerification":
+				return ec.fieldContext_Domain_lastVerification(ctx, field)
 			case "state":
 				return ec.fieldContext_Domain_state(ctx, field)
 			case "analytics":
@@ -3545,6 +3614,410 @@ func (ec *executionContext) fieldContext_AnalyticReports_allTimeObservations(_ c
 	return fc, nil
 }
 
+func (ec *executionContext) _DNSVerification_isValid(ctx context.Context, field graphql.CollectedField, obj *database_models.DNSVerification) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_DNSVerification_isValid(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.IsValid, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_DNSVerification_isValid(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "DNSVerification",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _DNSVerification_message(ctx context.Context, field graphql.CollectedField, obj *database_models.DNSVerification) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_DNSVerification_message(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Message, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_DNSVerification_message(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "DNSVerification",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _DNSVerification_error(ctx context.Context, field graphql.CollectedField, obj *database_models.DNSVerification) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_DNSVerification_error(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Error, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_DNSVerification_error(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "DNSVerification",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _DNSVerification_createdAt(ctx context.Context, field graphql.CollectedField, obj *database_models.DNSVerification) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_DNSVerification_createdAt(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CreatedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(time.Time)
+	fc.Result = res
+	return ec.marshalNDateTime2timeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_DNSVerification_createdAt(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "DNSVerification",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type DateTime does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _DNSVerification_lastCheckedAt(ctx context.Context, field graphql.CollectedField, obj *database_models.DNSVerification) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_DNSVerification_lastCheckedAt(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.LastCheckedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*time.Time)
+	fc.Result = res
+	return ec.marshalODateTime2ᚖtimeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_DNSVerification_lastCheckedAt(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "DNSVerification",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type DateTime does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _DNSVerification_updatedAt(ctx context.Context, field graphql.CollectedField, obj *database_models.DNSVerification) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_DNSVerification_updatedAt(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.UpdatedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*time.Time)
+	fc.Result = res
+	return ec.marshalODateTime2ᚖtimeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_DNSVerification_updatedAt(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "DNSVerification",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type DateTime does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _DNSVerification_nextProcessAt(ctx context.Context, field graphql.CollectedField, obj *database_models.DNSVerification) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_DNSVerification_nextProcessAt(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.NextProcessAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*time.Time)
+	fc.Result = res
+	return ec.marshalODateTime2ᚖtimeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_DNSVerification_nextProcessAt(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "DNSVerification",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type DateTime does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _DNSVerification_completedAt(ctx context.Context, field graphql.CollectedField, obj *database_models.DNSVerification) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_DNSVerification_completedAt(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CompletedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*time.Time)
+	fc.Result = res
+	return ec.marshalODateTime2ᚖtimeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_DNSVerification_completedAt(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "DNSVerification",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type DateTime does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _DNSVerification_createdBy(ctx context.Context, field graphql.CollectedField, obj *database_models.DNSVerification) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_DNSVerification_createdBy(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.DNSVerification().CreatedBy(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*database_models.User)
+	fc.Result = res
+	return ec.marshalNUser2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋmodelsᚐUser(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_DNSVerification_createdBy(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "DNSVerification",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_User_id(ctx, field)
+			case "avatar":
+				return ec.fieldContext_User_avatar(ctx, field)
+			case "email":
+				return ec.fieldContext_User_email(ctx, field)
+			case "fullname":
+				return ec.fieldContext_User_fullname(ctx, field)
+			case "verified":
+				return ec.fieldContext_User_verified(ctx, field)
+			case "phone":
+				return ec.fieldContext_User_phone(ctx, field)
+			case "organizations":
+				return ec.fieldContext_User_organizations(ctx, field)
+			case "platforms":
+				return ec.fieldContext_User_platforms(ctx, field)
+			case "invites":
+				return ec.fieldContext_User_invites(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_User_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_User_updatedAt(ctx, field)
+			case "deletedAt":
+				return ec.fieldContext_User_deletedAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Domain_id(ctx context.Context, field graphql.CollectedField, obj *database_models.Domain) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Domain_id(ctx, field)
 	if err != nil {
@@ -3816,8 +4289,8 @@ func (ec *executionContext) fieldContext_Domain_platform(_ context.Context, fiel
 	return fc, nil
 }
 
-func (ec *executionContext) _Domain_verification(ctx context.Context, field graphql.CollectedField, obj *database_models.Domain) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Domain_verification(ctx, field)
+func (ec *executionContext) _Domain_verifications(ctx context.Context, field graphql.CollectedField, obj *database_models.Domain) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Domain_verifications(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -3830,24 +4303,21 @@ func (ec *executionContext) _Domain_verification(ctx context.Context, field grap
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Domain().Verification(rctx, obj)
+		return ec.resolvers.Domain().Verifications(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
 		return graphql.Null
 	}
 	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
-	res := resTmp.([]*model.DomainVerification)
+	res := resTmp.([]*database_models.DNSVerification)
 	fc.Result = res
-	return ec.marshalNDomainVerification2ᚕᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐDomainVerification(ctx, field.Selections, res)
+	return ec.marshalODNSVerification2ᚕᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋmodelsᚐDNSVerificationᚄ(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Domain_verification(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Domain_verifications(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Domain",
 		Field:      field,
@@ -3855,22 +4325,87 @@ func (ec *executionContext) fieldContext_Domain_verification(_ context.Context, 
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
-			case "id":
-				return ec.fieldContext_DomainVerification_id(ctx, field)
-			case "domain":
-				return ec.fieldContext_DomainVerification_domain(ctx, field)
-			case "status":
-				return ec.fieldContext_DomainVerification_status(ctx, field)
-			case "logs":
-				return ec.fieldContext_DomainVerification_logs(ctx, field)
+			case "isValid":
+				return ec.fieldContext_DNSVerification_isValid(ctx, field)
+			case "message":
+				return ec.fieldContext_DNSVerification_message(ctx, field)
+			case "error":
+				return ec.fieldContext_DNSVerification_error(ctx, field)
 			case "createdAt":
-				return ec.fieldContext_DomainVerification_createdAt(ctx, field)
+				return ec.fieldContext_DNSVerification_createdAt(ctx, field)
+			case "lastCheckedAt":
+				return ec.fieldContext_DNSVerification_lastCheckedAt(ctx, field)
 			case "updatedAt":
-				return ec.fieldContext_DomainVerification_updatedAt(ctx, field)
-			case "deletedAt":
-				return ec.fieldContext_DomainVerification_deletedAt(ctx, field)
+				return ec.fieldContext_DNSVerification_updatedAt(ctx, field)
+			case "nextProcessAt":
+				return ec.fieldContext_DNSVerification_nextProcessAt(ctx, field)
+			case "completedAt":
+				return ec.fieldContext_DNSVerification_completedAt(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_DNSVerification_createdBy(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type DomainVerification", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type DNSVerification", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Domain_lastVerification(ctx context.Context, field graphql.CollectedField, obj *database_models.Domain) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Domain_lastVerification(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Domain().LastVerification(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*database_models.DNSVerification)
+	fc.Result = res
+	return ec.marshalODNSVerification2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋmodelsᚐDNSVerification(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Domain_lastVerification(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Domain",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "isValid":
+				return ec.fieldContext_DNSVerification_isValid(ctx, field)
+			case "message":
+				return ec.fieldContext_DNSVerification_message(ctx, field)
+			case "error":
+				return ec.fieldContext_DNSVerification_error(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_DNSVerification_createdAt(ctx, field)
+			case "lastCheckedAt":
+				return ec.fieldContext_DNSVerification_lastCheckedAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_DNSVerification_updatedAt(ctx, field)
+			case "nextProcessAt":
+				return ec.fieldContext_DNSVerification_nextProcessAt(ctx, field)
+			case "completedAt":
+				return ec.fieldContext_DNSVerification_completedAt(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_DNSVerification_createdBy(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type DNSVerification", field.Name)
 		},
 	}
 	return fc, nil
@@ -4193,344 +4728,6 @@ func (ec *executionContext) _Domain_deletedAt(ctx context.Context, field graphql
 func (ec *executionContext) fieldContext_Domain_deletedAt(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Domain",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type DateTime does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _DomainVerification_id(ctx context.Context, field graphql.CollectedField, obj *model.DomainVerification) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_DomainVerification_id(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.ID, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(uuid.UUID)
-	fc.Result = res
-	return ec.marshalNUUID2githubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_DomainVerification_id(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "DomainVerification",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type UUID does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _DomainVerification_domain(ctx context.Context, field graphql.CollectedField, obj *model.DomainVerification) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_DomainVerification_domain(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Domain, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(*database_models.Domain)
-	fc.Result = res
-	return ec.marshalNDomain2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋmodelsᚐDomain(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_DomainVerification_domain(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "DomainVerification",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_Domain_id(ctx, field)
-			case "name":
-				return ec.fieldContext_Domain_name(ctx, field)
-			case "url":
-				return ec.fieldContext_Domain_url(ctx, field)
-			case "organization":
-				return ec.fieldContext_Domain_organization(ctx, field)
-			case "platform":
-				return ec.fieldContext_Domain_platform(ctx, field)
-			case "verification":
-				return ec.fieldContext_Domain_verification(ctx, field)
-			case "state":
-				return ec.fieldContext_Domain_state(ctx, field)
-			case "analytics":
-				return ec.fieldContext_Domain_analytics(ctx, field)
-			case "analyticReports":
-				return ec.fieldContext_Domain_analyticReports(ctx, field)
-			case "lastDNSVerificationAt":
-				return ec.fieldContext_Domain_lastDNSVerificationAt(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Domain_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_Domain_updatedAt(ctx, field)
-			case "deletedAt":
-				return ec.fieldContext_Domain_deletedAt(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Domain", field.Name)
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _DomainVerification_status(ctx context.Context, field graphql.CollectedField, obj *model.DomainVerification) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_DomainVerification_status(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Status, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(database_enums.DNSStatus)
-	fc.Result = res
-	return ec.marshalNDNSStatus2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐDNSStatus(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_DomainVerification_status(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "DomainVerification",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type DNSStatus does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _DomainVerification_logs(ctx context.Context, field graphql.CollectedField, obj *model.DomainVerification) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_DomainVerification_logs(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Logs, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.([]*database_types.Log)
-	fc.Result = res
-	return ec.marshalNLog2ᚕᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐLogᚄ(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_DomainVerification_logs(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "DomainVerification",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_Log_id(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Log_createdAt(ctx, field)
-			case "message":
-				return ec.fieldContext_Log_message(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Log", field.Name)
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _DomainVerification_createdAt(ctx context.Context, field graphql.CollectedField, obj *model.DomainVerification) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_DomainVerification_createdAt(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.CreatedAt, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(time.Time)
-	fc.Result = res
-	return ec.marshalNDateTime2timeᚐTime(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_DomainVerification_createdAt(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "DomainVerification",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type DateTime does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _DomainVerification_updatedAt(ctx context.Context, field graphql.CollectedField, obj *model.DomainVerification) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_DomainVerification_updatedAt(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.UpdatedAt, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*time.Time)
-	fc.Result = res
-	return ec.marshalODateTime2ᚖtimeᚐTime(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_DomainVerification_updatedAt(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "DomainVerification",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type DateTime does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _DomainVerification_deletedAt(ctx context.Context, field graphql.CollectedField, obj *model.DomainVerification) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_DomainVerification_deletedAt(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.DeletedAt, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*time.Time)
-	fc.Result = res
-	return ec.marshalODateTime2ᚖtimeᚐTime(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_DomainVerification_deletedAt(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "DomainVerification",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -4910,8 +5107,10 @@ func (ec *executionContext) fieldContext_Link_domain(_ context.Context, field gr
 				return ec.fieldContext_Domain_organization(ctx, field)
 			case "platform":
 				return ec.fieldContext_Domain_platform(ctx, field)
-			case "verification":
-				return ec.fieldContext_Domain_verification(ctx, field)
+			case "verifications":
+				return ec.fieldContext_Domain_verifications(ctx, field)
+			case "lastVerification":
+				return ec.fieldContext_Domain_lastVerification(ctx, field)
 			case "state":
 				return ec.fieldContext_Domain_state(ctx, field)
 			case "analytics":
@@ -5190,8 +5389,8 @@ func (ec *executionContext) fieldContext_Link_validations(_ context.Context, fie
 				return ec.fieldContext_LinkValidation_lastCheckedAt(ctx, field)
 			case "updatedAt":
 				return ec.fieldContext_LinkValidation_updatedAt(ctx, field)
-			case "NextProcessAt":
-				return ec.fieldContext_LinkValidation_NextProcessAt(ctx, field)
+			case "nextProcessAt":
+				return ec.fieldContext_LinkValidation_nextProcessAt(ctx, field)
 			case "completedAt":
 				return ec.fieldContext_LinkValidation_completedAt(ctx, field)
 			case "createdBy":
@@ -5251,8 +5450,8 @@ func (ec *executionContext) fieldContext_Link_lastValidation(_ context.Context, 
 				return ec.fieldContext_LinkValidation_lastCheckedAt(ctx, field)
 			case "updatedAt":
 				return ec.fieldContext_LinkValidation_updatedAt(ctx, field)
-			case "NextProcessAt":
-				return ec.fieldContext_LinkValidation_NextProcessAt(ctx, field)
+			case "nextProcessAt":
+				return ec.fieldContext_LinkValidation_nextProcessAt(ctx, field)
 			case "completedAt":
 				return ec.fieldContext_LinkValidation_completedAt(ctx, field)
 			case "createdBy":
@@ -6542,8 +6741,8 @@ func (ec *executionContext) fieldContext_LinkValidation_updatedAt(_ context.Cont
 	return fc, nil
 }
 
-func (ec *executionContext) _LinkValidation_NextProcessAt(ctx context.Context, field graphql.CollectedField, obj *database_models.LinkValidation) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_LinkValidation_NextProcessAt(ctx, field)
+func (ec *executionContext) _LinkValidation_nextProcessAt(ctx context.Context, field graphql.CollectedField, obj *database_models.LinkValidation) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_LinkValidation_nextProcessAt(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -6570,7 +6769,7 @@ func (ec *executionContext) _LinkValidation_NextProcessAt(ctx context.Context, f
 	return ec.marshalODateTime2ᚖtimeᚐTime(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_LinkValidation_NextProcessAt(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_LinkValidation_nextProcessAt(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "LinkValidation",
 		Field:      field,
@@ -7262,8 +7461,10 @@ func (ec *executionContext) fieldContext_Mutation_createDomain(ctx context.Conte
 				return ec.fieldContext_Domain_organization(ctx, field)
 			case "platform":
 				return ec.fieldContext_Domain_platform(ctx, field)
-			case "verification":
-				return ec.fieldContext_Domain_verification(ctx, field)
+			case "verifications":
+				return ec.fieldContext_Domain_verifications(ctx, field)
+			case "lastVerification":
+				return ec.fieldContext_Domain_lastVerification(ctx, field)
 			case "state":
 				return ec.fieldContext_Domain_state(ctx, field)
 			case "analytics":
@@ -7290,6 +7491,101 @@ func (ec *executionContext) fieldContext_Mutation_createDomain(ctx context.Conte
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_createDomain_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_newDomainVerification(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_newDomainVerification(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Mutation().NewDomainVerification(rctx, fc.Args["domainId"].(uuid.UUID), fc.Args["forced"].(*bool))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Auth == nil {
+				return nil, errors.New("directive auth is not implemented")
+			}
+			return ec.directives.Auth(ctx, nil, directive0)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*database_models.DNSVerification); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/RouteHub-Link/routehub-service-graphql/database/models.DNSVerification`, tmp)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*database_models.DNSVerification)
+	fc.Result = res
+	return ec.marshalNDNSVerification2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋmodelsᚐDNSVerification(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_newDomainVerification(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "isValid":
+				return ec.fieldContext_DNSVerification_isValid(ctx, field)
+			case "message":
+				return ec.fieldContext_DNSVerification_message(ctx, field)
+			case "error":
+				return ec.fieldContext_DNSVerification_error(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_DNSVerification_createdAt(ctx, field)
+			case "lastCheckedAt":
+				return ec.fieldContext_DNSVerification_lastCheckedAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_DNSVerification_updatedAt(ctx, field)
+			case "nextProcessAt":
+				return ec.fieldContext_DNSVerification_nextProcessAt(ctx, field)
+			case "completedAt":
+				return ec.fieldContext_DNSVerification_completedAt(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_DNSVerification_createdBy(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type DNSVerification", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_newDomainVerification_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -8429,8 +8725,10 @@ func (ec *executionContext) fieldContext_ObservationAnalytic_domain(_ context.Co
 				return ec.fieldContext_Domain_organization(ctx, field)
 			case "platform":
 				return ec.fieldContext_Domain_platform(ctx, field)
-			case "verification":
-				return ec.fieldContext_Domain_verification(ctx, field)
+			case "verifications":
+				return ec.fieldContext_Domain_verifications(ctx, field)
+			case "lastVerification":
+				return ec.fieldContext_Domain_lastVerification(ctx, field)
 			case "state":
 				return ec.fieldContext_Domain_state(ctx, field)
 			case "analytics":
@@ -10185,8 +10483,10 @@ func (ec *executionContext) fieldContext_Organization_domains(_ context.Context,
 				return ec.fieldContext_Domain_organization(ctx, field)
 			case "platform":
 				return ec.fieldContext_Domain_platform(ctx, field)
-			case "verification":
-				return ec.fieldContext_Domain_verification(ctx, field)
+			case "verifications":
+				return ec.fieldContext_Domain_verifications(ctx, field)
+			case "lastVerification":
+				return ec.fieldContext_Domain_lastVerification(ctx, field)
 			case "state":
 				return ec.fieldContext_Domain_state(ctx, field)
 			case "analytics":
@@ -10627,8 +10927,10 @@ func (ec *executionContext) fieldContext_Permission_domains(_ context.Context, f
 				return ec.fieldContext_Domain_organization(ctx, field)
 			case "platform":
 				return ec.fieldContext_Domain_platform(ctx, field)
-			case "verification":
-				return ec.fieldContext_Domain_verification(ctx, field)
+			case "verifications":
+				return ec.fieldContext_Domain_verifications(ctx, field)
+			case "lastVerification":
+				return ec.fieldContext_Domain_lastVerification(ctx, field)
 			case "state":
 				return ec.fieldContext_Domain_state(ctx, field)
 			case "analytics":
@@ -11039,8 +11341,10 @@ func (ec *executionContext) fieldContext_Platform_domain(_ context.Context, fiel
 				return ec.fieldContext_Domain_organization(ctx, field)
 			case "platform":
 				return ec.fieldContext_Domain_platform(ctx, field)
-			case "verification":
-				return ec.fieldContext_Domain_verification(ctx, field)
+			case "verifications":
+				return ec.fieldContext_Domain_verifications(ctx, field)
+			case "lastVerification":
+				return ec.fieldContext_Domain_lastVerification(ctx, field)
 			case "state":
 				return ec.fieldContext_Domain_state(ctx, field)
 			case "analytics":
@@ -11723,8 +12027,10 @@ func (ec *executionContext) fieldContext_PlatformDeployment_domain(_ context.Con
 				return ec.fieldContext_Domain_organization(ctx, field)
 			case "platform":
 				return ec.fieldContext_Domain_platform(ctx, field)
-			case "verification":
-				return ec.fieldContext_Domain_verification(ctx, field)
+			case "verifications":
+				return ec.fieldContext_Domain_verifications(ctx, field)
+			case "lastVerification":
+				return ec.fieldContext_Domain_lastVerification(ctx, field)
 			case "state":
 				return ec.fieldContext_Domain_state(ctx, field)
 			case "analytics":
@@ -18643,6 +18949,98 @@ func (ec *executionContext) _AnalyticReports(ctx context.Context, sel ast.Select
 	return out
 }
 
+var dNSVerificationImplementors = []string{"DNSVerification"}
+
+func (ec *executionContext) _DNSVerification(ctx context.Context, sel ast.SelectionSet, obj *database_models.DNSVerification) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, dNSVerificationImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("DNSVerification")
+		case "isValid":
+			out.Values[i] = ec._DNSVerification_isValid(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "message":
+			out.Values[i] = ec._DNSVerification_message(ctx, field, obj)
+		case "error":
+			out.Values[i] = ec._DNSVerification_error(ctx, field, obj)
+		case "createdAt":
+			out.Values[i] = ec._DNSVerification_createdAt(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "lastCheckedAt":
+			out.Values[i] = ec._DNSVerification_lastCheckedAt(ctx, field, obj)
+		case "updatedAt":
+			out.Values[i] = ec._DNSVerification_updatedAt(ctx, field, obj)
+		case "nextProcessAt":
+			out.Values[i] = ec._DNSVerification_nextProcessAt(ctx, field, obj)
+		case "completedAt":
+			out.Values[i] = ec._DNSVerification_completedAt(ctx, field, obj)
+		case "createdBy":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._DNSVerification_createdBy(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
 var domainImplementors = []string{"Domain"}
 
 func (ec *executionContext) _Domain(ctx context.Context, sel ast.SelectionSet, obj *database_models.Domain) graphql.Marshaler {
@@ -18738,19 +19136,49 @@ func (ec *executionContext) _Domain(ctx context.Context, sel ast.SelectionSet, o
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "verification":
+		case "verifications":
 			field := field
 
-			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, _ *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Domain_verification(ctx, field, obj)
-				if res == graphql.Null {
-					atomic.AddUint32(&fs.Invalids, 1)
+				res = ec._Domain_verifications(ctx, field, obj)
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
 				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "lastVerification":
+			field := field
+
+			innerFunc := func(ctx context.Context, _ *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Domain_lastVerification(ctx, field, obj)
 				return res
 			}
 
@@ -18893,69 +19321,6 @@ func (ec *executionContext) _Domain(ctx context.Context, sel ast.SelectionSet, o
 			out.Values[i] = ec._Domain_updatedAt(ctx, field, obj)
 		case "deletedAt":
 			out.Values[i] = ec._Domain_deletedAt(ctx, field, obj)
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-	out.Dispatch(ctx)
-	if out.Invalids > 0 {
-		return graphql.Null
-	}
-
-	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
-
-	for label, dfs := range deferred {
-		ec.processDeferredGroup(graphql.DeferredGroup{
-			Label:    label,
-			Path:     graphql.GetPath(ctx),
-			FieldSet: dfs,
-			Context:  ctx,
-		})
-	}
-
-	return out
-}
-
-var domainVerificationImplementors = []string{"DomainVerification"}
-
-func (ec *executionContext) _DomainVerification(ctx context.Context, sel ast.SelectionSet, obj *model.DomainVerification) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, domainVerificationImplementors)
-
-	out := graphql.NewFieldSet(fields)
-	deferred := make(map[string]*graphql.FieldSet)
-	for i, field := range fields {
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("DomainVerification")
-		case "id":
-			out.Values[i] = ec._DomainVerification_id(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		case "domain":
-			out.Values[i] = ec._DomainVerification_domain(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		case "status":
-			out.Values[i] = ec._DomainVerification_status(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		case "logs":
-			out.Values[i] = ec._DomainVerification_logs(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		case "createdAt":
-			out.Values[i] = ec._DomainVerification_createdAt(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		case "updatedAt":
-			out.Values[i] = ec._DomainVerification_updatedAt(ctx, field, obj)
-		case "deletedAt":
-			out.Values[i] = ec._DomainVerification_deletedAt(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -19626,8 +19991,8 @@ func (ec *executionContext) _LinkValidation(ctx context.Context, sel ast.Selecti
 			out.Values[i] = ec._LinkValidation_lastCheckedAt(ctx, field, obj)
 		case "updatedAt":
 			out.Values[i] = ec._LinkValidation_updatedAt(ctx, field, obj)
-		case "NextProcessAt":
-			out.Values[i] = ec._LinkValidation_NextProcessAt(ctx, field, obj)
+		case "nextProcessAt":
+			out.Values[i] = ec._LinkValidation_nextProcessAt(ctx, field, obj)
 		case "completedAt":
 			out.Values[i] = ec._LinkValidation_completedAt(ctx, field, obj)
 		case "createdBy":
@@ -19870,6 +20235,13 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		case "createDomain":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_createDomain(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "newDomainVerification":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_newDomainVerification(ctx, field)
 			})
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
@@ -22026,14 +22398,18 @@ func (ec *executionContext) marshalNCrawlStatus2githubᚗcomᚋRouteHubᚑLink�
 	return v
 }
 
-func (ec *executionContext) unmarshalNDNSStatus2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐDNSStatus(ctx context.Context, v interface{}) (database_enums.DNSStatus, error) {
-	var res database_enums.DNSStatus
-	err := res.UnmarshalGQL(v)
-	return res, graphql.ErrorOnPath(ctx, err)
+func (ec *executionContext) marshalNDNSVerification2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋmodelsᚐDNSVerification(ctx context.Context, sel ast.SelectionSet, v database_models.DNSVerification) graphql.Marshaler {
+	return ec._DNSVerification(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNDNSStatus2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐDNSStatus(ctx context.Context, sel ast.SelectionSet, v database_enums.DNSStatus) graphql.Marshaler {
-	return v
+func (ec *executionContext) marshalNDNSVerification2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋmodelsᚐDNSVerification(ctx context.Context, sel ast.SelectionSet, v *database_models.DNSVerification) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._DNSVerification(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNDateTime2timeᚐTime(ctx context.Context, v interface{}) (time.Time, error) {
@@ -22122,44 +22498,6 @@ func (ec *executionContext) marshalNDomain2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋr
 func (ec *executionContext) unmarshalNDomainCreateInput2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐDomainCreateInput(ctx context.Context, v interface{}) (model.DomainCreateInput, error) {
 	res, err := ec.unmarshalInputDomainCreateInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalNDomainVerification2ᚕᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐDomainVerification(ctx context.Context, sel ast.SelectionSet, v []*model.DomainVerification) graphql.Marshaler {
-	ret := make(graphql.Array, len(v))
-	var wg sync.WaitGroup
-	isLen1 := len(v) == 1
-	if !isLen1 {
-		wg.Add(len(v))
-	}
-	for i := range v {
-		i := i
-		fc := &graphql.FieldContext{
-			Index:  &i,
-			Result: &v[i],
-		}
-		ctx := graphql.WithFieldContext(ctx, fc)
-		f := func(i int) {
-			defer func() {
-				if r := recover(); r != nil {
-					ec.Error(ctx, ec.Recover(ctx, r))
-					ret = nil
-				}
-			}()
-			if !isLen1 {
-				defer wg.Done()
-			}
-			ret[i] = ec.marshalODomainVerification2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐDomainVerification(ctx, sel, v[i])
-		}
-		if isLen1 {
-			f(i)
-		} else {
-			go f(i)
-		}
-
-	}
-	wg.Wait()
-
-	return ret
 }
 
 func (ec *executionContext) unmarshalNFloat2float64(ctx context.Context, v interface{}) (float64, error) {
@@ -23719,6 +24057,60 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 	return res
 }
 
+func (ec *executionContext) marshalODNSVerification2ᚕᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋmodelsᚐDNSVerificationᚄ(ctx context.Context, sel ast.SelectionSet, v []*database_models.DNSVerification) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNDNSVerification2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋmodelsᚐDNSVerification(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalODNSVerification2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋmodelsᚐDNSVerification(ctx context.Context, sel ast.SelectionSet, v *database_models.DNSVerification) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._DNSVerification(ctx, sel, v)
+}
+
 func (ec *executionContext) unmarshalODateTime2ᚖtimeᚐTime(ctx context.Context, v interface{}) (*time.Time, error) {
 	if v == nil {
 		return nil, nil
@@ -23733,13 +24125,6 @@ func (ec *executionContext) marshalODateTime2ᚖtimeᚐTime(ctx context.Context,
 	}
 	res := graphql.MarshalTime(*v)
 	return res
-}
-
-func (ec *executionContext) marshalODomainVerification2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐDomainVerification(ctx context.Context, sel ast.SelectionSet, v *model.DomainVerification) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return ec._DomainVerification(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalOFloat2ᚕfloat64ᚄ(ctx context.Context, v interface{}) ([]float64, error) {

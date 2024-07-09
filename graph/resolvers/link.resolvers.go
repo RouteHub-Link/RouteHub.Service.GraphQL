@@ -6,7 +6,6 @@ package graph
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"time"
 
@@ -101,7 +100,7 @@ func (r *linkCrawlResolver) CrawledBy(ctx context.Context, obj *database_models.
 
 // CreatedBy is the resolver for the createdBy field.
 func (r *linkValidationResolver) CreatedBy(ctx context.Context, obj *database_models.LinkValidation) (*database_models.User, error) {
-	panic(fmt.Errorf("not implemented: CreatedBy - createdBy"))
+	return r.LoaderContainer.User.Get(ctx, obj.CreatedBy)
 }
 
 // CreateLink is the resolver for the createLink field.
