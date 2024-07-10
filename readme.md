@@ -65,10 +65,10 @@ The main goal is to make new applications with uses this GraphQL backend.
 - [x] **Crawler Queing:** Queing for crawling is not implemented. not needed for now. we have a queue for validation and that's enough for now.
 - [x] **Validation Queue:** Validation queue is implemented for validating links. You can monitor it with asynqmon also validation process immediately starts after link creation. [DomainUtils Usage Serving Modes](https://github.com/RouteHub-Link/DomainUtils?tab=readme-ov-file#usage)
 - [x] **Link Pinning;** Link pinning for home page of platform is not implemented.
+- [x] **Domain Ownership Verification:** Domain verification is not implemented.
 
 ## Not Implemented
 
-- [ ] **Domain Ownership Verification:** Domain verification is not implemented.
 - [ ] **User Verification:** User verification is not implemented.
 - [ ] **Analytics:** Link analytics are not implemented.
 - [ ] **Deployments:** Platform Deployments are not implemented.
