@@ -1,6 +1,7 @@
 package database_models
 
 import (
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
@@ -28,7 +29,10 @@ func (DNSVerification) TableName() string {
 
 func (dv *DNSVerification) Requested(domain *Domain, userId uuid.UUID, taskId string, secret string) {
 	dv.ID = uuid.New()
-	dv.TaskId = taskId
+
+	_taskId := dv.trimTaskIdString(taskId)
+
+	dv.TaskId = _taskId
 	dv.DomainId = domain.ID
 	dv.CreatedBy = userId
 	dv.Secret = secret
@@ -52,4 +56,12 @@ func (dv *DNSVerification) Cancelled(message *string, err *string) {
 	updatedAt := time.Now()
 	dv.UpdatedAt = &updatedAt
 	dv.CompletedAt = &updatedAt
+}
+
+func (*DNSVerification) trimTaskIdString(taskId string) string {
+	_taskId := taskId
+	_taskId = strings.Trim(_taskId, "\n")
+	_taskId = strings.Trim(_taskId, " ")
+	_taskId = strings.Trim(_taskId, "\"")
+	return _taskId
 }
