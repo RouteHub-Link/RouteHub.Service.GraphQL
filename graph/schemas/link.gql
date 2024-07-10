@@ -67,7 +67,7 @@ type LinkValidation {
     createdAt: DateTime!
     lastCheckedAt: DateTime
     updatedAt: DateTime
-    NextProcessAt: DateTime
+    nextProcessAt: DateTime
     completedAt: DateTime
     createdBy: User!
 }

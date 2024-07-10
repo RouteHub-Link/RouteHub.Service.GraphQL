@@ -18,6 +18,7 @@ type ServiceContainer struct {
 	PlatformService               *services_platform.PlatformService
 	LinkService                   *services_link.LinkService
 	LinkValidationService         *services_link.LinkValidationService
+	DNSVerificationService        *services_domain.DNSVerificationService
 	WorkerService                 *worker.WrokerService
 	OrganizationService           *services_organization.OrganizationService
 	PlatformPermissionService     *services_platform.PlatformPermissionService
@@ -35,6 +36,7 @@ func NewServiceContainer(db *gorm.DB) *ServiceContainer {
 		WorkerService:                 &worker.WrokerService{},
 		LinkService:                   &services_link.LinkService{DB: db},
 		LinkValidationService:         services_link.NewLinkValidationService(&domainUtilsService, db),
+		DNSVerificationService:        services_domain.NewDNSVerificationService(&domainUtilsService, db),
 		OrganizationService:           &services_organization.OrganizationService{DB: db},
 		PlatformPermissionService:     &services_platform.PlatformPermissionService{DB: db},
 		OrganizationPermissionService: &services_organization.OrganizationPermissionService{DB: db},

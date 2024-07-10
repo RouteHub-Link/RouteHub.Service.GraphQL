@@ -1,6 +1,6 @@
 package services_domain_utils
 
-type DNSValidationPayload struct {
+type DNSVerificationPayload struct {
 	Link  string `json:"link"`
 	Value string `json:"value"`
 }

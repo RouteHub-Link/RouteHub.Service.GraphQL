@@ -88,7 +88,7 @@ func (lvs *LinkValidationService) GetLinkValidationsByLinkId(id uuid.UUID) (link
 	for _, linkValidation := range linkValidations {
 		err = checkLinkValidation(linkValidation, lvs)
 		if err != nil {
-			log.Default().Printf("\nError checking link validation: %+v\n link validation: %+v ", err, linkValidation)
+			log.Default().Printf("\nError checking link validation: %+v\n link validation record: %+v ", err, linkValidation)
 			return nil, err
 		}
 	}
