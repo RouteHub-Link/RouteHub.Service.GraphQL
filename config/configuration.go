@@ -11,10 +11,11 @@ import (
 )
 
 type ApplicationConfig struct {
-	GraphQL  GraphqlConfig  `koanf:"graphql"`
-	Database DatabaseConfig `koanf:"database"`
-	Redis    RedisConfig    `koanf:"redis"`
-	Services ServicesConfig `koanf:"services"`
+	GraphQL      GraphqlConfig  `koanf:"graphql"`
+	Database     DatabaseConfig `koanf:"database"`
+	Redis        RedisConfig    `koanf:"redis"`
+	Services     ServicesConfig `koanf:"services"`
+	CasbinConfig CasbinConfig   `koanf:"casbin"`
 }
 
 type GraphqlConfig struct {
@@ -58,6 +59,16 @@ type RedisConfig struct {
 
 type ServicesConfig struct {
 	DomainUtilsHost string `koanf:"domain_utils_host"`
+}
+
+type CasbinConfig struct {
+	Model string            `koanf:"model"`
+	Mongo CasbinMongoConfig `koanf:"mongodb"`
+}
+type CasbinMongoConfig struct {
+	URI        string `koanf:"uri"`
+	Database   string `koanf:"database"`
+	Collection string `koanf:"collection"`
 }
 
 type ConfigurationService struct {

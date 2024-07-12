@@ -36,3 +36,10 @@ graphql:
     lrue:
       size: 1000
       expire: 10m
+
+casbin:
+  model: ./config/authorization/rbac_model.conf
+  mongodb:
+    uri: mongodb://localhost:27017
+    database: casbin
+    collection: casbin_rule

@@ -19,6 +19,10 @@ import (
 var applicationConfig = Configuration.ConfigurationService{}.Get()
 
 func Serve() {
+
+	casbinAuth := auth.CasbinConfigurer{CasbinConfig: applicationConfig.CasbinConfig}
+	casbinAuth.GetEnforcer()
+
 	resolver := &Resolvers.Resolver{
 		DB:               database.DB,
 		ServiceContainer: services.NewServiceContainer(database.DB),
