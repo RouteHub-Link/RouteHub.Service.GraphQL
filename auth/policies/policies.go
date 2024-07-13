@@ -3,108 +3,79 @@ package policies
 import (
 	"log"
 
+	database_enums "github.com/RouteHub-Link/routehub-service-graphql/database/enums"
 	"github.com/casbin/casbin/v2"
 	"github.com/google/uuid"
 )
 
-type GeneratedPolicies struct {
-	Policies      [][]string
-	GroupedPolicy [][]string
-}
-
-func NewOrganizationPolicies(userId uuid.UUID, org uuid.UUID, platformId uuid.UUID) GeneratedPolicies {
-	policies := [][]string{
-		{"admin", org.String(), platformId.String(), "read"},
-		{"admin", org.String(), platformId.String(), "write"},
-		{"admin", org.String(), platformId.String(), "delete"},
-		{"admin", org.String(), "invitation", "create"},
-		{"admin", org.String(), "invitation", "read"},
-		{"admin", org.String(), "invitation", "delete"},
-	}
-
-	groupedPolicy := [][]string{{userId.String(), "admin", org.String()}}
-
-	return GeneratedPolicies{Policies: policies, GroupedPolicy: groupedPolicy}
-}
-
 type PolicyBuilder struct {
-	e              *casbin.Enforcer
-	userId         uuid.UUID
-	organizationId uuid.UUID
-	platformId     uuid.UUID
+	e       *casbin.Enforcer
+	sub     uuid.UUID
+	enforce bool
+	eft     string
 }
 
-func NewPolicyBuilder(e *casbin.Enforcer, userId, organizationId, platformId uuid.UUID) *PolicyBuilder {
+func NewPolicyBuilder(e *casbin.Enforcer, sub uuid.UUID, obj uuid.UUID, _eft string) *PolicyBuilder {
 	return &PolicyBuilder{
-		e:              e,
-		userId:         userId,
-		organizationId: organizationId,
-		platformId:     platformId,
+		e:       e,
+		sub:     sub,
+		enforce: false,
+		eft:     _eft,
 	}
 }
 
-func (pb *PolicyBuilder) OrganizationRead() *PolicyBuilder {
-	pb.e.AddPolicy("admin", pb.organizationId.String(), pb.organizationId.String(), "read")
+func (pb *PolicyBuilder) OrganizationRead(organizationId uuid.UUID) *PolicyBuilder {
+	pb.AddPolicy(pb.sub.String(), organizationId.String(), database_enums.OrganizationPermissionRead.String())
 	return pb
 }
 
-func (pb *PolicyBuilder) OrganizationUpdate() *PolicyBuilder {
-	pb.e.AddPolicy("admin", pb.organizationId.String(), pb.organizationId.String(), "update")
+func (pb *PolicyBuilder) OrganizationUpdate(organizationId uuid.UUID) *PolicyBuilder {
+	pb.AddPolicy(pb.sub.String(), organizationId.String(), database_enums.OrganizationPermissionUpdate.String())
 	return pb
 }
 
-func (pb *PolicyBuilder) OrganizationDelete() *PolicyBuilder {
-	pb.e.AddPolicy("admin", pb.organizationId.String(), pb.organizationId.String(), "delete")
+func (pb *PolicyBuilder) OrganizationDelete(organizationId uuid.UUID) *PolicyBuilder {
+	pb.AddPolicy(pb.sub.String(), organizationId.String(), database_enums.OrganizationPermissionDelete.String())
 	return pb
 }
 
-func (pb *PolicyBuilder) PlatformRead() *PolicyBuilder {
-	pb.e.AddPolicy("admin", pb.organizationId.String(), pb.platformId.String(), "read")
+func (pb *PolicyBuilder) OrganizationPlatformCreate(organizationId uuid.UUID) *PolicyBuilder {
+	pb.AddPolicy(pb.sub.String(), organizationId.String(), database_enums.OrganizationPermissionPlatformCreate.String())
 	return pb
 }
 
-func (pb *PolicyBuilder) PlatformUpdate() *PolicyBuilder {
-	pb.e.AddPolicy("admin", pb.organizationId.String(), pb.platformId.String(), "update")
+func (pb *PolicyBuilder) OrganizationUserInvite(organizationId uuid.UUID) *PolicyBuilder {
+	pb.AddPolicy(pb.sub.String(), organizationId.String(), database_enums.OrganizationPermissionUserInvite.String())
 	return pb
 }
 
-func (pb *PolicyBuilder) LinkCreate() *PolicyBuilder {
-	pb.e.AddPolicy("admin", pb.organizationId.String(), pb.platformId.String(), "link_create")
+func (pb *PolicyBuilder) PlatformRead(platformId uuid.UUID) *PolicyBuilder {
+	pb.AddPolicy(pb.sub.String(), platformId.String(), database_enums.PlatformPermissionRead.String())
 	return pb
 }
 
-func (pb *PolicyBuilder) LinkRead() *PolicyBuilder {
-	pb.e.AddPolicy("admin", pb.organizationId.String(), pb.platformId.String(), "link_read")
+func (pb *PolicyBuilder) PlatformUpdate(platformId uuid.UUID) *PolicyBuilder {
+	pb.AddPolicy(pb.sub.String(), platformId.String(), database_enums.PlatformPermissionUpdate.String())
 	return pb
 }
 
-func (pb *PolicyBuilder) LinkDelete() *PolicyBuilder {
-	pb.e.AddPolicy("admin", pb.organizationId.String(), pb.platformId.String(), "link_delete")
+func (pb *PolicyBuilder) LinkCreate(platformId uuid.UUID) *PolicyBuilder {
+	pb.AddPolicy(pb.sub.String(), platformId.String(), database_enums.PlatformPermissionLinkCreate.String())
 	return pb
 }
 
-func (pb *PolicyBuilder) LinkUpdate() *PolicyBuilder {
-	pb.e.AddPolicy("admin", pb.organizationId.String(), pb.platformId.String(), "link_update")
+func (pb *PolicyBuilder) LinkRead(platformId uuid.UUID) *PolicyBuilder {
+	pb.AddPolicy(pb.sub.String(), platformId.String(), database_enums.PlatformPermissionLinkRead.String())
 	return pb
 }
 
-func (pb *PolicyBuilder) InvitationCreate() *PolicyBuilder {
-	pb.e.AddPolicy("admin", pb.organizationId.String(), "invitation", "create")
+func (pb *PolicyBuilder) LinkDelete(platformId uuid.UUID) *PolicyBuilder {
+	pb.AddPolicy(pb.sub.String(), platformId.String(), database_enums.PlatformPermissionLinkDelete.String())
 	return pb
 }
 
-func (pb *PolicyBuilder) InvitationRead() *PolicyBuilder {
-	pb.e.AddPolicy("admin", pb.organizationId.String(), "invitation", "read")
-	return pb
-}
-
-func (pb *PolicyBuilder) InvitationDelete() *PolicyBuilder {
-	pb.e.AddPolicy("admin", pb.organizationId.String(), "invitation", "delete")
-	return pb
-}
-
-func (pb *PolicyBuilder) GroupingPolicy() *PolicyBuilder {
-	pb.e.AddGroupingPolicy(pb.userId.String(), "admin", pb.organizationId.String())
+func (pb *PolicyBuilder) LinkUpdate(platformId uuid.UUID) *PolicyBuilder {
+	pb.AddPolicy(pb.sub.String(), platformId.String(), database_enums.PlatformPermissionLinkUpdate.String())
 	return pb
 }
 
@@ -112,43 +83,16 @@ func (pb *PolicyBuilder) Build() {
 	pb.e.SavePolicy()
 }
 
-func (pb *PolicyBuilder) Enforce() {
-	res, _ := pb.e.Enforce(pb.userId.String(), pb.organizationId.String(), pb.organizationId.String(), "read")
-	log.Printf("userId, organizationId, organizationId, 'read' res : %v\n", res)
+func (pb *PolicyBuilder) AddPolicy(sub string, obj string, act string) {
+	pb.e.AddPolicy(sub, obj, act, pb.eft)
 
-	res, _ = pb.e.Enforce(pb.userId.String(), pb.organizationId.String(), pb.organizationId.String(), "update")
-	log.Printf("userId, organizationId, organizationId, 'update' res : %v\n", res)
+	if pb.enforce {
+		res, _ := pb.e.Enforce(sub, obj, act)
+		log.Printf("Enforce policy; \nsub: %v \nobj: %v \nact: %v \neft: %v \nresult: %v", sub, obj, act, pb.eft, res)
+	}
+}
 
-	res, _ = pb.e.Enforce(pb.userId.String(), pb.organizationId.String(), pb.organizationId.String(), "delete")
-	log.Printf("userId, organizationId, organizationId, 'delete' res : %v\n", res)
-
-	res, _ = pb.e.Enforce(pb.userId.String(), pb.organizationId.String(), pb.platformId.String(), "read")
-	log.Printf("userId, organizationId, platformId, 'read' res : %v\n", res)
-
-	res, _ = pb.e.Enforce(pb.userId.String(), pb.organizationId.String(), pb.platformId.String(), "update")
-	log.Printf("userId, organizationId, platformId, 'update' res : %v\n", res)
-
-	res, _ = pb.e.Enforce(pb.userId.String(), pb.organizationId.String(), pb.platformId.String(), "delete")
-	log.Printf("userId, organizationId, platformId, 'delete' res : %v\n", res)
-
-	res, _ = pb.e.Enforce(pb.userId.String(), pb.organizationId.String(), pb.platformId.String(), "link_create")
-	log.Printf("userId, organizationId, platformId, 'link_create' res : %v\n", res)
-
-	res, _ = pb.e.Enforce(pb.userId.String(), pb.organizationId.String(), pb.platformId.String(), "link_read")
-	log.Printf("userId, organizationId, platformId, 'link_read' res : %v\n", res)
-
-	res, _ = pb.e.Enforce(pb.userId.String(), pb.organizationId.String(), pb.platformId.String(), "link_delete")
-	log.Printf("userId, organizationId, platformId, 'link_delete' res : %v\n", res)
-
-	res, _ = pb.e.Enforce(pb.userId.String(), pb.organizationId.String(), pb.platformId.String(), "link_update")
-	log.Printf("userId, organizationId, platformId, 'link_update' res : %v\n", res)
-
-	res, _ = pb.e.Enforce(pb.userId.String(), pb.organizationId.String(), "invitation", "create")
-	log.Printf("userId, organizationId, 'invitation', 'create' res : %v\n", res)
-
-	res, _ = pb.e.Enforce(pb.userId.String(), pb.organizationId.String(), "invitation", "read")
-	log.Printf("userId, organizationId, 'invitation', 'read' res : %v\n", res)
-
-	res, _ = pb.e.Enforce(pb.userId.String(), pb.organizationId.String(), "invitation", "delete")
-	log.Printf("userId, organizationId, 'invitation', 'delete' res : %v\n", res)
+func (pb *PolicyBuilder) EnforceWhenAdded(enforce bool) *PolicyBuilder {
+	pb.enforce = enforce
+	return pb
 }

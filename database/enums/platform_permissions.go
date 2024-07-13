@@ -9,26 +9,27 @@ import (
 type PlatformPermission string
 
 const (
-	PlatformPermissionLinkCreate     PlatformPermission = "LINK_CREATE"
-	PlatformPermissionLinkUpdate     PlatformPermission = "LINK_UPDATE"
-	PlatformPermissionLinkDelete     PlatformPermission = "LINK_DELETE"
-	PlatformPermissionPlatformCreate PlatformPermission = "PLATFORM_CREATE"
-	PlatformPermissionPlatformUpdate PlatformPermission = "PLATFORM_UPDATE"
-	PlatformPermissionPlatformDelete PlatformPermission = "PLATFORM_DELETE"
+	PlatformPermissionLinkCreate PlatformPermission = "LINK_CREATE"
+	PlatformPermissionLinkUpdate PlatformPermission = "LINK_UPDATE"
+	PlatformPermissionLinkDelete PlatformPermission = "LINK_DELETE"
+	PlatformPermissionLinkRead   PlatformPermission = "LINK_READ"
+	PlatformPermissionRead       PlatformPermission = "PLATFORM_READ"
+	PlatformPermissionUpdate     PlatformPermission = "PLATFORM_UPDATE"
+	PlatformPermissionDelete     PlatformPermission = "PLATFORM_DELETE"
 )
 
 var AllPlatformPermission = []PlatformPermission{
 	PlatformPermissionLinkCreate,
 	PlatformPermissionLinkUpdate,
 	PlatformPermissionLinkDelete,
-	PlatformPermissionPlatformCreate,
-	PlatformPermissionPlatformUpdate,
-	PlatformPermissionPlatformDelete,
+	PlatformPermissionLinkRead,
+	PlatformPermissionUpdate,
+	PlatformPermissionDelete,
 }
 
 func (e PlatformPermission) IsValid() bool {
 	switch e {
-	case PlatformPermissionLinkCreate, PlatformPermissionLinkUpdate, PlatformPermissionLinkDelete, PlatformPermissionPlatformCreate, PlatformPermissionPlatformUpdate, PlatformPermissionPlatformDelete:
+	case PlatformPermissionLinkCreate, PlatformPermissionLinkUpdate, PlatformPermissionLinkDelete, PlatformPermissionLinkRead, PlatformPermissionRead, PlatformPermissionUpdate, PlatformPermissionDelete:
 		return true
 	}
 	return false

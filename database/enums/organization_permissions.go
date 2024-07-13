@@ -9,38 +9,29 @@ import (
 type OrganizationPermission string
 
 const (
-	OrganizationPermissionDomainCreate           OrganizationPermission = "DOMAIN_CREATE"
-	OrganizationPermissionDomainUpdate           OrganizationPermission = "DOMAIN_UPDATE"
-	OrganizationPermissionDomainDelete           OrganizationPermission = "DOMAIN_DELETE"
-	OrganizationPermissionOrganizationUpdate     OrganizationPermission = "ORGANIZATION_UPDATE"
-	OrganizationPermissionOrganizationDelete     OrganizationPermission = "ORGANIZATION_DELETE"
-	OrganizationPermissionOrganizationUserInvite OrganizationPermission = "ORGANIZATION_USER_INVITE"
-	OrganizationPermissionPlatformCreate         OrganizationPermission = "PLATFORM_CREATE"
-	OrganizationPermissionPlatformUpdate         OrganizationPermission = "PLATFORM_UPDATE"
-	OrganizationPermissionPlatformDelete         OrganizationPermission = "PLATFORM_DELETE"
-	OrganizationPermissionPlatformUserAdd        OrganizationPermission = "PLATFORM_USER_ADD"
-	OrganizationPermissionPlatformUserRemove     OrganizationPermission = "PLATFORM_USER_REMOVE"
-	OrganizationPermissionPlatformUserUpdate     OrganizationPermission = "PLATFORM_USER_UPDATE"
+	OrganizationPermissionDomainCreate   OrganizationPermission = "DOMAIN_CREATE"
+	OrganizationPermissionDomainUpdate   OrganizationPermission = "DOMAIN_UPDATE"
+	OrganizationPermissionDomainDelete   OrganizationPermission = "DOMAIN_DELETE"
+	OrganizationPermissionRead           OrganizationPermission = "ORGANIZATION_READ"
+	OrganizationPermissionUpdate         OrganizationPermission = "ORGANIZATION_UPDATE"
+	OrganizationPermissionDelete         OrganizationPermission = "ORGANIZATION_DELETE"
+	OrganizationPermissionUserInvite     OrganizationPermission = "ORGANIZATION_USER_INVITE"
+	OrganizationPermissionPlatformCreate OrganizationPermission = "PLATFORM_CREATE"
 )
 
 var AllOrganizationPermission = []OrganizationPermission{
 	OrganizationPermissionDomainCreate,
 	OrganizationPermissionDomainUpdate,
 	OrganizationPermissionDomainDelete,
-	OrganizationPermissionOrganizationUpdate,
-	OrganizationPermissionOrganizationDelete,
+	OrganizationPermissionUpdate,
+	OrganizationPermissionDelete,
 	OrganizationPermissionPlatformCreate,
-	OrganizationPermissionPlatformUpdate,
-	OrganizationPermissionPlatformDelete,
-	OrganizationPermissionOrganizationUserInvite,
-	OrganizationPermissionPlatformUserAdd,
-	OrganizationPermissionPlatformUserRemove,
-	OrganizationPermissionPlatformUserUpdate,
+	OrganizationPermissionUserInvite,
 }
 
 func (e OrganizationPermission) IsValid() bool {
 	switch e {
-	case OrganizationPermissionDomainCreate, OrganizationPermissionDomainUpdate, OrganizationPermissionDomainDelete, OrganizationPermissionOrganizationUpdate, OrganizationPermissionOrganizationDelete, OrganizationPermissionPlatformCreate, OrganizationPermissionPlatformUpdate, OrganizationPermissionPlatformDelete, OrganizationPermissionOrganizationUserInvite, OrganizationPermissionPlatformUserAdd, OrganizationPermissionPlatformUserRemove, OrganizationPermissionPlatformUserUpdate:
+	case OrganizationPermissionDomainCreate, OrganizationPermissionDomainUpdate, OrganizationPermissionDomainDelete, OrganizationPermissionUpdate, OrganizationPermissionDelete, OrganizationPermissionPlatformCreate, OrganizationPermissionUserInvite, OrganizationPermissionRead:
 		return true
 	}
 	return false

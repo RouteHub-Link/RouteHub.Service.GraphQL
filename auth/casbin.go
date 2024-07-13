@@ -1,7 +1,6 @@
 package auth
 
 import (
-	"log"
 	"sync"
 
 	"github.com/RouteHub-Link/routehub-service-graphql/auth/policies"
@@ -39,42 +38,24 @@ func (cc CasbinConfigurer) getAdapter() persist.Adapter {
 }
 
 func (cc CasbinConfigurer) initTestPolicy(e *casbin.Enforcer) (*casbin.Enforcer, error) {
-	// add the policy
-	testUserUUID := uuid.New()
-	testOrgUUID := uuid.New()
-	testPlatformUUID := uuid.New()
-
-	testPolicies := policies.NewOrganizationPolicies(testUserUUID, testOrgUUID, testPlatformUUID)
-	log.Printf("testPolicies : %+v", testPolicies)
-
 	userId := uuid.New()
 	organizationId := uuid.New()
 	platformId := uuid.New()
 
-	e.SavePolicy()
+	pb := policies.NewPolicyBuilder(e, userId, organizationId, "allow")
 
-	res, _ := e.Enforce(testUserUUID.String(), testOrgUUID.String(), testPlatformUUID.String(), "read")
-	log.Printf("res : %v", res)
-
-	// With Custom Builder
-	pb := policies.NewPolicyBuilder(e, userId, organizationId, platformId)
-
-	pb.OrganizationRead().
-		OrganizationUpdate().
-		OrganizationDelete().
-		PlatformRead().
-		PlatformUpdate().
-		InvitationCreate().
-		InvitationRead().
-		InvitationDelete().
-		LinkCreate().
-		LinkRead().
-		LinkDelete().
-		LinkUpdate().
-		GroupingPolicy().
-		Build()
-
-	pb.Enforce()
+	pb.EnforceWhenAdded(true).
+		OrganizationRead(organizationId).
+		OrganizationUpdate(organizationId).
+		OrganizationDelete(organizationId).
+		OrganizationPlatformCreate(organizationId).
+		OrganizationUserInvite(organizationId).
+		PlatformRead(platformId).
+		PlatformUpdate(platformId).
+		LinkCreate(organizationId).
+		LinkRead(organizationId).
+		LinkUpdate(organizationId).
+		LinkDelete(organizationId)
 
 	return e, nil
 }

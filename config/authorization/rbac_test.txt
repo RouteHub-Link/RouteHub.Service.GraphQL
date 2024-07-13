@@ -1,6 +1,0 @@
-alice, domain1, data1, read             true Reason: ["admin","domain1","data1","read"]
-john, org1, platform1, update           true Reason: ["admin","org1","platform1","update"] 
-jonah, org1, platform1, read            true Reason: ["member","org1","platform1","read"] 
-jonah, org1, platform1, update          false 
-jonah, org1, platform1, link_create     true Reason: ["member","org1","platform1","link_create"] 
-xUser, org1, platform1, link_create     false 
