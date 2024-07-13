@@ -60,8 +60,8 @@ enum CrawlStatus {
   FAILED
 }
 
-directive @auth on FIELD_DEFINITION
-directive @organizationPermission(permission: OrganizationPermission!) on INPUT_OBJECT
+directive @auth on FIELD_DEFINITION 
+directive @organizationPermission(permission: OrganizationPermission!) on INPUT_OBJECT | OBJECT
 directive @platformPermission(permission: PlatformPermission!) on INPUT_OBJECT
 directive @domainURLCheck on INPUT_OBJECT
 

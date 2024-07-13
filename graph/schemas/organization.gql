@@ -1,4 +1,4 @@
-type Organization {
+type Organization @organizationPermission(permission: ORGANIZATION_READ){
   id: UUID!
   name: String!
   website: String!

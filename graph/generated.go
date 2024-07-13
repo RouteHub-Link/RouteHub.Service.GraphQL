@@ -4163,8 +4163,32 @@ func (ec *executionContext) _Domain_organization(ctx context.Context, field grap
 		}
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Domain().Organization(rctx, obj)
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Domain().Organization(rctx, obj)
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			permission, err := ec.unmarshalNOrganizationPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐOrganizationPermission(ctx, "ORGANIZATION_READ")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.OrganizationPermission == nil {
+				return nil, errors.New("directive organizationPermission is not implemented")
+			}
+			return ec.directives.OrganizationPermission(ctx, obj, directive0, permission)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*database_models.Organization); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/RouteHub-Link/routehub-service-graphql/database/models.Organization`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -8036,13 +8060,23 @@ func (ec *executionContext) _Mutation_createOrganization(ctx context.Context, fi
 			return ec.resolvers.Mutation().CreateOrganization(rctx, fc.Args["input"].(model.OrganizationCreateInput))
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
+			permission, err := ec.unmarshalNOrganizationPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐOrganizationPermission(ctx, "ORGANIZATION_READ")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.OrganizationPermission == nil {
+				return nil, errors.New("directive organizationPermission is not implemented")
+			}
+			return ec.directives.OrganizationPermission(ctx, nil, directive0, permission)
+		}
+		directive2 := func(ctx context.Context) (interface{}, error) {
 			if ec.directives.Auth == nil {
 				return nil, errors.New("directive auth is not implemented")
 			}
-			return ec.directives.Auth(ctx, nil, directive0)
+			return ec.directives.Auth(ctx, nil, directive1)
 		}
 
-		tmp, err := directive1(rctx)
+		tmp, err := directive2(rctx)
 		if err != nil {
 			return nil, graphql.ErrorOnPath(ctx, err)
 		}
@@ -8135,13 +8169,23 @@ func (ec *executionContext) _Mutation_updateOrganization(ctx context.Context, fi
 			return ec.resolvers.Mutation().UpdateOrganization(rctx, fc.Args["input"].(model.OrganizationUpdateInput))
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
+			permission, err := ec.unmarshalNOrganizationPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐOrganizationPermission(ctx, "ORGANIZATION_READ")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.OrganizationPermission == nil {
+				return nil, errors.New("directive organizationPermission is not implemented")
+			}
+			return ec.directives.OrganizationPermission(ctx, nil, directive0, permission)
+		}
+		directive2 := func(ctx context.Context) (interface{}, error) {
 			if ec.directives.Auth == nil {
 				return nil, errors.New("directive auth is not implemented")
 			}
-			return ec.directives.Auth(ctx, nil, directive0)
+			return ec.directives.Auth(ctx, nil, directive1)
 		}
 
-		tmp, err := directive1(rctx)
+		tmp, err := directive2(rctx)
 		if err != nil {
 			return nil, graphql.ErrorOnPath(ctx, err)
 		}
@@ -9942,8 +9986,32 @@ func (ec *executionContext) _Organization_id(ctx context.Context, field graphql.
 		}
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.ID, nil
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return obj.ID, nil
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			permission, err := ec.unmarshalNOrganizationPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐOrganizationPermission(ctx, "ORGANIZATION_READ")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.OrganizationPermission == nil {
+				return nil, errors.New("directive organizationPermission is not implemented")
+			}
+			return ec.directives.OrganizationPermission(ctx, obj, directive0, permission)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(uuid.UUID); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be github.com/google/uuid.UUID`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -9986,8 +10054,32 @@ func (ec *executionContext) _Organization_name(ctx context.Context, field graphq
 		}
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Name, nil
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return obj.Name, nil
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			permission, err := ec.unmarshalNOrganizationPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐOrganizationPermission(ctx, "ORGANIZATION_READ")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.OrganizationPermission == nil {
+				return nil, errors.New("directive organizationPermission is not implemented")
+			}
+			return ec.directives.OrganizationPermission(ctx, obj, directive0, permission)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(string); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be string`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -10030,8 +10122,32 @@ func (ec *executionContext) _Organization_website(ctx context.Context, field gra
 		}
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Website, nil
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return obj.Website, nil
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			permission, err := ec.unmarshalNOrganizationPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐOrganizationPermission(ctx, "ORGANIZATION_READ")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.OrganizationPermission == nil {
+				return nil, errors.New("directive organizationPermission is not implemented")
+			}
+			return ec.directives.OrganizationPermission(ctx, obj, directive0, permission)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(string); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be string`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -10074,8 +10190,32 @@ func (ec *executionContext) _Organization_permissions(ctx context.Context, field
 		}
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Organization().Permissions(rctx, obj)
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Organization().Permissions(rctx, obj)
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			permission, err := ec.unmarshalNOrganizationPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐOrganizationPermission(ctx, "ORGANIZATION_READ")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.OrganizationPermission == nil {
+				return nil, errors.New("directive organizationPermission is not implemented")
+			}
+			return ec.directives.OrganizationPermission(ctx, obj, directive0, permission)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.([]database_enums.OrganizationPermission); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be []github.com/RouteHub-Link/routehub-service-graphql/database/enums.OrganizationPermission`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -10118,8 +10258,32 @@ func (ec *executionContext) _Organization_platforms(ctx context.Context, field g
 		}
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Organization().Platforms(rctx, obj)
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Organization().Platforms(rctx, obj)
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			permission, err := ec.unmarshalNOrganizationPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐOrganizationPermission(ctx, "ORGANIZATION_READ")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.OrganizationPermission == nil {
+				return nil, errors.New("directive organizationPermission is not implemented")
+			}
+			return ec.directives.OrganizationPermission(ctx, obj, directive0, permission)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.([]*database_models.Platform); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be []*github.com/RouteHub-Link/routehub-service-graphql/database/models.Platform`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -10192,8 +10356,32 @@ func (ec *executionContext) _Organization_industry(ctx context.Context, field gr
 		}
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Industry, nil
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return obj.Industry, nil
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			permission, err := ec.unmarshalNOrganizationPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐOrganizationPermission(ctx, "ORGANIZATION_READ")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.OrganizationPermission == nil {
+				return nil, errors.New("directive organizationPermission is not implemented")
+			}
+			return ec.directives.OrganizationPermission(ctx, obj, directive0, permission)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.([]*database_types.Industry); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be []*github.com/RouteHub-Link/routehub-service-graphql/database/types.Industry`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -10237,8 +10425,32 @@ func (ec *executionContext) _Organization_description(ctx context.Context, field
 		}
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Description, nil
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return obj.Description, nil
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			permission, err := ec.unmarshalNOrganizationPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐOrganizationPermission(ctx, "ORGANIZATION_READ")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.OrganizationPermission == nil {
+				return nil, errors.New("directive organizationPermission is not implemented")
+			}
+			return ec.directives.OrganizationPermission(ctx, obj, directive0, permission)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(string); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be string`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -10281,8 +10493,32 @@ func (ec *executionContext) _Organization_location(ctx context.Context, field gr
 		}
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Location, nil
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return obj.Location, nil
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			permission, err := ec.unmarshalNOrganizationPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐOrganizationPermission(ctx, "ORGANIZATION_READ")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.OrganizationPermission == nil {
+				return nil, errors.New("directive organizationPermission is not implemented")
+			}
+			return ec.directives.OrganizationPermission(ctx, obj, directive0, permission)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(string); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be string`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -10325,8 +10561,32 @@ func (ec *executionContext) _Organization_socialMedias(ctx context.Context, fiel
 		}
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.SocialMedias, nil
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return obj.SocialMedias, nil
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			permission, err := ec.unmarshalNOrganizationPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐOrganizationPermission(ctx, "ORGANIZATION_READ")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.OrganizationPermission == nil {
+				return nil, errors.New("directive organizationPermission is not implemented")
+			}
+			return ec.directives.OrganizationPermission(ctx, obj, directive0, permission)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.([]*database_types.SocialMedia); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be []*github.com/RouteHub-Link/routehub-service-graphql/database/types.SocialMedia`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -10377,8 +10637,32 @@ func (ec *executionContext) _Organization_users(ctx context.Context, field graph
 		}
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Organization().Users(rctx, obj)
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Organization().Users(rctx, obj)
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			permission, err := ec.unmarshalNOrganizationPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐOrganizationPermission(ctx, "ORGANIZATION_READ")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.OrganizationPermission == nil {
+				return nil, errors.New("directive organizationPermission is not implemented")
+			}
+			return ec.directives.OrganizationPermission(ctx, obj, directive0, permission)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.([]*database_models.User); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be []*github.com/RouteHub-Link/routehub-service-graphql/database/models.User`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -10447,8 +10731,32 @@ func (ec *executionContext) _Organization_domains(ctx context.Context, field gra
 		}
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Organization().Domains(rctx, obj)
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Organization().Domains(rctx, obj)
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			permission, err := ec.unmarshalNOrganizationPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐOrganizationPermission(ctx, "ORGANIZATION_READ")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.OrganizationPermission == nil {
+				return nil, errors.New("directive organizationPermission is not implemented")
+			}
+			return ec.directives.OrganizationPermission(ctx, obj, directive0, permission)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.([]*database_models.Domain); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be []*github.com/RouteHub-Link/routehub-service-graphql/database/models.Domain`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -10823,8 +11131,32 @@ func (ec *executionContext) _Permission_organizations(ctx context.Context, field
 		}
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Organizations, nil
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return obj.Organizations, nil
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			permission, err := ec.unmarshalNOrganizationPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐOrganizationPermission(ctx, "ORGANIZATION_READ")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.OrganizationPermission == nil {
+				return nil, errors.New("directive organizationPermission is not implemented")
+			}
+			return ec.directives.OrganizationPermission(ctx, obj, directive0, permission)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.([]*database_models.Organization); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be []*github.com/RouteHub-Link/routehub-service-graphql/database/models.Organization`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -11237,8 +11569,32 @@ func (ec *executionContext) _Platform_organization(ctx context.Context, field gr
 		}
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Platform().Organization(rctx, obj)
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Platform().Organization(rctx, obj)
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			permission, err := ec.unmarshalNOrganizationPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐOrganizationPermission(ctx, "ORGANIZATION_READ")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.OrganizationPermission == nil {
+				return nil, errors.New("directive organizationPermission is not implemented")
+			}
+			return ec.directives.OrganizationPermission(ctx, obj, directive0, permission)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*database_models.Organization); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/RouteHub-Link/routehub-service-graphql/database/models.Organization`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -12355,13 +12711,23 @@ func (ec *executionContext) _Query_organizations(ctx context.Context, field grap
 			return ec.resolvers.Query().Organizations(rctx)
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
+			permission, err := ec.unmarshalNOrganizationPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐOrganizationPermission(ctx, "ORGANIZATION_READ")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.OrganizationPermission == nil {
+				return nil, errors.New("directive organizationPermission is not implemented")
+			}
+			return ec.directives.OrganizationPermission(ctx, nil, directive0, permission)
+		}
+		directive2 := func(ctx context.Context) (interface{}, error) {
 			if ec.directives.Auth == nil {
 				return nil, errors.New("directive auth is not implemented")
 			}
-			return ec.directives.Auth(ctx, nil, directive0)
+			return ec.directives.Auth(ctx, nil, directive1)
 		}
 
-		tmp, err := directive1(rctx)
+		tmp, err := directive2(rctx)
 		if err != nil {
 			return nil, graphql.ErrorOnPath(ctx, err)
 		}
@@ -13897,8 +14263,32 @@ func (ec *executionContext) _User_organizations(ctx context.Context, field graph
 		}
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.User().Organizations(rctx, obj)
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.User().Organizations(rctx, obj)
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			permission, err := ec.unmarshalNOrganizationPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐOrganizationPermission(ctx, "ORGANIZATION_READ")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.OrganizationPermission == nil {
+				return nil, errors.New("directive organizationPermission is not implemented")
+			}
+			return ec.directives.OrganizationPermission(ctx, obj, directive0, permission)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.([]*database_models.Organization); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be []*github.com/RouteHub-Link/routehub-service-graphql/database/models.Organization`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -14363,8 +14753,32 @@ func (ec *executionContext) _UserInvite_organization(ctx context.Context, field 
 		}
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.UserInvite().Organization(rctx, obj)
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.UserInvite().Organization(rctx, obj)
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			permission, err := ec.unmarshalNOrganizationPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐOrganizationPermission(ctx, "ORGANIZATION_READ")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.OrganizationPermission == nil {
+				return nil, errors.New("directive organizationPermission is not implemented")
+			}
+			return ec.directives.OrganizationPermission(ctx, obj, directive0, permission)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.([]*database_models.Organization); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be []*github.com/RouteHub-Link/routehub-service-graphql/database/models.Organization`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
