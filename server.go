@@ -7,7 +7,6 @@ import (
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/RouteHub-Link/routehub-service-graphql/auth"
-	Configuration "github.com/RouteHub-Link/routehub-service-graphql/config"
 	"github.com/RouteHub-Link/routehub-service-graphql/database"
 	"github.com/RouteHub-Link/routehub-service-graphql/directives"
 	"github.com/RouteHub-Link/routehub-service-graphql/graph"
@@ -16,13 +15,7 @@ import (
 	"github.com/RouteHub-Link/routehub-service-graphql/services"
 )
 
-var applicationConfig = Configuration.ConfigurationService{}.Get()
-
 func Serve() {
-
-	casbinAuth := auth.CasbinConfigurer{CasbinConfig: applicationConfig.CasbinConfig}
-	casbinAuth.GetEnforcer()
-
 	resolver := &Resolvers.Resolver{
 		DB:               database.DB,
 		ServiceContainer: services.NewServiceContainer(database.DB),
