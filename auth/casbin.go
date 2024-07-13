@@ -13,16 +13,25 @@ import (
 )
 
 var (
-	adp           persist.Adapter
-	onceConfigure sync.Once
+	CasbinAdapter  persist.Adapter
+	CasbinEnforcer *casbin.Enforcer
+	onceAdapter    sync.Once
+	onceEnforcer   sync.Once
 )
 
 type CasbinConfigurer struct {
 	CasbinConfig config.CasbinConfig
 }
 
+func NewCasbinConfigurer(casbinConfig config.CasbinConfig) CasbinConfigurer {
+	cc := CasbinConfigurer{CasbinConfig: casbinConfig}
+	cc.getAdapter()
+	cc.getEnforcer()
+	return cc
+}
+
 func (cc CasbinConfigurer) getAdapter() persist.Adapter {
-	onceConfigure.Do(func() {
+	onceAdapter.Do(func() {
 
 		mongoClientOption := mongooptions.Client().ApplyURI(cc.CasbinConfig.Mongo.URI)
 
@@ -30,11 +39,11 @@ func (cc CasbinConfigurer) getAdapter() persist.Adapter {
 		if err != nil {
 			panic(err)
 		}
-		adp = a
+		CasbinAdapter = a
 
 	})
 
-	return adp
+	return CasbinAdapter
 }
 
 func (cc CasbinConfigurer) initTestPolicy(e *casbin.Enforcer) (*casbin.Enforcer, error) {
@@ -42,7 +51,7 @@ func (cc CasbinConfigurer) initTestPolicy(e *casbin.Enforcer) (*casbin.Enforcer,
 	organizationId := uuid.New()
 	platformId := uuid.New()
 
-	pb := policies.NewPolicyBuilder(e, userId, organizationId, "allow")
+	pb := policies.NewPolicyBuilder(e, userId, "allow")
 
 	pb.EnforceWhenAdded(true).
 		OrganizationRead(organizationId).
@@ -60,14 +69,13 @@ func (cc CasbinConfigurer) initTestPolicy(e *casbin.Enforcer) (*casbin.Enforcer,
 	return e, nil
 }
 
-func (cc CasbinConfigurer) GetEnforcer() *casbin.Enforcer {
-	e, _ := casbin.NewEnforcer(cc.CasbinConfig.Model, cc.getAdapter())
+func (cc CasbinConfigurer) getEnforcer() *casbin.Enforcer {
+	onceEnforcer.Do(func() {
+		e, _ := casbin.NewEnforcer(cc.CasbinConfig.Model, cc.getAdapter())
+		CasbinEnforcer = e
 
-	//policy, err := e.GetPolicy()
-	//lenPolicy := len(policy)
-	//if err != nil || lenPolicy == 0 {
+		_, _ = cc.initTestPolicy(e)
+	})
 
-	_, _ = cc.initTestPolicy(e)
-
-	return e
+	return CasbinEnforcer
 }
