@@ -15,7 +15,7 @@ type PolicyBuilder struct {
 	eft     string
 }
 
-func NewPolicyBuilder(e *casbin.Enforcer, sub uuid.UUID, obj uuid.UUID, _eft string) *PolicyBuilder {
+func NewPolicyBuilder(e *casbin.Enforcer, sub uuid.UUID, _eft string) *PolicyBuilder {
 	return &PolicyBuilder{
 		e:       e,
 		sub:     sub,
