@@ -184,7 +184,8 @@ func (r *mutationResolver) RequestCrawl(ctx context.Context, input model.CrawlRe
 		return nil, gqlerror.Errorf("Process Failed %s", err.Error())
 	}
 
-	e := r.ServiceContainer.WorkerService.NewCrawlURL(worker.CrawlURLPayload{LinkId: input.LinkID, CrawlId: crawlId, LinkUrl: link.Target})
+	WorkerService := worker.WrokerService{}
+	e := WorkerService.NewCrawlURL(worker.CrawlURLPayload{LinkId: input.LinkID, CrawlId: crawlId, LinkUrl: link.Target})
 	if e != nil {
 		return nil, gqlerror.Errorf("Process Failed %s", e.Error())
 	}

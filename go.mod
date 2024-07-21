@@ -10,6 +10,7 @@ require (
 	github.com/cloudmatelabs/gorm-gqlgen-relay v1.3.2
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/fergusstrange/embedded-postgres v1.25.0
+	github.com/go-resty/resty/v2 v2.13.1
 	github.com/gocolly/colly/v2 v2.1.0
 	github.com/google/uuid v1.6.0
 	github.com/graph-gophers/dataloader/v7 v7.1.0

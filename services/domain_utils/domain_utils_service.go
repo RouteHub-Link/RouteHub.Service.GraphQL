@@ -4,58 +4,50 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
-	"io"
-	"log"
 	"net/http"
 	"strings"
 	"time"
 
 	"github.com/RouteHub-Link/routehub-service-graphql/config"
+	"github.com/go-resty/resty/v2"
 )
 
 type DomainUtilsService struct {
-	host string
+	host  string
+	resty *resty.Client
 }
 
 func NewDomainUtilsService() *DomainUtilsService {
 	applicationConfig := config.ConfigurationService{}.Get()
+	restyClient := resty.New()
 
-	return &DomainUtilsService{host: applicationConfig.Services.DomainUtilsHost}
+	return &DomainUtilsService{host: applicationConfig.Services.DomainUtilsHost, resty: restyClient}
 }
 
 func (ds *DomainUtilsService) PostValidateURL(payload *URLValidationPayload) (id string, err error) {
 	if payload.Link == "" {
-		err = errors.New("link is required")
-		return
+		return "", errors.New("link is required")
 	}
 
 	url := strings.Join([]string{ds.host, ValidateURL}, "/")
-	payloadAsjson, err := json.Marshal(payload)
-	req, err := http.NewRequest("POST", url, bytes.NewBuffer(payloadAsjson))
-	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return
-	}
+	payloadAsjson, _ := json.Marshal(payload)
 
-	client := &http.Client{}
-	resp, err := client.Do(req)
+	resp, err := ds.resty.R().
+		SetHeader("Content-Type", "application/json").
+		SetBody(payloadAsjson).
+		Post(url)
+
 	if err != nil {
 		panic(err)
 	}
-	defer resp.Body.Close()
 
-	if resp.StatusCode != http.StatusOK {
-		err = errors.New("request failed")
-		return
+	if resp.StatusCode() != http.StatusOK {
+		return "", errors.New("request failed")
 	}
 
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return
-	}
-
+	body := resp.Body()
 	id = trimByteString(body, id)
-	return
+	return id, nil
 }
 
 func (ds *DomainUtilsService) GetValidateURL(id string) (state TaskState, result *TaskResultPayload, err error) {
@@ -65,81 +57,59 @@ func (ds *DomainUtilsService) GetValidateURL(id string) (state TaskState, result
 	}
 
 	url := strings.Join([]string{ds.host, ValidateURL, id}, "/")
-	req, err := http.NewRequest("GET", url, nil)
-	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return
-	}
-
-	client := &http.Client{}
-	resp, err := client.Do(req)
+	resp, err := ds.resty.R().Get(url)
 	if err != nil {
 		panic(err)
 	}
-	defer resp.Body.Close()
 
-	if resp.StatusCode != http.StatusOK {
+	if resp.StatusCode() != http.StatusOK {
 		err = errors.New("request failed")
-		return
-	}
-
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
 		return
 	}
 
 	taskInfo := new(TaskInfo)
 
-	err = json.Unmarshal(body, &taskInfo)
+	err = json.Unmarshal(resp.Body(), &taskInfo)
 	if err != nil {
 		return
 	}
 
 	state = taskInfo.State
-	emptyTime := time.Time{}
-	if taskInfo.CompletedAt == emptyTime {
+	if taskInfo.CompletedAt.IsZero() {
 		return
 	}
 
-	byteToJson := json.NewDecoder(bytes.NewReader(taskInfo.Result))
-	err = byteToJson.Decode(&result)
+	err = json.NewDecoder(bytes.NewReader(taskInfo.Result)).Decode(&result)
 
 	return
 }
 
 func (ds *DomainUtilsService) PostValidateDNS(payload *DNSVerificationPayload) (id string, err error) {
 	if payload.Link == "" {
-		err = errors.New("link is required")
-		return
+		return "", errors.New("link is required")
 	}
 
 	url := strings.Join([]string{ds.host, ValidateDNS}, "/")
 	payloadAsjson, err := json.Marshal(payload)
-	req, err := http.NewRequest("POST", url, bytes.NewBuffer(payloadAsjson))
-	req.Header.Set("Content-Type", "application/json")
 	if err != nil {
-		return
+		return "", err
 	}
 
-	client := &http.Client{}
-	resp, err := client.Do(req)
+	resp, err := ds.resty.R().
+		SetHeader("Content-Type", "application/json").
+		SetBody(payloadAsjson).
+		Post(url)
 	if err != nil {
-		panic(err)
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		err = errors.New("request failed")
-		return
+		return "", err
 	}
 
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return
+	if resp.StatusCode() != http.StatusOK {
+		return "", errors.New("request failed")
 	}
 
-	id = string(body)
-	return
+	body := resp.Body()
+	id = trimByteString(body, id)
+	return id, nil
 }
 
 func (ds *DomainUtilsService) GetValidateDNS(id string) (state TaskState, result *TaskResultPayload, taskInfo *TaskInfo, err error) {
@@ -149,32 +119,22 @@ func (ds *DomainUtilsService) GetValidateDNS(id string) (state TaskState, result
 	}
 
 	url := strings.Join([]string{ds.host, ValidateDNS, id}, "/")
-	req, err := http.NewRequest("GET", url, nil)
-	req.Header.Set("Content-Type", "application/json")
+
+	resp, err := ds.resty.R().
+		SetHeader("Content-Type", "application/json").
+		Get(url)
 	if err != nil {
 		return
 	}
 
-	client := &http.Client{}
-	resp, err := client.Do(req)
-	if err != nil {
-		panic(err)
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
+	if resp.StatusCode() != http.StatusOK {
 		err = errors.New("request failed")
-		return
-	}
-
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
 		return
 	}
 
 	taskInfo = new(TaskInfo)
 
-	err = json.Unmarshal(body, &taskInfo)
+	err = json.Unmarshal(resp.Body(), &taskInfo)
 	if err != nil {
 		return
 	}
@@ -185,46 +145,36 @@ func (ds *DomainUtilsService) GetValidateDNS(id string) (state TaskState, result
 		return
 	}
 
-	byteToJson := json.NewDecoder(bytes.NewReader(taskInfo.Result))
-	err = byteToJson.Decode(&result)
+	err = json.NewDecoder(bytes.NewReader(taskInfo.Result)).Decode(&result)
 
 	return
 }
-
 func (ds *DomainUtilsService) PostValidateSite(payload *SiteValidationPayload) (id string, err error) {
 	if payload.Link == "" {
-		err = errors.New("link is required")
-		return
+		return "", errors.New("link is required")
 	}
 
 	url := strings.Join([]string{ds.host, ValidateSite}, "/")
 	payloadAsjson, err := json.Marshal(payload)
-	req, err := http.NewRequest("POST", url, bytes.NewBuffer(payloadAsjson))
-	req.Header.Set("Content-Type", "application/json")
-	log.Printf("request : +%v", req)
 	if err != nil {
-		return
+		return "", err
 	}
 
-	client := &http.Client{}
-	resp, err := client.Do(req)
+	resp, err := ds.resty.R().
+		SetHeader("Content-Type", "application/json").
+		SetBody(payloadAsjson).
+		Post(url)
 	if err != nil {
-		panic(err)
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		err = errors.New("request failed")
-		return
+		return "", err
 	}
 
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return
+	if resp.StatusCode() != http.StatusOK {
+		return "", errors.New("request failed")
 	}
 
+	body := resp.Body()
 	id = trimByteString(body, id)
-	return
+	return id, nil
 }
 
 func (ds *DomainUtilsService) GetValidateSite(id string) (state TaskState, result *TaskResultPayload, taskInfo *TaskInfo, err error) {
@@ -234,51 +184,37 @@ func (ds *DomainUtilsService) GetValidateSite(id string) (state TaskState, resul
 	}
 
 	url := strings.Join([]string{ds.host, ValidateSite, id}, "/")
-	req, err := http.NewRequest("GET", url, nil)
-	req.Header.Set("Content-Type", "application/json")
+
+	resp, err := ds.resty.R().
+		SetHeader("Content-Type", "application/json").
+		Get(url)
 	if err != nil {
 		return
 	}
 
-	client := &http.Client{}
-	resp, err := client.Do(req)
-	if err != nil {
-		panic(err)
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
+	if resp.StatusCode() != http.StatusOK {
 		err = errors.New("request failed")
-		return
-	}
-
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
 		return
 	}
 
 	taskInfo = new(TaskInfo)
 
-	err = json.Unmarshal(body, &taskInfo)
+	err = json.Unmarshal(resp.Body(), &taskInfo)
 	if err != nil {
 		return
 	}
 
 	state = taskInfo.State
-	emptyTime := time.Time{}
-	if taskInfo.CompletedAt == emptyTime {
+	if taskInfo.CompletedAt.IsZero() {
 		return
 	}
 
-	byteToJson := json.NewDecoder(bytes.NewReader(taskInfo.Result))
-	err = byteToJson.Decode(&result)
+	err = json.NewDecoder(bytes.NewReader(taskInfo.Result)).Decode(&result)
 
 	return
 }
 
 func trimByteString(body []byte, id string) string {
-	id = string(body)
-	id = strings.Replace(id, "\"", "", -1)
-	id = strings.Replace(id, "\n", "", -1)
+	id = string(bytes.TrimSpace(body))
 	return id
 }
