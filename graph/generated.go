@@ -107,6 +107,7 @@ type ComplexityRoot struct {
 		LastCheckedAt func(childComplexity int) int
 		Message       func(childComplexity int) int
 		NextProcessAt func(childComplexity int) int
+		Secret        func(childComplexity int) int
 		UpdatedAt     func(childComplexity int) int
 	}
 
@@ -677,6 +678,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.DNSVerification.NextProcessAt(childComplexity), true
+
+	case "DNSVerification.secret":
+		if e.complexity.DNSVerification.Secret == nil {
+			break
+		}
+
+		return e.complexity.DNSVerification.Secret(childComplexity), true
 
 	case "DNSVerification.updatedAt":
 		if e.complexity.DNSVerification.UpdatedAt == nil {
@@ -3658,6 +3666,47 @@ func (ec *executionContext) fieldContext_DNSVerification_isValid(_ context.Conte
 	return fc, nil
 }
 
+func (ec *executionContext) _DNSVerification_secret(ctx context.Context, field graphql.CollectedField, obj *database_models.DNSVerification) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_DNSVerification_secret(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Secret, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalOString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_DNSVerification_secret(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "DNSVerification",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _DNSVerification_message(ctx context.Context, field graphql.CollectedField, obj *database_models.DNSVerification) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_DNSVerification_message(ctx, field)
 	if err != nil {
@@ -4351,6 +4400,8 @@ func (ec *executionContext) fieldContext_Domain_verifications(_ context.Context,
 			switch field.Name {
 			case "isValid":
 				return ec.fieldContext_DNSVerification_isValid(ctx, field)
+			case "secret":
+				return ec.fieldContext_DNSVerification_secret(ctx, field)
 			case "message":
 				return ec.fieldContext_DNSVerification_message(ctx, field)
 			case "error":
@@ -4412,6 +4463,8 @@ func (ec *executionContext) fieldContext_Domain_lastVerification(_ context.Conte
 			switch field.Name {
 			case "isValid":
 				return ec.fieldContext_DNSVerification_isValid(ctx, field)
+			case "secret":
+				return ec.fieldContext_DNSVerification_secret(ctx, field)
 			case "message":
 				return ec.fieldContext_DNSVerification_message(ctx, field)
 			case "error":
@@ -7582,6 +7635,8 @@ func (ec *executionContext) fieldContext_Mutation_newDomainVerification(ctx cont
 			switch field.Name {
 			case "isValid":
 				return ec.fieldContext_DNSVerification_isValid(ctx, field)
+			case "secret":
+				return ec.fieldContext_DNSVerification_secret(ctx, field)
 			case "message":
 				return ec.fieldContext_DNSVerification_message(ctx, field)
 			case "error":
@@ -19379,6 +19434,8 @@ func (ec *executionContext) _DNSVerification(ctx context.Context, sel ast.Select
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
+		case "secret":
+			out.Values[i] = ec._DNSVerification_secret(ctx, field, obj)
 		case "message":
 			out.Values[i] = ec._DNSVerification_message(ctx, field, obj)
 		case "error":

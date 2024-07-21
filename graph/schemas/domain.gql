@@ -26,6 +26,7 @@ input DomainCreateInput @domainURLCheck {
 
 type DNSVerification {
     isValid: Boolean!
+    secret: String
     message: String
     error: String
     createdAt: DateTime!
