@@ -4,5 +4,8 @@ redis:
 postgres:
 	docker run -d -p 5432:5432 --name postgres -e POSTGRES_PASSWORD=postgres
 
+mongo:
+	docker run -d -p 27017:27017 --name mongo mongo
+
 serve:
 	go run .
