@@ -9,3 +9,6 @@ mongo:
 
 serve:
 	go run .
+
+gqlgen:
+	go run -mod=mod github.com/99designs/gqlgen
