@@ -36,7 +36,7 @@ func (pb *PolicyBuilder) PlatformLinkRead(platformId uuid.UUID) *PolicyBuilder {
 	return pb
 }
 
-func EnforcePlatformPermissions(e *casbin.Enforcer, userId uuid.UUID, platformId uuid.UUID, permissions []database_enums.PlatformPermission) ([]PermissionActExplained, error) {
+func EnforcePlatformPermissions(e *casbin.SyncedCachedEnforcer, userId uuid.UUID, platformId uuid.UUID, permissions []database_enums.PlatformPermission) ([]PermissionActExplained, error) {
 	permissionsAsStrings := []string{}
 	for _, permission := range permissions {
 		permissionsAsStrings = append(permissionsAsStrings, permission.String())

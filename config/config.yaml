@@ -39,6 +39,7 @@ graphql:
 
 casbin:
   model: ./config/authorization/rbac_model.conf
+  log_level: DEBUG
   mongodb:
     uri: mongodb://localhost:27017
     database: casbin

@@ -73,6 +73,8 @@ func (u UserService) UpdateInvitation(updateUserInviteInput model.UpdateUserInvi
 		return
 	}
 
+	// TODO CASBIN
+
 	organizationUsers := userInvite.ToOrganizationsPermissions(user.ID)
 	err = u.DB.Create(&organizationUsers).Error
 	if err != nil {

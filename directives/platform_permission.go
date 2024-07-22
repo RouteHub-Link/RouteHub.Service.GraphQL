@@ -2,7 +2,6 @@ package directives
 
 import (
 	"context"
-	"log"
 	"reflect"
 
 	"github.com/99designs/gqlgen/graphql"
@@ -52,8 +51,7 @@ func PlatformPermissionDirectiveHandler(ctx context.Context, obj interface{}, ne
 	}
 
 	e := auth.CasbinEnforcer
-	hasPermission, exp, err := e.EnforceEx(userSession.ID.String(), platformId, permission.String())
-	log.Printf("\nPlatformPermissionDirectiveHandler EnforceEX;\nres: %+v\nexp: %+v\nerr: %+v\n\n", hasPermission, exp, err)
+	hasPermission, _, err := e.EnforceEx(userSession.ID.String(), platformId, permission.String())
 
 	if hasPermission {
 		return next(ctx)

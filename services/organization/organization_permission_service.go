@@ -1,8 +1,6 @@
 package services_organization
 
 import (
-	"log"
-
 	"github.com/RouteHub-Link/routehub-service-graphql/auth"
 	"github.com/RouteHub-Link/routehub-service-graphql/auth/policies"
 	database_enums "github.com/RouteHub-Link/routehub-service-graphql/database/enums"
@@ -18,7 +16,6 @@ type OrganizationPermissionService struct {
 func (o OrganizationPermissionService) GetOrganizationPermissions(userId uuid.UUID, organizationId uuid.UUID) (permissions []database_enums.OrganizationPermission, err error) {
 
 	res, err := policies.EnforceOrganizationPermissions(auth.CasbinEnforcer, userId, organizationId, database_enums.AllOrganizationPermission)
-	log.Printf("\nOrganizationPermissionService GetOrganizationPermissions;\nres: %+v\nerr: %+v\n\n", res, err)
 	if err != nil {
 		return nil, gqlerror.Errorf("Access Denied")
 	}
