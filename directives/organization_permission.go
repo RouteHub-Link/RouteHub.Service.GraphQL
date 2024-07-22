@@ -30,7 +30,6 @@ func OrganizationPermissionDirectiveHandler(ctx context.Context, obj interface{}
 		_orgId, ok := obj.(map[string]interface{})["organizationId"].(string)
 		if !ok {
 			return nil, gqlerror.Errorf("organizationId not found in obj")
-
 		}
 		organizationId = _orgId
 	} else {

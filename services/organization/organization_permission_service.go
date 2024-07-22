@@ -1,8 +1,11 @@
 package services_organization
 
 import (
+	"log"
+
+	"github.com/RouteHub-Link/routehub-service-graphql/auth"
+	"github.com/RouteHub-Link/routehub-service-graphql/auth/policies"
 	database_enums "github.com/RouteHub-Link/routehub-service-graphql/database/enums"
-	database_relations "github.com/RouteHub-Link/routehub-service-graphql/database/relations"
 	"github.com/google/uuid"
 	"github.com/vektah/gqlparser/gqlerror"
 	"gorm.io/gorm"
@@ -13,22 +16,18 @@ type OrganizationPermissionService struct {
 }
 
 func (o OrganizationPermissionService) GetOrganizationPermissions(userId uuid.UUID, organizationId uuid.UUID) (permissions []database_enums.OrganizationPermission, err error) {
-	var organizationUser database_relations.OrganizationUser
-	err = o.DB.Where("user_id = ? AND organization_id = ?", userId, organizationId).First(&organizationUser).Error
+
+	res, err := policies.EnforceOrganizationPermissions(auth.CasbinEnforcer, userId, organizationId, database_enums.AllOrganizationPermission)
+	log.Printf("\nOrganizationPermissionService GetOrganizationPermissions;\nres: %+v\nerr: %+v\n\n", res, err)
 	if err != nil {
 		return nil, gqlerror.Errorf("Access Denied")
 	}
-	return organizationUser.Permissions, nil
 
-	/*
-	   log.Printf("\n \norganizationUser: %+v\narg permission : %+v", organizationUser, permission)
+	for _, permission := range res {
+		permissions = append(permissions, database_enums.OrganizationPermission(permission.Permission))
+	}
 
-	   	for _, organization_user_permission := range organizationUser.Permissions {
-	   		if organization_user_permission == permission {
-	   			return next(ctx)
-	   		}
-	   	}
-	*/
+	return permissions, nil
 }
 
 func (o OrganizationPermissionService) GetUserHasPermission(userId uuid.UUID, organizationId uuid.UUID, permission database_enums.OrganizationPermission) (hasPermission bool, err error) {

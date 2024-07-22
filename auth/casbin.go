@@ -30,6 +30,10 @@ func NewCasbinConfigurer(casbinConfig config.CasbinConfig) CasbinConfigurer {
 	return cc
 }
 
+func GetPolicyBuilder(userId uuid.UUID, e *casbin.Enforcer) *policies.PolicyBuilder {
+	return policies.NewPolicyBuilder(e, userId, "allow")
+}
+
 func (cc CasbinConfigurer) getAdapter() persist.Adapter {
 	onceAdapter.Do(func() {
 
@@ -61,10 +65,10 @@ func (cc CasbinConfigurer) initTestPolicy(e *casbin.Enforcer) (*casbin.Enforcer,
 		OrganizationUserInvite(organizationId).
 		PlatformRead(platformId).
 		PlatformUpdate(platformId).
-		LinkCreate(organizationId).
-		LinkRead(organizationId).
-		LinkUpdate(organizationId).
-		LinkDelete(organizationId)
+		PlatformLinkCreate(platformId).
+		PlatformLinkDelete(platformId).
+		PlatformLinkRead(platformId).
+		PlatformLinkUpdate(platformId)
 
 	return e, nil
 }

@@ -7,7 +7,7 @@ Deployments are not implemented yet but idea is when the platform created or upd
 Analytics are actually definitely not gonna be inside of this project client application is handles the analytics and this field actually shoul resolve the client application.
 Pinned links are the links that pinned by the organization. These links should be listed on client application homepage.
 """
-type Platform {
+type Platform @platformPermission(permission: PLATFORM_READ) {
   id: UUID!
   "This is a simple name of the platform nothing special."
   name: String!

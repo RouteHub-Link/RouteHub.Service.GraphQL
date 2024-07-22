@@ -3,7 +3,6 @@ package policies
 import (
 	"log"
 
-	database_enums "github.com/RouteHub-Link/routehub-service-graphql/database/enums"
 	"github.com/casbin/casbin/v2"
 	"github.com/google/uuid"
 )
@@ -15,6 +14,12 @@ type PolicyBuilder struct {
 	eft     string
 }
 
+type PermissionActExplained struct {
+	Permission string
+	Exp        []string
+	Act        string
+}
+
 func NewPolicyBuilder(e *casbin.Enforcer, sub uuid.UUID, _eft string) *PolicyBuilder {
 	return &PolicyBuilder{
 		e:       e,
@@ -22,61 +27,6 @@ func NewPolicyBuilder(e *casbin.Enforcer, sub uuid.UUID, _eft string) *PolicyBui
 		enforce: false,
 		eft:     _eft,
 	}
-}
-
-func (pb *PolicyBuilder) OrganizationRead(organizationId uuid.UUID) *PolicyBuilder {
-	pb.AddPolicy(pb.sub.String(), organizationId.String(), database_enums.OrganizationPermissionRead.String())
-	return pb
-}
-
-func (pb *PolicyBuilder) OrganizationUpdate(organizationId uuid.UUID) *PolicyBuilder {
-	pb.AddPolicy(pb.sub.String(), organizationId.String(), database_enums.OrganizationPermissionUpdate.String())
-	return pb
-}
-
-func (pb *PolicyBuilder) OrganizationDelete(organizationId uuid.UUID) *PolicyBuilder {
-	pb.AddPolicy(pb.sub.String(), organizationId.String(), database_enums.OrganizationPermissionDelete.String())
-	return pb
-}
-
-func (pb *PolicyBuilder) OrganizationPlatformCreate(organizationId uuid.UUID) *PolicyBuilder {
-	pb.AddPolicy(pb.sub.String(), organizationId.String(), database_enums.OrganizationPermissionPlatformCreate.String())
-	return pb
-}
-
-func (pb *PolicyBuilder) OrganizationUserInvite(organizationId uuid.UUID) *PolicyBuilder {
-	pb.AddPolicy(pb.sub.String(), organizationId.String(), database_enums.OrganizationPermissionUserInvite.String())
-	return pb
-}
-
-func (pb *PolicyBuilder) PlatformRead(platformId uuid.UUID) *PolicyBuilder {
-	pb.AddPolicy(pb.sub.String(), platformId.String(), database_enums.PlatformPermissionRead.String())
-	return pb
-}
-
-func (pb *PolicyBuilder) PlatformUpdate(platformId uuid.UUID) *PolicyBuilder {
-	pb.AddPolicy(pb.sub.String(), platformId.String(), database_enums.PlatformPermissionUpdate.String())
-	return pb
-}
-
-func (pb *PolicyBuilder) LinkCreate(platformId uuid.UUID) *PolicyBuilder {
-	pb.AddPolicy(pb.sub.String(), platformId.String(), database_enums.PlatformPermissionLinkCreate.String())
-	return pb
-}
-
-func (pb *PolicyBuilder) LinkRead(platformId uuid.UUID) *PolicyBuilder {
-	pb.AddPolicy(pb.sub.String(), platformId.String(), database_enums.PlatformPermissionLinkRead.String())
-	return pb
-}
-
-func (pb *PolicyBuilder) LinkDelete(platformId uuid.UUID) *PolicyBuilder {
-	pb.AddPolicy(pb.sub.String(), platformId.String(), database_enums.PlatformPermissionLinkDelete.String())
-	return pb
-}
-
-func (pb *PolicyBuilder) LinkUpdate(platformId uuid.UUID) *PolicyBuilder {
-	pb.AddPolicy(pb.sub.String(), platformId.String(), database_enums.PlatformPermissionLinkUpdate.String())
-	return pb
 }
 
 func (pb *PolicyBuilder) Build() {
@@ -95,4 +45,24 @@ func (pb *PolicyBuilder) AddPolicy(sub string, obj string, act string) {
 func (pb *PolicyBuilder) EnforceWhenAdded(enforce bool) *PolicyBuilder {
 	pb.enforce = enforce
 	return pb
+}
+
+func EnforcePermissions(e *casbin.Enforcer, userId uuid.UUID, platformId uuid.UUID, permissions []string) ([]PermissionActExplained, error) {
+	permissionActExplained := []PermissionActExplained{}
+
+	// BatchEnforce does some magic (for in enforce) to checking multiple permissions
+	for _, permission := range permissions {
+		hasPermission, exp, err := e.EnforceEx(userId.String(), platformId.String(), permission)
+		log.Printf("\nEnforcePermissions;\nhasPermission: %+v\nexp: %+v\nerr: %+v\n\n", hasPermission, exp, err)
+		if err != nil {
+			return nil, err
+		}
+
+		if hasPermission {
+			_act := exp[len(exp)-1]
+			permissionActExplained = append(permissionActExplained, PermissionActExplained{Permission: permission, Exp: exp, Act: _act})
+		}
+	}
+
+	return permissionActExplained, nil
 }

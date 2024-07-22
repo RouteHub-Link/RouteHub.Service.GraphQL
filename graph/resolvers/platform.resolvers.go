@@ -39,7 +39,6 @@ func (r *platformResolver) Domain(ctx context.Context, obj *database_models.Plat
 // Permissions is the resolver for the permissions field.
 func (r *platformResolver) Permissions(ctx context.Context, obj *database_models.Platform) ([]database_enums.PlatformPermission, error) {
 	userSession := auth.ForContext(ctx)
-
 	return r.ServiceContainer.PlatformPermissionService.GetPlatformPermissions(userSession.ID, obj.ID)
 }
 

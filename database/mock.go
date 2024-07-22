@@ -182,11 +182,7 @@ func Seed() {
 
 		policies.NewPolicyBuilder(auth.CasbinEnforcer, user.ID, "allow").
 			PlatformRead(platform.ID).
-			PlatformUpdate(platform.ID).LinkCreate(platform.ID).
-			LinkDelete(platform.ID).
-			LinkRead(platform.ID).
-			LinkUpdate(platform.ID).
-			LinkCreate(platform.ID)
+			PlatformUpdate(platform.ID)
 	}
 
 	var link_count int64
