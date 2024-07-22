@@ -147,6 +147,10 @@ func (ConfigurationService) Get() *ApplicationConfig {
 			_appConfig.Database.Type.Provider = Provider(os.Getenv("database.type.provider"))
 		}
 
+		if os.Getenv("services.domain_utils_host") != "" {
+			_appConfig.Services.DomainUtilsHost = os.Getenv("services.domain_utils_host")
+		}
+
 		log.Printf("config loaded: %+v", _appConfig)
 	})
 

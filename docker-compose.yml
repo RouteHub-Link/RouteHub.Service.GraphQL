@@ -24,11 +24,14 @@ services:
       database.type.migrate: true
       database.type.seed: true
       database.type.provider: postgres
+      services.domain_utils_host: http://receiver.routehubservicedomainutils.orb.local
 
   caching-redis:
     image: redis
     ports:
       - 6379:6379
+    volumes:
+      - ./volumes/caching-redis:/data
   
   database-postgres:
     image: postgres
@@ -38,10 +41,12 @@ services:
       POSTGRES_USER: routehub
       POSTGRES_PASSWORD: routehub
       POSTGRES_DB: routehub
+    volumes:
+      - ./volumes/database-postgres:/var/lib/postgresql/data
     
   casbin-mongodb:
       image: mongo
       ports:
         - 27017:27017
-
-
+      volumes:
+        - ./volumes/casbin-mongodb:/data/db
