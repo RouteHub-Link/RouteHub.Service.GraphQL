@@ -10,7 +10,6 @@ type CasbinSlogLogger struct {
 	enabled bool
 	slogger *slog.Logger
 	ctx     context.Context
-	level   slog.Level
 }
 
 func NewCasbinSlogLogger(slogger *slog.Logger) *CasbinSlogLogger {
@@ -34,7 +33,7 @@ func (l *CasbinSlogLogger) LogModel(model [][]string) {
 		return
 	}
 
-	l.slogger.LogAttrs(l.ctx, level, "Casbin Model", slog.Any("Model", model))
+	l.slogger.LogAttrs(l.ctx, slog.LevelDebug, "Casbin Model", slog.Any("Model", model))
 }
 
 func (l *CasbinSlogLogger) LogEnforce(matcher string, request []interface{}, result bool, explains [][]string) {
@@ -42,7 +41,7 @@ func (l *CasbinSlogLogger) LogEnforce(matcher string, request []interface{}, res
 		return
 	}
 
-	l.slogger.LogAttrs(l.ctx, level, "Casbin Enforce", slog.Group("Enforce", slog.Any("Request", request), slog.Bool("Result", result), slog.Any("Explain", explains)))
+	l.slogger.LogAttrs(l.ctx, slog.LevelDebug, "Casbin Enforce", slog.Group("Enforce", slog.Any("Request", request), slog.Bool("Result", result), slog.Any("Explain", explains)))
 }
 
 func (l *CasbinSlogLogger) LogPolicy(policy map[string][][]string) {
@@ -50,7 +49,7 @@ func (l *CasbinSlogLogger) LogPolicy(policy map[string][][]string) {
 		return
 	}
 
-	l.slogger.LogAttrs(l.ctx, level, "Casbin Policy", slog.Any("Policy", policy))
+	l.slogger.LogAttrs(l.ctx, slog.LevelDebug, "Casbin Policy", slog.Any("Policy", policy))
 }
 
 func (l *CasbinSlogLogger) LogRole(roles []string) {
@@ -58,7 +57,7 @@ func (l *CasbinSlogLogger) LogRole(roles []string) {
 		return
 	}
 
-	l.slogger.LogAttrs(l.ctx, level, "Casbin Role", slog.Any("Roles", roles))
+	l.slogger.LogAttrs(l.ctx, slog.LevelDebug, "Casbin Role", slog.Any("Roles", roles))
 }
 
 // LogError implements log.Logger.
@@ -67,5 +66,5 @@ func (l *CasbinSlogLogger) LogError(err error, msg ...string) {
 		return
 	}
 
-	l.slogger.LogAttrs(l.ctx, l.level, "Casbin Error", slog.Any("Error", err), slog.Any("Message", msg))
+	l.slogger.LogAttrs(l.ctx, slog.LevelError, "Casbin Error", slog.Any("Error", err), slog.Any("Message", msg))
 }

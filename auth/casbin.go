@@ -71,7 +71,7 @@ func (cc CasbinConfigurer) getAdapter() persist.Adapter {
 		monitor := &event.CommandMonitor{
 			Started: func(_ context.Context, e *event.CommandStartedEvent) {
 				if e.CommandName != "endSessions" {
-					casbinMongoLogger.LogAttrs(ctx, level, "Casbin MongoDB Command", slog.String("Database", e.DatabaseName), slog.String("CommandName", e.CommandName), slog.Any("Command", e.Command))
+					casbinMongoLogger.LogAttrs(ctx, slog.LevelDebug, "Casbin MongoDB Command", slog.String("Database", e.DatabaseName), slog.String("CommandName", e.CommandName), slog.Any("Command", e.Command))
 				}
 			},
 		}
