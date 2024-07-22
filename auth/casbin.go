@@ -17,10 +17,14 @@ import (
 )
 
 var (
-	CasbinAdapter  persist.Adapter
-	CasbinEnforcer *casbin.SyncedCachedEnforcer
-	onceAdapter    sync.Once
-	onceEnforcer   sync.Once
+	CasbinAdapter     persist.Adapter
+	CasbinEnforcer    *casbin.SyncedCachedEnforcer
+	onceLogger        sync.Once
+	onceAdapter       sync.Once
+	onceEnforcer      sync.Once
+	casbinMongoLogger *slog.Logger
+	casbinSlog        *CasbinSlogLogger
+	level             slog.Level
 )
 
 type CasbinConfigurer struct {
@@ -29,6 +33,8 @@ type CasbinConfigurer struct {
 
 func NewCasbinConfigurer(casbinConfig config.CasbinConfig) CasbinConfigurer {
 	cc := CasbinConfigurer{CasbinConfig: casbinConfig}
+
+	cc.getLogger()
 	cc.getAdapter()
 	cc.getEnforcer()
 	return cc
@@ -38,15 +44,26 @@ func GetPolicyBuilder(userId uuid.UUID, e *casbin.SyncedCachedEnforcer) *policie
 	return policies.NewPolicyBuilder(e, userId, "allow")
 }
 
-func (cc CasbinConfigurer) getAdapter() persist.Adapter {
-	onceAdapter.Do(func() {
-
-		opts := &slog.HandlerOptions{
-			Level: slog.Level(-8),
+func (cc CasbinConfigurer) getLogger() *slog.Logger {
+	onceLogger.Do(func() {
+		var err = level.UnmarshalText([]byte(cc.CasbinConfig.LogLevel))
+		if err != nil {
+			level = slog.LevelInfo
 		}
 
-		logger := slog.New(slog.NewJSONHandler(os.Stdout, opts))
+		opts := &slog.HandlerOptions{
+			Level: slog.Level(level),
+		}
 
+		casbinMongoLogger = slog.New(slog.NewJSONHandler(os.Stdout, opts))
+		casbinSlog = NewCasbinSlogLogger(casbinMongoLogger)
+	})
+
+	return casbinMongoLogger
+}
+
+func (cc CasbinConfigurer) getAdapter() persist.Adapter {
+	onceAdapter.Do(func() {
 		ctx := context.Background()
 
 		mongoClientOption := mongooptions.Client().ApplyURI(cc.CasbinConfig.Mongo.URI)
@@ -54,7 +71,7 @@ func (cc CasbinConfigurer) getAdapter() persist.Adapter {
 		monitor := &event.CommandMonitor{
 			Started: func(_ context.Context, e *event.CommandStartedEvent) {
 				if e.CommandName != "endSessions" {
-					logger.Log(ctx, opts.Level.Level(), "MongoDB Trace Command", e.CommandName, e.Command)
+					casbinMongoLogger.LogAttrs(ctx, level, "Casbin MongoDB Command", slog.String("Database", e.DatabaseName), slog.String("CommandName", e.CommandName), slog.Any("Command", e.Command))
 				}
 			},
 		}
@@ -66,7 +83,6 @@ func (cc CasbinConfigurer) getAdapter() persist.Adapter {
 			panic(err)
 		}
 		CasbinAdapter = a
-
 	})
 
 	return CasbinAdapter
@@ -99,9 +115,11 @@ func (cc CasbinConfigurer) getEnforcer() *casbin.SyncedCachedEnforcer {
 	onceEnforcer.Do(func() {
 		//e, _ := casbin.NewEnforcer(cc.CasbinConfig.Model, cc.getAdapter())
 		e, _ := casbin.NewSyncedCachedEnforcer(cc.CasbinConfig.Model, cc.getAdapter())
+		e.SetLogger(casbinSlog)
+		e.EnableLog(true)
 		CasbinEnforcer = e
 
-		//_, _ = cc.initTestPolicy(e)
+		_, _ = cc.initTestPolicy(e)
 	})
 
 	return CasbinEnforcer

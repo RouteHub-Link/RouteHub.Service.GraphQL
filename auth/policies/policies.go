@@ -53,7 +53,6 @@ func EnforcePermissions(e *casbin.SyncedCachedEnforcer, userId uuid.UUID, platfo
 	// BatchEnforce does some magic (for in enforce) to checking multiple permissions
 	for _, permission := range permissions {
 		hasPermission, exp, err := e.EnforceEx(userId.String(), platformId.String(), permission)
-		log.Printf("\nEnforcePermissions;\nhasPermission: %+v\nexp: %+v\nerr: %+v\n\n", hasPermission, exp, err)
 		if err != nil {
 			return nil, err
 		}

@@ -62,8 +62,9 @@ type ServicesConfig struct {
 }
 
 type CasbinConfig struct {
-	Model string            `koanf:"model"`
-	Mongo CasbinMongoConfig `koanf:"mongodb"`
+	Model    string            `koanf:"model"`
+	LogLevel string            `koanf:"log_level"`
+	Mongo    CasbinMongoConfig `koanf:"mongodb"`
 }
 type CasbinMongoConfig struct {
 	URI        string `koanf:"uri"`
