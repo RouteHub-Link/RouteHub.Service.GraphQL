@@ -1,8 +1,11 @@
 package services_platform
 
 import (
+	"log"
+
+	"github.com/RouteHub-Link/routehub-service-graphql/auth"
+	"github.com/RouteHub-Link/routehub-service-graphql/auth/policies"
 	database_enums "github.com/RouteHub-Link/routehub-service-graphql/database/enums"
-	database_relations "github.com/RouteHub-Link/routehub-service-graphql/database/relations"
 	"github.com/google/uuid"
 	"github.com/vektah/gqlparser/gqlerror"
 	"gorm.io/gorm"
@@ -12,26 +15,22 @@ type PlatformPermissionService struct {
 	DB *gorm.DB
 }
 
-func (p PlatformPermissionService) GetPlatformPermissions(userId uuid.UUID, platformId uuid.UUID) (platformPermissions []database_enums.PlatformPermission, err error) {
-	var platformUser database_relations.PlatformUser
-	err = p.DB.Where("user_id = ? AND platform_id = ?", userId, platformId).First(&platformUser).Error
-	if err != nil {
-		return nil, err
+func (p PlatformPermissionService) GetPlatformPermissions(userId uuid.UUID, platformId uuid.UUID) (permissions []database_enums.PlatformPermission, err error) {
+	res, err := policies.EnforcePlatformPermissions(auth.CasbinEnforcer, userId, platformId, database_enums.AllPlatformPermission)
+	for _, permission := range res {
+		permissions = append(permissions, database_enums.PlatformPermission(permission.Permission))
 	}
-	return platformUser.Permissions, err
+
+	return permissions, err
 }
 
 func (p PlatformPermissionService) GetUserHasPermission(userId uuid.UUID, platformId uuid.UUID, permission database_enums.PlatformPermission) (hasPermission bool, err error) {
-	platformPermissions, err := p.GetPlatformPermissions(userId, platformId)
+	e := auth.CasbinEnforcer
+	hasPermission, exp, err := e.EnforceEx(userId.String(), platformId, permission.String())
+	log.Printf("\nOrganizationPermissionDirectiveHandler EnforceEX;\nres: %+v\nexp: %+v\nerr: %+v\n\n", hasPermission, exp, err)
+
 	if err != nil {
 		return false, gqlerror.Errorf("Access Denied")
-	}
-
-	for _, platformPermission := range platformPermissions {
-		if platformPermission == permission {
-			hasPermission = true
-			return
-		}
 	}
 
 	return

@@ -107,6 +107,7 @@ type ComplexityRoot struct {
 		LastCheckedAt func(childComplexity int) int
 		Message       func(childComplexity int) int
 		NextProcessAt func(childComplexity int) int
+		Secret        func(childComplexity int) int
 		UpdatedAt     func(childComplexity int) int
 	}
 
@@ -677,6 +678,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.DNSVerification.NextProcessAt(childComplexity), true
+
+	case "DNSVerification.secret":
+		if e.complexity.DNSVerification.Secret == nil {
+			break
+		}
+
+		return e.complexity.DNSVerification.Secret(childComplexity), true
 
 	case "DNSVerification.updatedAt":
 		if e.complexity.DNSVerification.UpdatedAt == nil {
@@ -2853,8 +2861,32 @@ func (ec *executionContext) _AnalyticReport_link(ctx context.Context, field grap
 		}
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Link, nil
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return obj.Link, nil
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			permission, err := ec.unmarshalNPlatformPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐPlatformPermission(ctx, "LINK_READ")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.PlatformPermission == nil {
+				return nil, errors.New("directive platformPermission is not implemented")
+			}
+			return ec.directives.PlatformPermission(ctx, obj, directive0, permission)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*database_models.Link); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/RouteHub-Link/routehub-service-graphql/database/models.Link`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3658,6 +3690,47 @@ func (ec *executionContext) fieldContext_DNSVerification_isValid(_ context.Conte
 	return fc, nil
 }
 
+func (ec *executionContext) _DNSVerification_secret(ctx context.Context, field graphql.CollectedField, obj *database_models.DNSVerification) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_DNSVerification_secret(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Secret, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalOString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_DNSVerification_secret(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "DNSVerification",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _DNSVerification_message(ctx context.Context, field graphql.CollectedField, obj *database_models.DNSVerification) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_DNSVerification_message(ctx, field)
 	if err != nil {
@@ -4163,8 +4236,32 @@ func (ec *executionContext) _Domain_organization(ctx context.Context, field grap
 		}
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Domain().Organization(rctx, obj)
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Domain().Organization(rctx, obj)
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			permission, err := ec.unmarshalNOrganizationPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐOrganizationPermission(ctx, "ORGANIZATION_READ")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.OrganizationPermission == nil {
+				return nil, errors.New("directive organizationPermission is not implemented")
+			}
+			return ec.directives.OrganizationPermission(ctx, obj, directive0, permission)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*database_models.Organization); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/RouteHub-Link/routehub-service-graphql/database/models.Organization`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -4231,8 +4328,32 @@ func (ec *executionContext) _Domain_platform(ctx context.Context, field graphql.
 		}
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Domain().Platform(rctx, obj)
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Domain().Platform(rctx, obj)
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			permission, err := ec.unmarshalNPlatformPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐPlatformPermission(ctx, "PLATFORM_READ")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.PlatformPermission == nil {
+				return nil, errors.New("directive platformPermission is not implemented")
+			}
+			return ec.directives.PlatformPermission(ctx, obj, directive0, permission)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*database_models.Platform); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/RouteHub-Link/routehub-service-graphql/database/models.Platform`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -4327,6 +4448,8 @@ func (ec *executionContext) fieldContext_Domain_verifications(_ context.Context,
 			switch field.Name {
 			case "isValid":
 				return ec.fieldContext_DNSVerification_isValid(ctx, field)
+			case "secret":
+				return ec.fieldContext_DNSVerification_secret(ctx, field)
 			case "message":
 				return ec.fieldContext_DNSVerification_message(ctx, field)
 			case "error":
@@ -4388,6 +4511,8 @@ func (ec *executionContext) fieldContext_Domain_lastVerification(_ context.Conte
 			switch field.Name {
 			case "isValid":
 				return ec.fieldContext_DNSVerification_isValid(ctx, field)
+			case "secret":
+				return ec.fieldContext_DNSVerification_secret(ctx, field)
 			case "message":
 				return ec.fieldContext_DNSVerification_message(ctx, field)
 			case "error":
@@ -4795,8 +4920,32 @@ func (ec *executionContext) _Link_id(ctx context.Context, field graphql.Collecte
 		}
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.ID, nil
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return obj.ID, nil
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			permission, err := ec.unmarshalNPlatformPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐPlatformPermission(ctx, "LINK_READ")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.PlatformPermission == nil {
+				return nil, errors.New("directive platformPermission is not implemented")
+			}
+			return ec.directives.PlatformPermission(ctx, obj, directive0, permission)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(uuid.UUID); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be github.com/google/uuid.UUID`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -4839,8 +4988,32 @@ func (ec *executionContext) _Link_target(ctx context.Context, field graphql.Coll
 		}
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Target, nil
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return obj.Target, nil
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			permission, err := ec.unmarshalNPlatformPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐPlatformPermission(ctx, "LINK_READ")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.PlatformPermission == nil {
+				return nil, errors.New("directive platformPermission is not implemented")
+			}
+			return ec.directives.PlatformPermission(ctx, obj, directive0, permission)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(string); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be string`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -4883,8 +5056,32 @@ func (ec *executionContext) _Link_path(ctx context.Context, field graphql.Collec
 		}
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Path, nil
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return obj.Path, nil
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			permission, err := ec.unmarshalNPlatformPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐPlatformPermission(ctx, "LINK_READ")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.PlatformPermission == nil {
+				return nil, errors.New("directive platformPermission is not implemented")
+			}
+			return ec.directives.PlatformPermission(ctx, obj, directive0, permission)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(string); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be string`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -4927,8 +5124,32 @@ func (ec *executionContext) _Link_creator(ctx context.Context, field graphql.Col
 		}
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Link().Creator(rctx, obj)
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Link().Creator(rctx, obj)
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			permission, err := ec.unmarshalNPlatformPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐPlatformPermission(ctx, "LINK_READ")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.PlatformPermission == nil {
+				return nil, errors.New("directive platformPermission is not implemented")
+			}
+			return ec.directives.PlatformPermission(ctx, obj, directive0, permission)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*database_models.User); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/RouteHub-Link/routehub-service-graphql/database/models.User`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -4997,8 +5218,42 @@ func (ec *executionContext) _Link_platform(ctx context.Context, field graphql.Co
 		}
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Platform, nil
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return obj.Platform, nil
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			permission, err := ec.unmarshalNPlatformPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐPlatformPermission(ctx, "PLATFORM_READ")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.PlatformPermission == nil {
+				return nil, errors.New("directive platformPermission is not implemented")
+			}
+			return ec.directives.PlatformPermission(ctx, obj, directive0, permission)
+		}
+		directive2 := func(ctx context.Context) (interface{}, error) {
+			permission, err := ec.unmarshalNPlatformPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐPlatformPermission(ctx, "LINK_READ")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.PlatformPermission == nil {
+				return nil, errors.New("directive platformPermission is not implemented")
+			}
+			return ec.directives.PlatformPermission(ctx, obj, directive1, permission)
+		}
+
+		tmp, err := directive2(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*database_models.Platform); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/RouteHub-Link/routehub-service-graphql/database/models.Platform`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -5071,8 +5326,32 @@ func (ec *executionContext) _Link_domain(ctx context.Context, field graphql.Coll
 		}
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Link().Domain(rctx, obj)
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Link().Domain(rctx, obj)
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			permission, err := ec.unmarshalNPlatformPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐPlatformPermission(ctx, "LINK_READ")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.PlatformPermission == nil {
+				return nil, errors.New("directive platformPermission is not implemented")
+			}
+			return ec.directives.PlatformPermission(ctx, obj, directive0, permission)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*database_models.Domain); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/RouteHub-Link/routehub-service-graphql/database/models.Domain`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -5145,8 +5424,32 @@ func (ec *executionContext) _Link_analytics(ctx context.Context, field graphql.C
 		}
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Link().Analytics(rctx, obj)
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Link().Analytics(rctx, obj)
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			permission, err := ec.unmarshalNPlatformPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐPlatformPermission(ctx, "LINK_READ")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.PlatformPermission == nil {
+				return nil, errors.New("directive platformPermission is not implemented")
+			}
+			return ec.directives.PlatformPermission(ctx, obj, directive0, permission)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.([]*model.MetricAnalytics); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be []*github.com/RouteHub-Link/routehub-service-graphql/graph/model.MetricAnalytics`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -5203,8 +5506,32 @@ func (ec *executionContext) _Link_openGraph(ctx context.Context, field graphql.C
 		}
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Link().OpenGraph(rctx, obj)
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Link().OpenGraph(rctx, obj)
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			permission, err := ec.unmarshalNPlatformPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐPlatformPermission(ctx, "LINK_READ")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.PlatformPermission == nil {
+				return nil, errors.New("directive platformPermission is not implemented")
+			}
+			return ec.directives.PlatformPermission(ctx, obj, directive0, permission)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.([]*database_types.OpenGraph); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be []*github.com/RouteHub-Link/routehub-service-graphql/database/types.OpenGraph`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -5266,8 +5593,32 @@ func (ec *executionContext) _Link_redirectionOptions(ctx context.Context, field 
 		}
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Link().RedirectionOptions(rctx, obj)
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Link().RedirectionOptions(rctx, obj)
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			permission, err := ec.unmarshalNPlatformPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐPlatformPermission(ctx, "LINK_READ")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.PlatformPermission == nil {
+				return nil, errors.New("directive platformPermission is not implemented")
+			}
+			return ec.directives.PlatformPermission(ctx, obj, directive0, permission)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(database_enums.RedirectionOptions); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be github.com/RouteHub-Link/routehub-service-graphql/database/enums.RedirectionOptions`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -5310,8 +5661,32 @@ func (ec *executionContext) _Link_state(ctx context.Context, field graphql.Colle
 		}
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.State, nil
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return obj.State, nil
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			permission, err := ec.unmarshalNPlatformPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐPlatformPermission(ctx, "LINK_READ")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.PlatformPermission == nil {
+				return nil, errors.New("directive platformPermission is not implemented")
+			}
+			return ec.directives.PlatformPermission(ctx, obj, directive0, permission)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(database_enums.StatusState); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be github.com/RouteHub-Link/routehub-service-graphql/database/enums.StatusState`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -5354,8 +5729,32 @@ func (ec *executionContext) _Link_validations(ctx context.Context, field graphql
 		}
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Link().Validations(rctx, obj)
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Link().Validations(rctx, obj)
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			permission, err := ec.unmarshalNPlatformPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐPlatformPermission(ctx, "LINK_READ")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.PlatformPermission == nil {
+				return nil, errors.New("directive platformPermission is not implemented")
+			}
+			return ec.directives.PlatformPermission(ctx, obj, directive0, permission)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.([]*database_models.LinkValidation); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be []*github.com/RouteHub-Link/routehub-service-graphql/database/models.LinkValidation`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -5415,8 +5814,32 @@ func (ec *executionContext) _Link_lastValidation(ctx context.Context, field grap
 		}
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Link().LastValidation(rctx, obj)
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Link().LastValidation(rctx, obj)
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			permission, err := ec.unmarshalNPlatformPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐPlatformPermission(ctx, "LINK_READ")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.PlatformPermission == nil {
+				return nil, errors.New("directive platformPermission is not implemented")
+			}
+			return ec.directives.PlatformPermission(ctx, obj, directive0, permission)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*database_models.LinkValidation); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/RouteHub-Link/routehub-service-graphql/database/models.LinkValidation`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -5476,8 +5899,32 @@ func (ec *executionContext) _Link_crawls(ctx context.Context, field graphql.Coll
 		}
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Link().Crawls(rctx, obj)
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Link().Crawls(rctx, obj)
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			permission, err := ec.unmarshalNPlatformPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐPlatformPermission(ctx, "LINK_READ")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.PlatformPermission == nil {
+				return nil, errors.New("directive platformPermission is not implemented")
+			}
+			return ec.directives.PlatformPermission(ctx, obj, directive0, permission)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.([]*database_models.LinkCrawl); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be []*github.com/RouteHub-Link/routehub-service-graphql/database/models.LinkCrawl`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -5544,8 +5991,32 @@ func (ec *executionContext) _Link_createdAt(ctx context.Context, field graphql.C
 		}
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.CreatedAt, nil
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return obj.CreatedAt, nil
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			permission, err := ec.unmarshalNPlatformPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐPlatformPermission(ctx, "LINK_READ")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.PlatformPermission == nil {
+				return nil, errors.New("directive platformPermission is not implemented")
+			}
+			return ec.directives.PlatformPermission(ctx, obj, directive0, permission)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(time.Time); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be time.Time`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -5588,8 +6059,32 @@ func (ec *executionContext) _Link_updatedAt(ctx context.Context, field graphql.C
 		}
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.UpdatedAt, nil
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return obj.UpdatedAt, nil
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			permission, err := ec.unmarshalNPlatformPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐPlatformPermission(ctx, "LINK_READ")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.PlatformPermission == nil {
+				return nil, errors.New("directive platformPermission is not implemented")
+			}
+			return ec.directives.PlatformPermission(ctx, obj, directive0, permission)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*time.Time); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *time.Time`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -5629,8 +6124,32 @@ func (ec *executionContext) _Link_deletedAt(ctx context.Context, field graphql.C
 		}
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.DeletedAt, nil
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return obj.DeletedAt, nil
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			permission, err := ec.unmarshalNPlatformPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐPlatformPermission(ctx, "LINK_READ")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.PlatformPermission == nil {
+				return nil, errors.New("directive platformPermission is not implemented")
+			}
+			return ec.directives.PlatformPermission(ctx, obj, directive0, permission)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*time.Time); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *time.Time`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -5906,8 +6425,32 @@ func (ec *executionContext) _LinkCrawl_link(ctx context.Context, field graphql.C
 		}
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.LinkCrawl().Link(rctx, obj)
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.LinkCrawl().Link(rctx, obj)
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			permission, err := ec.unmarshalNPlatformPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐPlatformPermission(ctx, "LINK_READ")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.PlatformPermission == nil {
+				return nil, errors.New("directive platformPermission is not implemented")
+			}
+			return ec.directives.PlatformPermission(ctx, obj, directive0, permission)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*database_models.Link); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/RouteHub-Link/routehub-service-graphql/database/models.Link`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -6424,8 +6967,32 @@ func (ec *executionContext) _LinkEdge_node(ctx context.Context, field graphql.Co
 		}
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Node, nil
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return obj.Node, nil
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			permission, err := ec.unmarshalNPlatformPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐPlatformPermission(ctx, "LINK_READ")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.PlatformPermission == nil {
+				return nil, errors.New("directive platformPermission is not implemented")
+			}
+			return ec.directives.PlatformPermission(ctx, obj, directive0, permission)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*database_models.Link); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/RouteHub-Link/routehub-service-graphql/database/models.Link`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -7558,6 +8125,8 @@ func (ec *executionContext) fieldContext_Mutation_newDomainVerification(ctx cont
 			switch field.Name {
 			case "isValid":
 				return ec.fieldContext_DNSVerification_isValid(ctx, field)
+			case "secret":
+				return ec.fieldContext_DNSVerification_secret(ctx, field)
 			case "message":
 				return ec.fieldContext_DNSVerification_message(ctx, field)
 			case "error":
@@ -7610,13 +8179,23 @@ func (ec *executionContext) _Mutation_createLink(ctx context.Context, field grap
 			return ec.resolvers.Mutation().CreateLink(rctx, fc.Args["input"].(model.LinkCreateInput))
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
+			permission, err := ec.unmarshalNPlatformPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐPlatformPermission(ctx, "LINK_READ")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.PlatformPermission == nil {
+				return nil, errors.New("directive platformPermission is not implemented")
+			}
+			return ec.directives.PlatformPermission(ctx, nil, directive0, permission)
+		}
+		directive2 := func(ctx context.Context) (interface{}, error) {
 			if ec.directives.Auth == nil {
 				return nil, errors.New("directive auth is not implemented")
 			}
-			return ec.directives.Auth(ctx, nil, directive0)
+			return ec.directives.Auth(ctx, nil, directive1)
 		}
 
-		tmp, err := directive1(rctx)
+		tmp, err := directive2(rctx)
 		if err != nil {
 			return nil, graphql.ErrorOnPath(ctx, err)
 		}
@@ -7818,13 +8397,23 @@ func (ec *executionContext) _Mutation_addToPinnedLinks(ctx context.Context, fiel
 			return ec.resolvers.Mutation().AddToPinnedLinks(rctx, fc.Args["input"].(model.PinnedLinkInput))
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
+			permission, err := ec.unmarshalNPlatformPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐPlatformPermission(ctx, "LINK_READ")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.PlatformPermission == nil {
+				return nil, errors.New("directive platformPermission is not implemented")
+			}
+			return ec.directives.PlatformPermission(ctx, nil, directive0, permission)
+		}
+		directive2 := func(ctx context.Context) (interface{}, error) {
 			if ec.directives.Auth == nil {
 				return nil, errors.New("directive auth is not implemented")
 			}
-			return ec.directives.Auth(ctx, nil, directive0)
+			return ec.directives.Auth(ctx, nil, directive1)
 		}
 
-		tmp, err := directive1(rctx)
+		tmp, err := directive2(rctx)
 		if err != nil {
 			return nil, graphql.ErrorOnPath(ctx, err)
 		}
@@ -7927,13 +8516,23 @@ func (ec *executionContext) _Mutation_removeFromPinnedLinks(ctx context.Context,
 			return ec.resolvers.Mutation().RemoveFromPinnedLinks(rctx, fc.Args["input"].(model.PinnedLinkInput))
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
+			permission, err := ec.unmarshalNPlatformPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐPlatformPermission(ctx, "LINK_READ")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.PlatformPermission == nil {
+				return nil, errors.New("directive platformPermission is not implemented")
+			}
+			return ec.directives.PlatformPermission(ctx, nil, directive0, permission)
+		}
+		directive2 := func(ctx context.Context) (interface{}, error) {
 			if ec.directives.Auth == nil {
 				return nil, errors.New("directive auth is not implemented")
 			}
-			return ec.directives.Auth(ctx, nil, directive0)
+			return ec.directives.Auth(ctx, nil, directive1)
 		}
 
-		tmp, err := directive1(rctx)
+		tmp, err := directive2(rctx)
 		if err != nil {
 			return nil, graphql.ErrorOnPath(ctx, err)
 		}
@@ -8036,13 +8635,23 @@ func (ec *executionContext) _Mutation_createOrganization(ctx context.Context, fi
 			return ec.resolvers.Mutation().CreateOrganization(rctx, fc.Args["input"].(model.OrganizationCreateInput))
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
+			permission, err := ec.unmarshalNOrganizationPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐOrganizationPermission(ctx, "ORGANIZATION_READ")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.OrganizationPermission == nil {
+				return nil, errors.New("directive organizationPermission is not implemented")
+			}
+			return ec.directives.OrganizationPermission(ctx, nil, directive0, permission)
+		}
+		directive2 := func(ctx context.Context) (interface{}, error) {
 			if ec.directives.Auth == nil {
 				return nil, errors.New("directive auth is not implemented")
 			}
-			return ec.directives.Auth(ctx, nil, directive0)
+			return ec.directives.Auth(ctx, nil, directive1)
 		}
 
-		tmp, err := directive1(rctx)
+		tmp, err := directive2(rctx)
 		if err != nil {
 			return nil, graphql.ErrorOnPath(ctx, err)
 		}
@@ -8135,13 +8744,23 @@ func (ec *executionContext) _Mutation_updateOrganization(ctx context.Context, fi
 			return ec.resolvers.Mutation().UpdateOrganization(rctx, fc.Args["input"].(model.OrganizationUpdateInput))
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
+			permission, err := ec.unmarshalNOrganizationPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐOrganizationPermission(ctx, "ORGANIZATION_READ")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.OrganizationPermission == nil {
+				return nil, errors.New("directive organizationPermission is not implemented")
+			}
+			return ec.directives.OrganizationPermission(ctx, nil, directive0, permission)
+		}
+		directive2 := func(ctx context.Context) (interface{}, error) {
 			if ec.directives.Auth == nil {
 				return nil, errors.New("directive auth is not implemented")
 			}
-			return ec.directives.Auth(ctx, nil, directive0)
+			return ec.directives.Auth(ctx, nil, directive1)
 		}
 
-		tmp, err := directive1(rctx)
+		tmp, err := directive2(rctx)
 		if err != nil {
 			return nil, graphql.ErrorOnPath(ctx, err)
 		}
@@ -8234,13 +8853,23 @@ func (ec *executionContext) _Mutation_createPlatform(ctx context.Context, field 
 			return ec.resolvers.Mutation().CreatePlatform(rctx, fc.Args["input"].(graph_inputs.PlatformCreateInput))
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
+			permission, err := ec.unmarshalNPlatformPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐPlatformPermission(ctx, "PLATFORM_READ")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.PlatformPermission == nil {
+				return nil, errors.New("directive platformPermission is not implemented")
+			}
+			return ec.directives.PlatformPermission(ctx, nil, directive0, permission)
+		}
+		directive2 := func(ctx context.Context) (interface{}, error) {
 			if ec.directives.Auth == nil {
 				return nil, errors.New("directive auth is not implemented")
 			}
-			return ec.directives.Auth(ctx, nil, directive0)
+			return ec.directives.Auth(ctx, nil, directive1)
 		}
 
-		tmp, err := directive1(rctx)
+		tmp, err := directive2(rctx)
 		if err != nil {
 			return nil, graphql.ErrorOnPath(ctx, err)
 		}
@@ -8611,8 +9240,32 @@ func (ec *executionContext) _ObservationAnalytic_link(ctx context.Context, field
 		}
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Link, nil
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return obj.Link, nil
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			permission, err := ec.unmarshalNPlatformPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐPlatformPermission(ctx, "LINK_READ")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.PlatformPermission == nil {
+				return nil, errors.New("directive platformPermission is not implemented")
+			}
+			return ec.directives.PlatformPermission(ctx, obj, directive0, permission)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*database_models.Link); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/RouteHub-Link/routehub-service-graphql/database/models.Link`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -8763,8 +9416,32 @@ func (ec *executionContext) _ObservationAnalytic_platform(ctx context.Context, f
 		}
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Platform, nil
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return obj.Platform, nil
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			permission, err := ec.unmarshalNPlatformPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐPlatformPermission(ctx, "PLATFORM_READ")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.PlatformPermission == nil {
+				return nil, errors.New("directive platformPermission is not implemented")
+			}
+			return ec.directives.PlatformPermission(ctx, obj, directive0, permission)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*database_models.Platform); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/RouteHub-Link/routehub-service-graphql/database/models.Platform`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -9942,8 +10619,32 @@ func (ec *executionContext) _Organization_id(ctx context.Context, field graphql.
 		}
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.ID, nil
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return obj.ID, nil
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			permission, err := ec.unmarshalNOrganizationPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐOrganizationPermission(ctx, "ORGANIZATION_READ")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.OrganizationPermission == nil {
+				return nil, errors.New("directive organizationPermission is not implemented")
+			}
+			return ec.directives.OrganizationPermission(ctx, obj, directive0, permission)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(uuid.UUID); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be github.com/google/uuid.UUID`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -9986,8 +10687,32 @@ func (ec *executionContext) _Organization_name(ctx context.Context, field graphq
 		}
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Name, nil
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return obj.Name, nil
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			permission, err := ec.unmarshalNOrganizationPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐOrganizationPermission(ctx, "ORGANIZATION_READ")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.OrganizationPermission == nil {
+				return nil, errors.New("directive organizationPermission is not implemented")
+			}
+			return ec.directives.OrganizationPermission(ctx, obj, directive0, permission)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(string); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be string`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -10030,8 +10755,32 @@ func (ec *executionContext) _Organization_website(ctx context.Context, field gra
 		}
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Website, nil
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return obj.Website, nil
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			permission, err := ec.unmarshalNOrganizationPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐOrganizationPermission(ctx, "ORGANIZATION_READ")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.OrganizationPermission == nil {
+				return nil, errors.New("directive organizationPermission is not implemented")
+			}
+			return ec.directives.OrganizationPermission(ctx, obj, directive0, permission)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(string); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be string`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -10074,8 +10823,32 @@ func (ec *executionContext) _Organization_permissions(ctx context.Context, field
 		}
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Organization().Permissions(rctx, obj)
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Organization().Permissions(rctx, obj)
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			permission, err := ec.unmarshalNOrganizationPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐOrganizationPermission(ctx, "ORGANIZATION_READ")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.OrganizationPermission == nil {
+				return nil, errors.New("directive organizationPermission is not implemented")
+			}
+			return ec.directives.OrganizationPermission(ctx, obj, directive0, permission)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.([]database_enums.OrganizationPermission); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be []github.com/RouteHub-Link/routehub-service-graphql/database/enums.OrganizationPermission`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -10118,8 +10891,42 @@ func (ec *executionContext) _Organization_platforms(ctx context.Context, field g
 		}
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Organization().Platforms(rctx, obj)
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Organization().Platforms(rctx, obj)
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			permission, err := ec.unmarshalNPlatformPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐPlatformPermission(ctx, "PLATFORM_READ")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.PlatformPermission == nil {
+				return nil, errors.New("directive platformPermission is not implemented")
+			}
+			return ec.directives.PlatformPermission(ctx, obj, directive0, permission)
+		}
+		directive2 := func(ctx context.Context) (interface{}, error) {
+			permission, err := ec.unmarshalNOrganizationPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐOrganizationPermission(ctx, "ORGANIZATION_READ")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.OrganizationPermission == nil {
+				return nil, errors.New("directive organizationPermission is not implemented")
+			}
+			return ec.directives.OrganizationPermission(ctx, obj, directive1, permission)
+		}
+
+		tmp, err := directive2(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.([]*database_models.Platform); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be []*github.com/RouteHub-Link/routehub-service-graphql/database/models.Platform`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -10192,8 +10999,32 @@ func (ec *executionContext) _Organization_industry(ctx context.Context, field gr
 		}
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Industry, nil
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return obj.Industry, nil
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			permission, err := ec.unmarshalNOrganizationPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐOrganizationPermission(ctx, "ORGANIZATION_READ")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.OrganizationPermission == nil {
+				return nil, errors.New("directive organizationPermission is not implemented")
+			}
+			return ec.directives.OrganizationPermission(ctx, obj, directive0, permission)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.([]*database_types.Industry); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be []*github.com/RouteHub-Link/routehub-service-graphql/database/types.Industry`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -10237,8 +11068,32 @@ func (ec *executionContext) _Organization_description(ctx context.Context, field
 		}
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Description, nil
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return obj.Description, nil
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			permission, err := ec.unmarshalNOrganizationPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐOrganizationPermission(ctx, "ORGANIZATION_READ")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.OrganizationPermission == nil {
+				return nil, errors.New("directive organizationPermission is not implemented")
+			}
+			return ec.directives.OrganizationPermission(ctx, obj, directive0, permission)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(string); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be string`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -10281,8 +11136,32 @@ func (ec *executionContext) _Organization_location(ctx context.Context, field gr
 		}
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Location, nil
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return obj.Location, nil
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			permission, err := ec.unmarshalNOrganizationPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐOrganizationPermission(ctx, "ORGANIZATION_READ")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.OrganizationPermission == nil {
+				return nil, errors.New("directive organizationPermission is not implemented")
+			}
+			return ec.directives.OrganizationPermission(ctx, obj, directive0, permission)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(string); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be string`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -10325,8 +11204,32 @@ func (ec *executionContext) _Organization_socialMedias(ctx context.Context, fiel
 		}
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.SocialMedias, nil
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return obj.SocialMedias, nil
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			permission, err := ec.unmarshalNOrganizationPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐOrganizationPermission(ctx, "ORGANIZATION_READ")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.OrganizationPermission == nil {
+				return nil, errors.New("directive organizationPermission is not implemented")
+			}
+			return ec.directives.OrganizationPermission(ctx, obj, directive0, permission)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.([]*database_types.SocialMedia); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be []*github.com/RouteHub-Link/routehub-service-graphql/database/types.SocialMedia`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -10377,8 +11280,32 @@ func (ec *executionContext) _Organization_users(ctx context.Context, field graph
 		}
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Organization().Users(rctx, obj)
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Organization().Users(rctx, obj)
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			permission, err := ec.unmarshalNOrganizationPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐOrganizationPermission(ctx, "ORGANIZATION_READ")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.OrganizationPermission == nil {
+				return nil, errors.New("directive organizationPermission is not implemented")
+			}
+			return ec.directives.OrganizationPermission(ctx, obj, directive0, permission)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.([]*database_models.User); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be []*github.com/RouteHub-Link/routehub-service-graphql/database/models.User`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -10447,8 +11374,32 @@ func (ec *executionContext) _Organization_domains(ctx context.Context, field gra
 		}
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Organization().Domains(rctx, obj)
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Organization().Domains(rctx, obj)
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			permission, err := ec.unmarshalNOrganizationPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐOrganizationPermission(ctx, "ORGANIZATION_READ")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.OrganizationPermission == nil {
+				return nil, errors.New("directive organizationPermission is not implemented")
+			}
+			return ec.directives.OrganizationPermission(ctx, obj, directive0, permission)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.([]*database_models.Domain); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be []*github.com/RouteHub-Link/routehub-service-graphql/database/models.Domain`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -10823,8 +11774,32 @@ func (ec *executionContext) _Permission_organizations(ctx context.Context, field
 		}
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Organizations, nil
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return obj.Organizations, nil
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			permission, err := ec.unmarshalNOrganizationPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐOrganizationPermission(ctx, "ORGANIZATION_READ")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.OrganizationPermission == nil {
+				return nil, errors.New("directive organizationPermission is not implemented")
+			}
+			return ec.directives.OrganizationPermission(ctx, obj, directive0, permission)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.([]*database_models.Organization); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be []*github.com/RouteHub-Link/routehub-service-graphql/database/models.Organization`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -10965,8 +11940,32 @@ func (ec *executionContext) _Permission_platforms(ctx context.Context, field gra
 		}
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Platforms, nil
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return obj.Platforms, nil
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			permission, err := ec.unmarshalNPlatformPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐPlatformPermission(ctx, "PLATFORM_READ")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.PlatformPermission == nil {
+				return nil, errors.New("directive platformPermission is not implemented")
+			}
+			return ec.directives.PlatformPermission(ctx, obj, directive0, permission)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.([]*database_models.Platform); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be []*github.com/RouteHub-Link/routehub-service-graphql/database/models.Platform`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -11039,8 +12038,32 @@ func (ec *executionContext) _Platform_id(ctx context.Context, field graphql.Coll
 		}
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.ID, nil
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return obj.ID, nil
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			permission, err := ec.unmarshalNPlatformPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐPlatformPermission(ctx, "PLATFORM_READ")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.PlatformPermission == nil {
+				return nil, errors.New("directive platformPermission is not implemented")
+			}
+			return ec.directives.PlatformPermission(ctx, obj, directive0, permission)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(uuid.UUID); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be github.com/google/uuid.UUID`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -11083,8 +12106,32 @@ func (ec *executionContext) _Platform_name(ctx context.Context, field graphql.Co
 		}
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Name, nil
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return obj.Name, nil
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			permission, err := ec.unmarshalNPlatformPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐPlatformPermission(ctx, "PLATFORM_READ")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.PlatformPermission == nil {
+				return nil, errors.New("directive platformPermission is not implemented")
+			}
+			return ec.directives.PlatformPermission(ctx, obj, directive0, permission)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(string); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be string`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -11127,8 +12174,32 @@ func (ec *executionContext) _Platform_openGraph(ctx context.Context, field graph
 		}
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.OpenGraph, nil
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return obj.OpenGraph, nil
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			permission, err := ec.unmarshalNPlatformPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐPlatformPermission(ctx, "PLATFORM_READ")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.PlatformPermission == nil {
+				return nil, errors.New("directive platformPermission is not implemented")
+			}
+			return ec.directives.PlatformPermission(ctx, obj, directive0, permission)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*database_types.OpenGraph); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/RouteHub-Link/routehub-service-graphql/database/types.OpenGraph`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -11193,8 +12264,32 @@ func (ec *executionContext) _Platform_redirectionChoice(ctx context.Context, fie
 		}
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.RedirectionChoice, nil
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return obj.RedirectionChoice, nil
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			permission, err := ec.unmarshalNPlatformPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐPlatformPermission(ctx, "PLATFORM_READ")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.PlatformPermission == nil {
+				return nil, errors.New("directive platformPermission is not implemented")
+			}
+			return ec.directives.PlatformPermission(ctx, obj, directive0, permission)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(database_enums.RedirectionOptions); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be github.com/RouteHub-Link/routehub-service-graphql/database/enums.RedirectionOptions`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -11237,8 +12332,42 @@ func (ec *executionContext) _Platform_organization(ctx context.Context, field gr
 		}
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Platform().Organization(rctx, obj)
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Platform().Organization(rctx, obj)
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			permission, err := ec.unmarshalNOrganizationPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐOrganizationPermission(ctx, "ORGANIZATION_READ")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.OrganizationPermission == nil {
+				return nil, errors.New("directive organizationPermission is not implemented")
+			}
+			return ec.directives.OrganizationPermission(ctx, obj, directive0, permission)
+		}
+		directive2 := func(ctx context.Context) (interface{}, error) {
+			permission, err := ec.unmarshalNPlatformPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐPlatformPermission(ctx, "PLATFORM_READ")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.PlatformPermission == nil {
+				return nil, errors.New("directive platformPermission is not implemented")
+			}
+			return ec.directives.PlatformPermission(ctx, obj, directive1, permission)
+		}
+
+		tmp, err := directive2(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*database_models.Organization); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/RouteHub-Link/routehub-service-graphql/database/models.Organization`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -11305,8 +12434,32 @@ func (ec *executionContext) _Platform_domain(ctx context.Context, field graphql.
 		}
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Platform().Domain(rctx, obj)
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Platform().Domain(rctx, obj)
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			permission, err := ec.unmarshalNPlatformPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐPlatformPermission(ctx, "PLATFORM_READ")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.PlatformPermission == nil {
+				return nil, errors.New("directive platformPermission is not implemented")
+			}
+			return ec.directives.PlatformPermission(ctx, obj, directive0, permission)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*database_models.Domain); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/RouteHub-Link/routehub-service-graphql/database/models.Domain`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -11379,8 +12532,32 @@ func (ec *executionContext) _Platform_permissions(ctx context.Context, field gra
 		}
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Platform().Permissions(rctx, obj)
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Platform().Permissions(rctx, obj)
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			permission, err := ec.unmarshalNPlatformPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐPlatformPermission(ctx, "PLATFORM_READ")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.PlatformPermission == nil {
+				return nil, errors.New("directive platformPermission is not implemented")
+			}
+			return ec.directives.PlatformPermission(ctx, obj, directive0, permission)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.([]database_enums.PlatformPermission); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be []github.com/RouteHub-Link/routehub-service-graphql/database/enums.PlatformPermission`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -11423,8 +12600,32 @@ func (ec *executionContext) _Platform_deployments(ctx context.Context, field gra
 		}
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Platform().Deployments(rctx, obj)
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Platform().Deployments(rctx, obj)
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			permission, err := ec.unmarshalNPlatformPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐPlatformPermission(ctx, "PLATFORM_READ")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.PlatformPermission == nil {
+				return nil, errors.New("directive platformPermission is not implemented")
+			}
+			return ec.directives.PlatformPermission(ctx, obj, directive0, permission)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.([]*model.PlatformDeployment); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be []*github.com/RouteHub-Link/routehub-service-graphql/graph/model.PlatformDeployment`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -11485,8 +12686,42 @@ func (ec *executionContext) _Platform_links(ctx context.Context, field graphql.C
 		}
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Platform().Links(rctx, obj)
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Platform().Links(rctx, obj)
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			permission, err := ec.unmarshalNPlatformPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐPlatformPermission(ctx, "LINK_READ")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.PlatformPermission == nil {
+				return nil, errors.New("directive platformPermission is not implemented")
+			}
+			return ec.directives.PlatformPermission(ctx, obj, directive0, permission)
+		}
+		directive2 := func(ctx context.Context) (interface{}, error) {
+			permission, err := ec.unmarshalNPlatformPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐPlatformPermission(ctx, "PLATFORM_READ")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.PlatformPermission == nil {
+				return nil, errors.New("directive platformPermission is not implemented")
+			}
+			return ec.directives.PlatformPermission(ctx, obj, directive1, permission)
+		}
+
+		tmp, err := directive2(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.([]*database_models.Link); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be []*github.com/RouteHub-Link/routehub-service-graphql/database/models.Link`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -11563,8 +12798,32 @@ func (ec *executionContext) _Platform_analytics(ctx context.Context, field graph
 		}
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Platform().Analytics(rctx, obj)
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Platform().Analytics(rctx, obj)
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			permission, err := ec.unmarshalNPlatformPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐPlatformPermission(ctx, "PLATFORM_READ")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.PlatformPermission == nil {
+				return nil, errors.New("directive platformPermission is not implemented")
+			}
+			return ec.directives.PlatformPermission(ctx, obj, directive0, permission)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.([]*model.AnalyticReport); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be []*github.com/RouteHub-Link/routehub-service-graphql/graph/model.AnalyticReport`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -11625,8 +12884,32 @@ func (ec *executionContext) _Platform_analyticReports(ctx context.Context, field
 		}
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Platform().AnalyticReports(rctx, obj)
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Platform().AnalyticReports(rctx, obj)
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			permission, err := ec.unmarshalNPlatformPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐPlatformPermission(ctx, "PLATFORM_READ")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.PlatformPermission == nil {
+				return nil, errors.New("directive platformPermission is not implemented")
+			}
+			return ec.directives.PlatformPermission(ctx, obj, directive0, permission)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*model.AnalyticReports); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/RouteHub-Link/routehub-service-graphql/graph/model.AnalyticReports`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -11683,8 +12966,32 @@ func (ec *executionContext) _Platform_status(ctx context.Context, field graphql.
 		}
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Status, nil
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return obj.Status, nil
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			permission, err := ec.unmarshalNPlatformPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐPlatformPermission(ctx, "PLATFORM_READ")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.PlatformPermission == nil {
+				return nil, errors.New("directive platformPermission is not implemented")
+			}
+			return ec.directives.PlatformPermission(ctx, obj, directive0, permission)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(database_enums.StatusState); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be github.com/RouteHub-Link/routehub-service-graphql/database/enums.StatusState`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -11727,8 +13034,32 @@ func (ec *executionContext) _Platform_templates(ctx context.Context, field graph
 		}
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Platform().Templates(rctx, obj)
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Platform().Templates(rctx, obj)
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			permission, err := ec.unmarshalNPlatformPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐPlatformPermission(ctx, "PLATFORM_READ")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.PlatformPermission == nil {
+				return nil, errors.New("directive platformPermission is not implemented")
+			}
+			return ec.directives.PlatformPermission(ctx, obj, directive0, permission)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.([]*model.Template); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be []*github.com/RouteHub-Link/routehub-service-graphql/graph/model.Template`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -11795,8 +13126,42 @@ func (ec *executionContext) _Platform_pinnedLinks(ctx context.Context, field gra
 		}
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Platform().PinnedLinks(rctx, obj)
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Platform().PinnedLinks(rctx, obj)
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			permission, err := ec.unmarshalNPlatformPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐPlatformPermission(ctx, "LINK_READ")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.PlatformPermission == nil {
+				return nil, errors.New("directive platformPermission is not implemented")
+			}
+			return ec.directives.PlatformPermission(ctx, obj, directive0, permission)
+		}
+		directive2 := func(ctx context.Context) (interface{}, error) {
+			permission, err := ec.unmarshalNPlatformPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐPlatformPermission(ctx, "PLATFORM_READ")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.PlatformPermission == nil {
+				return nil, errors.New("directive platformPermission is not implemented")
+			}
+			return ec.directives.PlatformPermission(ctx, obj, directive1, permission)
+		}
+
+		tmp, err := directive2(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.([]*database_models.Link); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be []*github.com/RouteHub-Link/routehub-service-graphql/database/models.Link`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -11917,8 +13282,32 @@ func (ec *executionContext) _PlatformDeployment_platform(ctx context.Context, fi
 		}
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Platform, nil
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return obj.Platform, nil
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			permission, err := ec.unmarshalNPlatformPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐPlatformPermission(ctx, "PLATFORM_READ")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.PlatformPermission == nil {
+				return nil, errors.New("directive platformPermission is not implemented")
+			}
+			return ec.directives.PlatformPermission(ctx, obj, directive0, permission)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*database_models.Platform); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/RouteHub-Link/routehub-service-graphql/database/models.Platform`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -12355,13 +13744,23 @@ func (ec *executionContext) _Query_organizations(ctx context.Context, field grap
 			return ec.resolvers.Query().Organizations(rctx)
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
+			permission, err := ec.unmarshalNOrganizationPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐOrganizationPermission(ctx, "ORGANIZATION_READ")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.OrganizationPermission == nil {
+				return nil, errors.New("directive organizationPermission is not implemented")
+			}
+			return ec.directives.OrganizationPermission(ctx, nil, directive0, permission)
+		}
+		directive2 := func(ctx context.Context) (interface{}, error) {
 			if ec.directives.Auth == nil {
 				return nil, errors.New("directive auth is not implemented")
 			}
-			return ec.directives.Auth(ctx, nil, directive0)
+			return ec.directives.Auth(ctx, nil, directive1)
 		}
 
-		tmp, err := directive1(rctx)
+		tmp, err := directive2(rctx)
 		if err != nil {
 			return nil, graphql.ErrorOnPath(ctx, err)
 		}
@@ -12443,13 +13842,23 @@ func (ec *executionContext) _Query_platforms(ctx context.Context, field graphql.
 			return ec.resolvers.Query().Platforms(rctx)
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
+			permission, err := ec.unmarshalNPlatformPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐPlatformPermission(ctx, "PLATFORM_READ")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.PlatformPermission == nil {
+				return nil, errors.New("directive platformPermission is not implemented")
+			}
+			return ec.directives.PlatformPermission(ctx, nil, directive0, permission)
+		}
+		directive2 := func(ctx context.Context) (interface{}, error) {
 			if ec.directives.Auth == nil {
 				return nil, errors.New("directive auth is not implemented")
 			}
-			return ec.directives.Auth(ctx, nil, directive0)
+			return ec.directives.Auth(ctx, nil, directive1)
 		}
 
-		tmp, err := directive1(rctx)
+		tmp, err := directive2(rctx)
 		if err != nil {
 			return nil, graphql.ErrorOnPath(ctx, err)
 		}
@@ -13127,8 +14536,32 @@ func (ec *executionContext) _Template_platform(ctx context.Context, field graphq
 		}
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Platform, nil
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return obj.Platform, nil
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			permission, err := ec.unmarshalNPlatformPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐPlatformPermission(ctx, "PLATFORM_READ")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.PlatformPermission == nil {
+				return nil, errors.New("directive platformPermission is not implemented")
+			}
+			return ec.directives.PlatformPermission(ctx, obj, directive0, permission)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*database_models.Platform); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/RouteHub-Link/routehub-service-graphql/database/models.Platform`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -13897,8 +15330,32 @@ func (ec *executionContext) _User_organizations(ctx context.Context, field graph
 		}
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.User().Organizations(rctx, obj)
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.User().Organizations(rctx, obj)
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			permission, err := ec.unmarshalNOrganizationPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐOrganizationPermission(ctx, "ORGANIZATION_READ")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.OrganizationPermission == nil {
+				return nil, errors.New("directive organizationPermission is not implemented")
+			}
+			return ec.directives.OrganizationPermission(ctx, obj, directive0, permission)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.([]*database_models.Organization); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be []*github.com/RouteHub-Link/routehub-service-graphql/database/models.Organization`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -13965,8 +15422,32 @@ func (ec *executionContext) _User_platforms(ctx context.Context, field graphql.C
 		}
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.User().Platforms(rctx, obj)
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.User().Platforms(rctx, obj)
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			permission, err := ec.unmarshalNPlatformPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐPlatformPermission(ctx, "PLATFORM_READ")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.PlatformPermission == nil {
+				return nil, errors.New("directive platformPermission is not implemented")
+			}
+			return ec.directives.PlatformPermission(ctx, obj, directive0, permission)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.([]*database_models.Platform); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be []*github.com/RouteHub-Link/routehub-service-graphql/database/models.Platform`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -14363,8 +15844,32 @@ func (ec *executionContext) _UserInvite_organization(ctx context.Context, field 
 		}
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.UserInvite().Organization(rctx, obj)
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.UserInvite().Organization(rctx, obj)
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			permission, err := ec.unmarshalNOrganizationPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐOrganizationPermission(ctx, "ORGANIZATION_READ")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.OrganizationPermission == nil {
+				return nil, errors.New("directive organizationPermission is not implemented")
+			}
+			return ec.directives.OrganizationPermission(ctx, obj, directive0, permission)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.([]*database_models.Organization); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be []*github.com/RouteHub-Link/routehub-service-graphql/database/models.Organization`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -14431,8 +15936,32 @@ func (ec *executionContext) _UserInvite_platforms(ctx context.Context, field gra
 		}
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.UserInvite().Platforms(rctx, obj)
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.UserInvite().Platforms(rctx, obj)
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			permission, err := ec.unmarshalNPlatformPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐPlatformPermission(ctx, "PLATFORM_READ")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.PlatformPermission == nil {
+				return nil, errors.New("directive platformPermission is not implemented")
+			}
+			return ec.directives.PlatformPermission(ctx, obj, directive0, permission)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.([]*database_models.Platform); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be []*github.com/RouteHub-Link/routehub-service-graphql/database/models.Platform`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -18965,6 +20494,8 @@ func (ec *executionContext) _DNSVerification(ctx context.Context, sel ast.Select
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
+		case "secret":
+			out.Values[i] = ec._DNSVerification_secret(ctx, field, obj)
 		case "message":
 			out.Values[i] = ec._DNSVerification_message(ctx, field, obj)
 		case "error":

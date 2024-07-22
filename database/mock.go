@@ -1,6 +1,8 @@
 package database
 
 import (
+	"github.com/RouteHub-Link/routehub-service-graphql/auth"
+	"github.com/RouteHub-Link/routehub-service-graphql/auth/policies"
 	database_enums "github.com/RouteHub-Link/routehub-service-graphql/database/enums"
 	database_models "github.com/RouteHub-Link/routehub-service-graphql/database/models"
 	database_relations "github.com/RouteHub-Link/routehub-service-graphql/database/relations"
@@ -87,6 +89,21 @@ func Seed() {
 
 		DB.Create(user_Organization)
 		DB.Create(user2_Organization)
+
+		policies.NewPolicyBuilder(auth.CasbinEnforcer, user.ID, "allow").
+			OrganizationPlatformCreate(organization.ID).
+			OrganizationDelete(organization.ID).
+			OrganizationRead(organization.ID).
+			OrganizationUpdate(organization.ID).
+			OrganizationUserInvite(organization.ID)
+
+		policies.NewPolicyBuilder(auth.CasbinEnforcer, user2.ID, "allow").
+			OrganizationPlatformCreate(organization.ID).
+			OrganizationDelete(organization.ID).
+			OrganizationRead(organization.ID).
+			OrganizationUpdate(organization.ID).
+			OrganizationUserInvite(organization.ID)
+
 	}
 
 	var domain_count int64
@@ -162,6 +179,10 @@ func Seed() {
 		}
 
 		DB.Create(&platform_user)
+
+		policies.NewPolicyBuilder(auth.CasbinEnforcer, user.ID, "allow").
+			PlatformRead(platform.ID).
+			PlatformUpdate(platform.ID)
 	}
 
 	var link_count int64

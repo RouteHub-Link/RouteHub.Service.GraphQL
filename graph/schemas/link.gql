@@ -1,5 +1,5 @@
 "A shortened link."
-type Link {
+type Link @platformPermission(permission: LINK_READ) {
     id: UUID!
     "The link's target. This is the link that will be redirected to."
     target: String!

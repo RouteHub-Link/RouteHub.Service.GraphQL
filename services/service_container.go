@@ -7,7 +7,6 @@ import (
 	services_organization "github.com/RouteHub-Link/routehub-service-graphql/services/organization"
 	services_platform "github.com/RouteHub-Link/routehub-service-graphql/services/platform"
 	services_user "github.com/RouteHub-Link/routehub-service-graphql/services/user"
-	"github.com/RouteHub-Link/routehub-service-graphql/worker"
 	"gorm.io/gorm"
 )
 
@@ -19,7 +18,6 @@ type ServiceContainer struct {
 	LinkService                   *services_link.LinkService
 	LinkValidationService         *services_link.LinkValidationService
 	DNSVerificationService        *services_domain.DNSVerificationService
-	WorkerService                 *worker.WrokerService
 	OrganizationService           *services_organization.OrganizationService
 	PlatformPermissionService     *services_platform.PlatformPermissionService
 	OrganizationPermissionService *services_organization.OrganizationPermissionService
@@ -33,7 +31,6 @@ func NewServiceContainer(db *gorm.DB) *ServiceContainer {
 		DomainService:                 &services_domain.DomainService{DB: db},
 		DomainUtilsService:            &domainUtilsService,
 		PlatformService:               &services_platform.PlatformService{DB: db},
-		WorkerService:                 &worker.WrokerService{},
 		LinkService:                   &services_link.LinkService{DB: db},
 		LinkValidationService:         services_link.NewLinkValidationService(&domainUtilsService, db),
 		DNSVerificationService:        services_domain.NewDNSVerificationService(&domainUtilsService, db),

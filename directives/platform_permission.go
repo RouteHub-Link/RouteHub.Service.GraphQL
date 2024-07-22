@@ -2,31 +2,58 @@ package directives
 
 import (
 	"context"
+	"log"
+	"reflect"
 
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/RouteHub-Link/routehub-service-graphql/auth"
 	"github.com/RouteHub-Link/routehub-service-graphql/database"
 	database_enums "github.com/RouteHub-Link/routehub-service-graphql/database/enums"
 	database_models "github.com/RouteHub-Link/routehub-service-graphql/database/models"
-	services_platform "github.com/RouteHub-Link/routehub-service-graphql/services/platform"
 	"github.com/google/uuid"
 	"github.com/vektah/gqlparser/gqlerror"
 )
 
 func PlatformPermissionDirectiveHandler(ctx context.Context, obj interface{}, next graphql.Resolver, permission database_enums.PlatformPermission) (res interface{}, err error) {
 	userSession := auth.ForContext(ctx)
-	db := database.DB
+	var platformId string
 	if userSession == nil {
 		return nil, gqlerror.Errorf("Access Denied")
 	}
 
-	platformUUID, err := getPlatformId(obj)
-	if err != nil {
-		return nil, err
+	fc := graphql.GetFieldContext(ctx)
+
+	if obj == nil {
+		return next(ctx)
 	}
 
-	platformPermissionService := services_platform.PlatformPermissionService{DB: db}
-	hasPermission, err := platformPermissionService.GetUserHasPermission(userSession.ID, *platformUUID, permission)
+	if fc.Parent.Object == "Mutation" {
+		uuid, err := getPlatformId(obj)
+		if err != nil {
+			return nil, err
+		}
+
+		platformId = uuid.String()
+	} else {
+		reflectFields := reflect.ValueOf(obj).Elem()
+		if reflectFields.Type() != reflect.TypeOf(database_models.Platform{}) {
+			return next(ctx)
+		}
+
+		reflectField := reflectFields.FieldByName("ID")
+		if reflectField.IsValid() {
+			bytes := reflectField.Bytes()
+			platformId = uuid.Must(uuid.FromBytes(bytes)).String()
+		}
+
+		if platformId == "" {
+			return nil, gqlerror.Errorf("platformId not found in obj")
+		}
+	}
+
+	e := auth.CasbinEnforcer
+	hasPermission, exp, err := e.EnforceEx(userSession.ID.String(), platformId, permission.String())
+	log.Printf("\nPlatformPermissionDirectiveHandler EnforceEX;\nres: %+v\nexp: %+v\nerr: %+v\n\n", hasPermission, exp, err)
 
 	if hasPermission {
 		return next(ctx)
@@ -35,24 +62,6 @@ func PlatformPermissionDirectiveHandler(ctx context.Context, obj interface{}, ne
 	}
 
 	return nil, gqlerror.Errorf("Access Denied")
-	/*
-	   var platformUser database_relations.PlatformUser
-	   err = db.Where("user_id = ? AND platform_id = ?", userSession.ID, platformUUID).First(&platformUser).Error
-
-	   	if err != nil {
-	   		return nil, gqlerror.Errorf("Access Denied")
-	   	}
-
-	   log.Printf("\n \norganizationUser: %+v\narg permission : %+v", platformUser, permission)
-
-	   	for _, organization_user_permission := range platformUser.Permissions {
-	   		if organization_user_permission == permission {
-	   			return next(ctx)
-	   		}
-	   	}
-
-	   return nil, gqlerror.Errorf("Access Denied")
-	*/
 }
 
 func getPlatformId(obj interface{}) (*uuid.UUID, error) {
