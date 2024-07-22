@@ -113,13 +113,10 @@ func (cc CasbinConfigurer) initTestPolicy(e *casbin.SyncedCachedEnforcer) (*casb
 
 func (cc CasbinConfigurer) getEnforcer() *casbin.SyncedCachedEnforcer {
 	onceEnforcer.Do(func() {
-		//e, _ := casbin.NewEnforcer(cc.CasbinConfig.Model, cc.getAdapter())
 		e, _ := casbin.NewSyncedCachedEnforcer(cc.CasbinConfig.Model, cc.getAdapter())
 		e.SetLogger(casbinSlog)
 		e.EnableLog(true)
 		CasbinEnforcer = e
-
-		_, _ = cc.initTestPolicy(e)
 	})
 
 	return CasbinEnforcer
