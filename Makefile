@@ -12,3 +12,6 @@ serve:
 
 gqlgen:
 	go run -mod=mod github.com/99designs/gqlgen
+
+docker:
+	docker compose up -d --build

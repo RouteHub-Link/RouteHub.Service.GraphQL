@@ -2,6 +2,7 @@ package config
 
 import (
 	"log"
+	"os"
 	"sync"
 	"time"
 
@@ -106,6 +107,47 @@ func (ConfigurationService) Get() *ApplicationConfig {
 			log.Fatalf("error database provider is not valid: %v valid providers are : %+v", _appConfig.Database.Type.Provider, AllProviders)
 		}
 
+		if os.Getenv("casbin.mongodb.uri") != "" {
+			_appConfig.CasbinConfig.Mongo.URI = os.Getenv("casbin.mongodb.uri")
+		}
+
+		if os.Getenv("database.host") != "" {
+			_appConfig.Database.Host = os.Getenv("database.host")
+		}
+
+		if os.Getenv("database.port") != "" {
+			_appConfig.Database.PortAsString = os.Getenv("database.port")
+		}
+
+		if os.Getenv("database.user") != "" {
+			_appConfig.Database.User = os.Getenv("database.user")
+		}
+
+		if os.Getenv("database.password") != "" {
+			_appConfig.Database.Password = os.Getenv("database.password")
+		}
+
+		if os.Getenv("database.database") != "" {
+			_appConfig.Database.Database = os.Getenv("database.database")
+		}
+
+		if os.Getenv("database.application_name") != "" {
+			_appConfig.Database.ApplicationName = os.Getenv("database.application_name")
+		}
+
+		if os.Getenv("database.type.migrate") != "" {
+			_appConfig.Database.Type.Migrate = os.Getenv("database.type.migrate") == "true"
+		}
+
+		if os.Getenv("database.type.seed") != "" {
+			_appConfig.Database.Type.Seed = os.Getenv("database.type.seed") == "true"
+		}
+
+		if os.Getenv("database.type.provider") != "" {
+			_appConfig.Database.Type.Provider = Provider(os.Getenv("database.type.provider"))
+		}
+
+		log.Printf("config loaded: %+v", _appConfig)
 	})
 
 	return _appConfig

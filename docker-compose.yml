@@ -1,0 +1,47 @@
+version: '3.4'
+
+services:
+  routehub-service:
+    image: routehubservice
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    ports:
+      - 8081:8081
+    depends_on:
+      - database-postgres
+      - caching-redis
+      - casbin-mongodb
+    restart: on-failure
+    environment:
+      casbin.mongodb.uri: mongodb://casbin-mongodb:27017
+      database.host: database-postgres
+      database.port: 5432
+      database.user: routehub
+      database.password: routehub
+      database.database: routehub
+      database.application_name: RouteHub-GraphQL
+      database.type.migrate: true
+      database.type.seed: true
+      database.type.provider: postgres
+
+  caching-redis:
+    image: redis
+    ports:
+      - 6379:6379
+  
+  database-postgres:
+    image: postgres
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: routehub
+      POSTGRES_PASSWORD: routehub
+      POSTGRES_DB: routehub
+    
+  casbin-mongodb:
+      image: mongo
+      ports:
+        - 27017:27017
+
+
