@@ -78,7 +78,7 @@ func (cc CasbinConfigurer) getEnforcer() *casbin.Enforcer {
 		e, _ := casbin.NewEnforcer(cc.CasbinConfig.Model, cc.getAdapter())
 		CasbinEnforcer = e
 
-		_, _ = cc.initTestPolicy(e)
+		//_, _ = cc.initTestPolicy(e)
 	})
 
 	return CasbinEnforcer
