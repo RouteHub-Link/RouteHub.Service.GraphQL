@@ -8,7 +8,7 @@ import (
 )
 
 type PolicyBuilder struct {
-	e       *casbin.Enforcer
+	e       *casbin.SyncedCachedEnforcer
 	sub     uuid.UUID
 	enforce bool
 	eft     string
@@ -20,7 +20,7 @@ type PermissionActExplained struct {
 	Act        string
 }
 
-func NewPolicyBuilder(e *casbin.Enforcer, sub uuid.UUID, _eft string) *PolicyBuilder {
+func NewPolicyBuilder(e *casbin.SyncedCachedEnforcer, sub uuid.UUID, _eft string) *PolicyBuilder {
 	return &PolicyBuilder{
 		e:       e,
 		sub:     sub,
@@ -47,7 +47,7 @@ func (pb *PolicyBuilder) EnforceWhenAdded(enforce bool) *PolicyBuilder {
 	return pb
 }
 
-func EnforcePermissions(e *casbin.Enforcer, userId uuid.UUID, platformId uuid.UUID, permissions []string) ([]PermissionActExplained, error) {
+func EnforcePermissions(e *casbin.SyncedCachedEnforcer, userId uuid.UUID, platformId uuid.UUID, permissions []string) ([]PermissionActExplained, error) {
 	permissionActExplained := []PermissionActExplained{}
 
 	// BatchEnforce does some magic (for in enforce) to checking multiple permissions

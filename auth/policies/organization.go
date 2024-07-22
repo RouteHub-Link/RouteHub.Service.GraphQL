@@ -31,7 +31,7 @@ func (pb *PolicyBuilder) OrganizationUserInvite(organizationId uuid.UUID) *Polic
 	return pb
 }
 
-func EnforceOrganizationPermissions(e *casbin.Enforcer, userId uuid.UUID, organizationId uuid.UUID, permissions []database_enums.OrganizationPermission) ([]PermissionActExplained, error) {
+func EnforceOrganizationPermissions(e *casbin.SyncedCachedEnforcer, userId uuid.UUID, organizationId uuid.UUID, permissions []database_enums.OrganizationPermission) ([]PermissionActExplained, error) {
 	permissionsAsStrings := []string{}
 	for _, permission := range permissions {
 		permissionsAsStrings = append(permissionsAsStrings, permission.String())
