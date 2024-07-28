@@ -11,11 +11,12 @@ import (
 )
 
 type ApplicationConfig struct {
-	GraphQL      GraphqlConfig  `koanf:"graphql"`
-	Database     DatabaseConfig `koanf:"database"`
-	Redis        RedisConfig    `koanf:"redis"`
-	Services     ServicesConfig `koanf:"services"`
-	CasbinConfig CasbinConfig   `koanf:"casbin"`
+	GraphQL          GraphqlConfig    `koanf:"graphql"`
+	Database         DatabaseConfig   `koanf:"database"`
+	Redis            RedisConfig      `koanf:"redis"`
+	Services         ServicesConfig   `koanf:"services"`
+	CasbinConfig     CasbinConfig     `koanf:"casbin"`
+	AuthorizerConfig AuthorizerConfig `koanf:"authorizer"`
 }
 
 type GraphqlConfig struct {
@@ -66,14 +67,21 @@ type CasbinConfig struct {
 	LogLevel string            `koanf:"log_level"`
 	Mongo    CasbinMongoConfig `koanf:"mongodb"`
 }
+
+type AuthorizerConfig struct {
+	CLIENTID            string             `koanf:"client_id"`
+	AUTHORIZERURL       string             `koanf:"authorizer_url"`
+	OPTIONALREDIRECTURL *string            `koanf:"optional_redirect_url"`
+	EXTRAHEADERS        *map[string]string `koanf:"extra_headers"`
+}
+
 type CasbinMongoConfig struct {
 	URI        string `koanf:"uri"`
 	Database   string `koanf:"database"`
 	Collection string `koanf:"collection"`
 }
 
-type ConfigurationService struct {
-}
+type ConfigurationService struct{}
 
 var (
 	_appConfig    *ApplicationConfig
