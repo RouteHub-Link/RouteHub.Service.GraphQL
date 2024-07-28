@@ -44,3 +44,16 @@ casbin:
     uri: mongodb://localhost:27017
     database: casbin
     collection: casbin_rule
+
+authorizer:
+  client_id: b20008b0-adec-499a-ac91-272d4c92cdcb
+  client_secret: xxx
+  token_url: http://localhost:8080/oauth/token
+  response_mode: form_post
+  response_type: code
+  scope: openid profile email
+  authorizer_url: http://localhost:8080/authorize
+  issuer: http://localhost:8080
+  callback: /oauth/callback
+  
+

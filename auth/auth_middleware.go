@@ -35,12 +35,3 @@ func Middleware(next http.Handler) http.Handler {
 		next.ServeHTTP(w, r)
 	})
 }
-
-func ForContext(ctx context.Context) *UserSession {
-	raw, err := ctx.Value(userCtxKey).(*UserSession)
-	if !err {
-		log.Printf("session not found from context %s", userCtxKey)
-	}
-
-	return raw
-}

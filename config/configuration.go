@@ -69,10 +69,16 @@ type CasbinConfig struct {
 }
 
 type AuthorizerConfig struct {
-	CLIENTID            string             `koanf:"client_id"`
-	AUTHORIZERURL       string             `koanf:"authorizer_url"`
-	OPTIONALREDIRECTURL *string            `koanf:"optional_redirect_url"`
-	EXTRAHEADERS        *map[string]string `koanf:"extra_headers"`
+	ClientID      string             `koanf:"client_id"`
+	ClientSecret  string             `koanf:"client_secret"`
+	Issuer        string             `koanf:"issuer"`
+	AuthorizerURL string             `koanf:"authorizer_url"`
+	TokenURL      string             `koanf:"token_url"`
+	ResponseMode  string             `koanf:"response_mode"`
+	ResponseType  string             `koanf:"response_type"`
+	Scopes        []string           `koanf:"scope"`
+	Callback      string             `koanf:"redirect_url"`
+	ExtraHedars   *map[string]string `koanf:"extra_headers"`
 }
 
 type CasbinMongoConfig struct {
