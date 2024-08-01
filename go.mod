@@ -8,6 +8,7 @@ require (
 	github.com/casbin/casbin/v2 v2.97.0
 	github.com/casbin/mongodb-adapter/v3 v3.6.0
 	github.com/cloudmatelabs/gorm-gqlgen-relay v1.3.2
+	github.com/coreos/go-oidc/v3 v3.11.0
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/fergusstrange/embedded-postgres v1.25.0
 	github.com/go-resty/resty/v2 v2.13.1
@@ -24,6 +25,7 @@ require (
 	github.com/vektah/gqlparser/v2 v2.5.11
 	go.mongodb.org/mongo-driver v1.16.0
 	golang.org/x/crypto v0.25.0
+	golang.org/x/oauth2 v0.21.0
 	gorm.io/driver/postgres v1.5.4
 	gorm.io/gorm v1.25.5
 )
@@ -36,7 +38,6 @@ require (
 	github.com/antchfx/xmlquery v1.3.1 // indirect
 	github.com/antchfx/xpath v1.1.10 // indirect
 	github.com/casbin/govaluate v1.2.0 // indirect
-	github.com/coreos/go-oidc/v3 v3.11.0 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.4 // indirect
 	github.com/fsnotify/fsnotify v1.6.0 // indirect
 	github.com/go-jose/go-jose/v4 v4.0.2 // indirect
@@ -75,7 +76,6 @@ require (
 	github.com/youmark/pkcs8 v0.0.0-20240424034433-3c2c7870ae76 // indirect
 	golang.org/x/mod v0.17.0 // indirect
 	golang.org/x/net v0.27.0 // indirect
-	golang.org/x/oauth2 v0.21.0 // indirect
 	golang.org/x/sync v0.7.0 // indirect
 	golang.org/x/sys v0.22.0 // indirect
 	golang.org/x/text v0.16.0 // indirect

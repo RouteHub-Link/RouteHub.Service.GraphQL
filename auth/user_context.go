@@ -27,6 +27,12 @@ func (u *UserSession) ParseFromClaims(claims jwt.MapClaims) {
 	u.Name = claims["username"].(string)
 }
 
+func (u *UserSession) ParseFromIdTokenClaims(claims *IdTokenClaims) {
+	log.Printf("claims:%v", claims)
+	u.ID = uuid.MustParse(claims.Sub)
+	u.Name = claims.Name
+}
+
 func (u *UserSession) ToClaims() *jwt.MapClaims {
 	return &jwt.MapClaims{
 		"jti":      u.ID.String(),

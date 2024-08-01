@@ -27,11 +27,12 @@ func Serve() {
 
 	var srv http.Handler = handler.NewDefaultServer(graph.NewExecutableSchema(config))
 
-	srv = auth.Middleware(srv)
+	//srv = auth.JWTMiddleware(srv)
+	srv = auth.PKCEMiddleware(srv)
 	srv = loaders.Middleware(srv)
 
 	if applicationConfig.GraphQL.Playground {
-		http.Handle("/", playground.ApolloSandboxHandler("GraphQL playground", "/query"))
+		http.Handle("/playground", playground.ApolloSandboxHandler("GraphQL playground", "/query"))
 		log.Printf("GraphQL playground enabled Connect to http://localhost:%s/ for GraphQL playground", applicationConfig.GraphQL.PortAsString)
 	}
 

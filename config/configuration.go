@@ -77,7 +77,7 @@ type AuthorizerConfig struct {
 	ResponseMode  string             `koanf:"response_mode"`
 	ResponseType  string             `koanf:"response_type"`
 	Scopes        []string           `koanf:"scope"`
-	Callback      string             `koanf:"redirect_url"`
+	Callback      string             `koanf:"callback"`
 	ExtraHedars   *map[string]string `koanf:"extra_headers"`
 }
 
