@@ -11,12 +11,12 @@ import (
 )
 
 type ApplicationConfig struct {
-	GraphQL          GraphqlConfig    `koanf:"graphql"`
-	Database         DatabaseConfig   `koanf:"database"`
-	Redis            RedisConfig      `koanf:"redis"`
-	Services         ServicesConfig   `koanf:"services"`
-	CasbinConfig     CasbinConfig     `koanf:"casbin"`
-	AuthorizerConfig AuthorizerConfig `koanf:"authorizer"`
+	GraphQL      GraphqlConfig  `koanf:"graphql"`
+	Database     DatabaseConfig `koanf:"database"`
+	Redis        RedisConfig    `koanf:"redis"`
+	Services     ServicesConfig `koanf:"services"`
+	CasbinConfig CasbinConfig   `koanf:"casbin"`
+	AuthConfig   AuthConfig     `koanf:"zitadel"`
 }
 
 type GraphqlConfig struct {
@@ -68,17 +68,23 @@ type CasbinConfig struct {
 	Mongo    CasbinMongoConfig `koanf:"mongodb"`
 }
 
-type AuthorizerConfig struct {
-	ClientID      string             `koanf:"client_id"`
-	ClientSecret  string             `koanf:"client_secret"`
-	Issuer        string             `koanf:"issuer"`
-	AuthorizerURL string             `koanf:"authorizer_url"`
-	TokenURL      string             `koanf:"token_url"`
-	ResponseMode  string             `koanf:"response_mode"`
-	ResponseType  string             `koanf:"response_type"`
-	Scopes        []string           `koanf:"scope"`
-	Callback      string             `koanf:"callback"`
-	ExtraHedars   *map[string]string `koanf:"extra_headers"`
+type AuthConfig struct {
+	ClientID            string             `koanf:"client_id"`
+	ClientSecret        string             `koanf:"client_secret"`
+	Issuer              string             `koanf:"issuer"`
+	AuthorizerURL       string             `koanf:"authorizer_url"`
+	TokenURL            string             `koanf:"token_url"`
+	ResponseMode        string             `koanf:"response_mode"`
+	ResponseType        string             `koanf:"response_type"`
+	Scopes              []string           `koanf:"scope"`
+	Callback            string             `koanf:"callback"`
+	ExtraHedars         *map[string]string `koanf:"extra_headers"`
+	CookieKey           string             `koanf:"cookieKey"`
+	JsonTokenID         string             `koanf:"jsonTokenID"`
+	JsonTokenPrivateKey string             `koanf:"jsonTokenPrivateKey"`
+	Domain              string             `koanf:"domain"`
+	Port                string             `koanf:"port"`
+	Insecure            bool               `koanf:"insecure"`
 }
 
 type CasbinMongoConfig struct {

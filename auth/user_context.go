@@ -6,6 +6,7 @@ import (
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/google/uuid"
+	"github.com/zitadel/oidc/v3/pkg/oidc"
 )
 
 // to prevent collisions between different context uses
@@ -27,9 +28,9 @@ func (u *UserSession) ParseFromClaims(claims jwt.MapClaims) {
 	u.Name = claims["username"].(string)
 }
 
-func (u *UserSession) ParseFromIdTokenClaims(claims *IdTokenClaims) {
+func (u *UserSession) ParseFromIdTokenClaims(claims *oidc.UserInfo) {
 	log.Printf("claims:%v", claims)
-	u.ID = uuid.MustParse(claims.Sub)
+	u.ID = uuid.MustParse(claims.Subject)
 	u.Name = claims.Name
 }
 
