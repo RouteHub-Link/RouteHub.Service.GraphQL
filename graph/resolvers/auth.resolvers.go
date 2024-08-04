@@ -7,33 +7,13 @@ package graph
 import (
 	"context"
 
-	"github.com/RouteHub-Link/routehub-service-graphql/auth"
 	"github.com/RouteHub-Link/routehub-service-graphql/graph"
 	"github.com/RouteHub-Link/routehub-service-graphql/graph/model"
 )
 
 // LoginUser is the resolver for the loginUser field.
 func (r *mutationResolver) LoginUser(ctx context.Context, input model.LoginInput) (*model.LoginPayload, error) {
-	userService := r.ServiceContainer.UserService
-
-	user, err := userService.Login(input)
-	if err != nil {
-		return nil, err
-	}
-
-	userSession := new(auth.UserSession)
-	userSession.ID = user.ID
-	userSession.Name = user.Fullname
-
-	token, err := auth.GenerateToken(userSession.ToClaims())
-
-	if err != nil {
-		return nil, err
-	}
-
-	return &model.LoginPayload{
-		Token: token,
-	}, nil
+	return nil, nil
 }
 
 // Mutation returns graph.MutationResolver implementation.
