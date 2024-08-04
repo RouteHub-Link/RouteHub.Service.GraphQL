@@ -6,6 +6,7 @@ import (
 
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/RouteHub-Link/routehub-service-graphql/auth"
+	auth_casbin "github.com/RouteHub-Link/routehub-service-graphql/auth/casbin"
 	database_enums "github.com/RouteHub-Link/routehub-service-graphql/database/enums"
 	database_models "github.com/RouteHub-Link/routehub-service-graphql/database/models"
 	"github.com/google/uuid"
@@ -48,7 +49,7 @@ func OrganizationPermissionDirectiveHandler(ctx context.Context, obj interface{}
 		}
 	}
 
-	e := auth.CasbinEnforcer
+	e := auth_casbin.CasbinEnforcer
 	hasPermission, _, err := e.EnforceEx(userSession.ID.String(), organizationId, permission.String())
 
 	if hasPermission {

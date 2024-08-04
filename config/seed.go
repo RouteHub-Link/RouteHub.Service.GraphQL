@@ -1,14 +1,13 @@
 package config
 
 type Seed struct {
-	Admin        SeedAdmin        `koanf:"admin"`
+	Admins       *[]SeedAdmin     `koanf:"admins"`
+	Second       SeedAdmin        `koanf:"second"`
 	Organization SeedOrganization `koanf:"organization"`
 	Domain       SeedDomain       `koanf:"domain"`
 }
-
 type SeedAdmin struct {
-	Email    string `koanf:"email"`
-	Password string `koanf:"password"`
+	Subject string `koanf:"subject"`
 }
 
 type SeedOrganization struct {

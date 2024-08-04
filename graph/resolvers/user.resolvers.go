@@ -11,17 +11,13 @@ import (
 	database_enums "github.com/RouteHub-Link/routehub-service-graphql/database/enums"
 	database_models "github.com/RouteHub-Link/routehub-service-graphql/database/models"
 	database_relations "github.com/RouteHub-Link/routehub-service-graphql/database/relations"
+	database_types "github.com/RouteHub-Link/routehub-service-graphql/database/types"
 	"github.com/RouteHub-Link/routehub-service-graphql/graph"
 	"github.com/RouteHub-Link/routehub-service-graphql/graph/model"
 	graph_inputs "github.com/RouteHub-Link/routehub-service-graphql/graph/model/inputs"
 	"github.com/google/uuid"
 	"github.com/vektah/gqlparser/gqlerror"
 )
-
-// CreateUser is the resolver for the createUser field.
-func (r *mutationResolver) CreateUser(ctx context.Context, input model.UserCreateInput) (*database_models.User, error) {
-	return r.ServiceContainer.UserService.CreateUser(input)
-}
 
 // InviteUser is the resolver for the inviteUser field.
 func (r *mutationResolver) InviteUser(ctx context.Context, input graph_inputs.UserInviteInput) (*database_relations.UserInvite, error) {
@@ -64,6 +60,41 @@ func (r *queryResolver) Users(ctx context.Context) ([]*database_models.User, err
 func (r *queryResolver) Invites(ctx context.Context) ([]*database_relations.UserInvite, error) {
 	userSession := auth.ForContext(ctx)
 	return r.ServiceContainer.UserService.GetInvitesByInvitedById(userSession.ID)
+}
+
+// Avatar is the resolver for the avatar field.
+func (r *userResolver) Avatar(ctx context.Context, obj *database_models.User) (string, error) {
+	userSession := auth.ForContext(ctx)
+	return userSession.UserInfo.Picture, nil
+}
+
+// Email is the resolver for the email field.
+func (r *userResolver) Email(ctx context.Context, obj *database_models.User) (string, error) {
+	userSession := auth.ForContext(ctx)
+	return userSession.UserInfo.Email, nil
+}
+
+// Fullname is the resolver for the fullname field.
+func (r *userResolver) Fullname(ctx context.Context, obj *database_models.User) (string, error) {
+	userSession := auth.ForContext(ctx)
+	return userSession.UserInfo.Name, nil
+}
+
+// Verified is the resolver for the verified field.
+func (r *userResolver) Verified(ctx context.Context, obj *database_models.User) (bool, error) {
+	userSession := auth.ForContext(ctx)
+	return bool(userSession.UserInfo.EmailVerified), nil
+}
+
+// Phone is the resolver for the phone field.
+func (r *userResolver) Phone(ctx context.Context, obj *database_models.User) (*database_types.AccountPhone, error) {
+	userSession := auth.ForContext(ctx)
+	phone := &database_types.AccountPhone{
+		Number:   userSession.UserInfo.PhoneNumber,
+		Verified: userSession.UserInfo.PhoneNumberVerified,
+	}
+
+	return phone, nil
 }
 
 // Organizations is the resolver for the Organizations field.

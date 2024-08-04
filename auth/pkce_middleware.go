@@ -11,6 +11,8 @@ import (
 	"sync"
 
 	applicationConfig "github.com/RouteHub-Link/routehub-service-graphql/config"
+	"github.com/RouteHub-Link/routehub-service-graphql/database"
+	services_user "github.com/RouteHub-Link/routehub-service-graphql/services/user"
 	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"github.com/zitadel/zitadel-go/v3/pkg/authentication"
 	openid "github.com/zitadel/zitadel-go/v3/pkg/authentication/oidc"
@@ -26,6 +28,7 @@ var (
 	authN                     *authentication.Authenticator[*openid.UserInfoContext[*oidc.IDTokenClaims, *oidc.UserInfo]]
 	authenticationInterceptor *authentication.Interceptor[*openid.UserInfoContext[*oidc.IDTokenClaims, *oidc.UserInfo]]
 	symmetricEncryptionKey    string
+	userService               *services_user.UserService
 )
 
 func PKCEMiddleware(next http.Handler) http.Handler {
@@ -39,6 +42,9 @@ func PKCEMiddleware(next http.Handler) http.Handler {
 			user := new(UserSession)
 			user.ParseFromIdTokenClaims(userInfo)
 
+			dbUser := userService.GetOrCreateUser(userInfo)
+			user.ID = dbUser.ID
+
 			newCtx := context.WithValue(r.Context(), userCtxKey, user)
 			log.Printf("user session on context \nname : %s\nuser : %+v \n userInfo: %+v ", userCtxKey, user, userInfo)
 
@@ -50,6 +56,7 @@ func PKCEMiddleware(next http.Handler) http.Handler {
 
 func ConfigureOauth(h http.Handler) (err error) {
 	onceConfigureOauth2.Do(func() {
+		userService = &services_user.UserService{DB: database.DB}
 		symmetricEncryptionKey = randomString(32)
 
 		ctx := context.Background()
@@ -68,6 +75,7 @@ func ConfigureOauth(h http.Handler) (err error) {
 		authN, err = authentication.New(ctx, zitadelInstance, symmetricEncryptionKey,
 			openid.DefaultAuthentication(authConfig.ClientID, redirectURL, symmetricEncryptionKey),
 		)
+
 		if err != nil {
 			slog.Error("zitadel sdk could not initialize", "error", err)
 			os.Exit(1)

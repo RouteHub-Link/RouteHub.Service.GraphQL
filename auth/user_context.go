@@ -27,7 +27,6 @@ func (u *UserSession) ParseFromClaims(claims jwt.MapClaims) {
 }
 
 func (u *UserSession) ParseFromIdTokenClaims(userInfo *oidc.UserInfo) {
-	u.ID = uuid.New()
 	u.UserInfo = userInfo
 }
 

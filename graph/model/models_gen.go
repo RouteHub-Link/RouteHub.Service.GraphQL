@@ -14,11 +14,6 @@ import (
 	"github.com/google/uuid"
 )
 
-type AccountPhoneInput struct {
-	Number      string `json:"number"`
-	CountryCode string `json:"countryCode"`
-}
-
 type AnalyticReport struct {
 	Link         *database_models.Link   `json:"link"`
 	Domain       *database_models.Domain `json:"domain"`
@@ -308,17 +303,6 @@ type UUIDFilter struct {
 type UpdateUserInviteInput struct {
 	Code   string                          `json:"code"`
 	Status database_enums.InvitationStatus `json:"status"`
-	User   *UserCreateInput                `json:"user"`
-}
-
-type UserCreateInput struct {
-	Email             string                   `json:"email"`
-	Password          string                   `json:"password"`
-	ConfirmPassword   string                   `json:"confirmPassword"`
-	Fullname          string                   `json:"fullname"`
-	Phone             *AccountPhoneInput       `json:"phone"`
-	ClientInformation *ClientInformationInput  `json:"clientInformation"`
-	Organization      *OrganizationCreateInput `json:"organization,omitempty"`
 }
 
 type PinnedLinkInput struct {

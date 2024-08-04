@@ -29,10 +29,7 @@ type UserInvite {
 
 type AccountPhone {
   number: String!
-  countryCode: String!
   verified: Boolean!
-  createdAt: DateTime!
-  updatedAt: DateTime
 }
 
 type Permission {
@@ -55,25 +52,10 @@ input PlatformsWithPermissionsInput {
   permissions: [PlatformPermission!]!
 }
 
-input AccountPhoneInput {
-  number: String!
-  countryCode: String!
-}
 
 input UpdateUserInviteInput {
   code: String!
   status: InvitationStatus!
-  user: UserCreateInput!
-}
-
-input UserCreateInput {
-  email: String!
-  password: String!
-  confirmPassword: String!
-  fullname: String!
-  phone: AccountPhoneInput!
-  clientInformation: ClientInformationInput!
-  organization: OrganizationCreateInput
 }
 
 input ClientInformationInput {
@@ -91,11 +73,6 @@ extend type Query {
 }
 
 extend type Mutation {
-  """
-  This mutation is used to create a new user.
-  If the organization is provided, new organization will be created for the user.
-  """
-  createUser(input: UserCreateInput!): User!
   """
   This mutation is used for inviting a user to an organization. 
   Authorized person can invite a user to multiple organizations with custom permissions.

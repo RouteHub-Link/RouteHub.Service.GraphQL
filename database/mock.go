@@ -1,14 +1,13 @@
 package database
 
 import (
-	"github.com/RouteHub-Link/routehub-service-graphql/auth"
+	auth_casbin "github.com/RouteHub-Link/routehub-service-graphql/auth/casbin"
 	"github.com/RouteHub-Link/routehub-service-graphql/auth/policies"
 	database_enums "github.com/RouteHub-Link/routehub-service-graphql/database/enums"
 	database_models "github.com/RouteHub-Link/routehub-service-graphql/database/models"
 	database_relations "github.com/RouteHub-Link/routehub-service-graphql/database/relations"
 	database_types "github.com/RouteHub-Link/routehub-service-graphql/database/types"
 	"github.com/google/uuid"
-	"golang.org/x/crypto/bcrypt"
 )
 
 func Seed() {
@@ -20,25 +19,23 @@ func Seed() {
 	var user *database_models.User
 	var user2 *database_models.User
 	if user_count == 0 {
-		pass := seedData.Admin.Password
-		mail := seedData.Admin.Email
-		hash, _ := bcrypt.GenerateFromPassword([]byte(pass), bcrypt.MinCost)
-		password := string(hash)
+		// seeder1@r4l.cc
+		// seeder2@r4l.cc
+		// passwords;
+		// L-5sEaqufG4.p4V
 
 		user = &database_models.User{
-			ID:           uuid.MustParse("927bb153-ed0a-4686-b8d5-5f1ced408ae4"),
-			Email:        mail,
-			PasswordHash: password,
-			Fullname:     "Admin",
-			Verified:     true,
+			ID: uuid.MustParse("927bb153-ed0a-4686-b8d5-5f1ced408ae4"),
 		}
 
 		user2 = &database_models.User{
-			ID:           uuid.MustParse("927bb153-ed0a-4686-b8d5-5f1ced408ae5"),
-			Email:        "test@r4l.com",
-			PasswordHash: password,
-			Fullname:     "Test",
-			Verified:     true,
+			ID: uuid.MustParse("927bb153-ed0a-4686-b8d5-5f1ced408ae5"),
+		}
+
+		if seedData.Admins != nil {
+			admins := *seedData.Admins
+			user.Subject = admins[0].Subject
+			user2.Subject = admins[1].Subject
 		}
 
 		DB.Create(user)
@@ -90,14 +87,14 @@ func Seed() {
 		DB.Create(user_Organization)
 		DB.Create(user2_Organization)
 
-		policies.NewPolicyBuilder(auth.CasbinEnforcer, user.ID, "allow").
+		policies.NewPolicyBuilder(auth_casbin.CasbinEnforcer, user.ID, "allow").
 			OrganizationPlatformCreate(organization.ID).
 			OrganizationDelete(organization.ID).
 			OrganizationRead(organization.ID).
 			OrganizationUpdate(organization.ID).
 			OrganizationUserInvite(organization.ID)
 
-		policies.NewPolicyBuilder(auth.CasbinEnforcer, user2.ID, "allow").
+		policies.NewPolicyBuilder(auth_casbin.CasbinEnforcer, user2.ID, "allow").
 			OrganizationPlatformCreate(organization.ID).
 			OrganizationDelete(organization.ID).
 			OrganizationRead(organization.ID).
@@ -180,7 +177,7 @@ func Seed() {
 
 		DB.Create(&platform_user)
 
-		policies.NewPolicyBuilder(auth.CasbinEnforcer, user.ID, "allow").
+		policies.NewPolicyBuilder(auth_casbin.CasbinEnforcer, user.ID, "allow").
 			PlatformRead(platform.ID).
 			PlatformUpdate(platform.ID)
 	}

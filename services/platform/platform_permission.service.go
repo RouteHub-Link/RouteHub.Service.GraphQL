@@ -3,7 +3,7 @@ package services_platform
 import (
 	"log"
 
-	"github.com/RouteHub-Link/routehub-service-graphql/auth"
+	auth_casbin "github.com/RouteHub-Link/routehub-service-graphql/auth/casbin"
 	"github.com/RouteHub-Link/routehub-service-graphql/auth/policies"
 	database_enums "github.com/RouteHub-Link/routehub-service-graphql/database/enums"
 	"github.com/google/uuid"
@@ -16,7 +16,7 @@ type PlatformPermissionService struct {
 }
 
 func (p PlatformPermissionService) GetPlatformPermissions(userId uuid.UUID, platformId uuid.UUID) (permissions []database_enums.PlatformPermission, err error) {
-	res, err := policies.EnforcePlatformPermissions(auth.CasbinEnforcer, userId, platformId, database_enums.AllPlatformPermission)
+	res, err := policies.EnforcePlatformPermissions(auth_casbin.CasbinEnforcer, userId, platformId, database_enums.AllPlatformPermission)
 	for _, permission := range res {
 		permissions = append(permissions, database_enums.PlatformPermission(permission.Permission))
 	}
@@ -25,7 +25,7 @@ func (p PlatformPermissionService) GetPlatformPermissions(userId uuid.UUID, plat
 }
 
 func (p PlatformPermissionService) GetUserHasPermission(userId uuid.UUID, platformId uuid.UUID, permission database_enums.PlatformPermission) (hasPermission bool, err error) {
-	e := auth.CasbinEnforcer
+	e := auth_casbin.CasbinEnforcer
 	hasPermission, exp, err := e.EnforceEx(userId.String(), platformId, permission.String())
 	log.Printf("\nOrganizationPermissionDirectiveHandler EnforceEX;\nres: %+v\nexp: %+v\nerr: %+v\n\n", hasPermission, exp, err)
 
