@@ -2,7 +2,6 @@ package auth
 
 import (
 	"log"
-	"time"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/google/uuid"
@@ -18,25 +17,21 @@ type contextKey struct {
 
 // A stand-in for our database backed user object
 type UserSession struct {
-	ID      uuid.UUID
-	Name    string
-	Subject string
+	ID       uuid.UUID
+	UserInfo *oidc.UserInfo
 }
 
 func (u *UserSession) ParseFromClaims(claims jwt.MapClaims) {
 	log.Printf("claims:%v", claims)
 	u.ID = uuid.MustParse(claims["jti"].(string))
-	u.Name = claims["username"].(string)
 }
 
-func (u *UserSession) ParseFromIdTokenClaims(claims *oidc.UserInfo) {
-	log.Printf("claims:%v", claims)
-
-	u.Name = claims.Name
-	u.Subject = claims.Subject
+func (u *UserSession) ParseFromIdTokenClaims(userInfo *oidc.UserInfo) {
 	u.ID = uuid.New()
+	u.UserInfo = userInfo
 }
 
+/*
 func (u *UserSession) ToClaims() *jwt.MapClaims {
 	return &jwt.MapClaims{
 		"jti":      u.ID.String(),
@@ -44,3 +39,4 @@ func (u *UserSession) ToClaims() *jwt.MapClaims {
 		"exp":      jwt.TimeFunc().Add(time.Hour * 24 * 365).Unix(),
 	}
 }
+*/
