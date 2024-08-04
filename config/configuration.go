@@ -69,22 +69,15 @@ type CasbinConfig struct {
 }
 
 type AuthConfig struct {
-	ClientID            string             `koanf:"client_id"`
-	ClientSecret        string             `koanf:"client_secret"`
-	Issuer              string             `koanf:"issuer"`
-	AuthorizerURL       string             `koanf:"authorizer_url"`
-	TokenURL            string             `koanf:"token_url"`
-	ResponseMode        string             `koanf:"response_mode"`
-	ResponseType        string             `koanf:"response_type"`
-	Scopes              []string           `koanf:"scope"`
-	Callback            string             `koanf:"callback"`
-	ExtraHedars         *map[string]string `koanf:"extra_headers"`
-	CookieKey           string             `koanf:"cookieKey"`
-	JsonTokenID         string             `koanf:"jsonTokenID"`
-	JsonTokenPrivateKey string             `koanf:"jsonTokenPrivateKey"`
-	Domain              string             `koanf:"domain"`
-	Port                string             `koanf:"port"`
-	Insecure            bool               `koanf:"insecure"`
+	ClientID      string   `koanf:"client_id"`
+	Callback      string   `koanf:"callback"`
+	Scopes        []string `koanf:"scope"`
+	AuthorizerURL string   `koanf:"authorizer_url"`
+	TokenURL      string   `koanf:"token_url"`
+	Issuer        string   `koanf:"issuer"`
+	Domain        string   `koanf:"domain"`
+	Port          string   `koanf:"port"`
+	Insecure      bool     `koanf:"insecure"`
 }
 
 type CasbinMongoConfig struct {

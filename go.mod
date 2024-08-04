@@ -26,6 +26,7 @@ require (
 	github.com/zitadel/zitadel-go/v3 v3.0.0-next.3
 	go.mongodb.org/mongo-driver v1.16.0
 	golang.org/x/crypto v0.25.0
+	golang.org/x/exp v0.0.0-20240707233637-46b078467d37
 	gorm.io/driver/postgres v1.5.4
 	gorm.io/gorm v1.25.5
 )
@@ -83,7 +84,6 @@ require (
 	go.opentelemetry.io/otel v1.28.0 // indirect
 	go.opentelemetry.io/otel/metric v1.28.0 // indirect
 	go.opentelemetry.io/otel/trace v1.28.0 // indirect
-	golang.org/x/exp v0.0.0-20240707233637-46b078467d37 // indirect
 	golang.org/x/mod v0.19.0 // indirect
 	golang.org/x/net v0.27.0 // indirect
 	golang.org/x/oauth2 v0.21.0 // indirect

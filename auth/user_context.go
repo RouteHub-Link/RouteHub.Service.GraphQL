@@ -18,8 +18,9 @@ type contextKey struct {
 
 // A stand-in for our database backed user object
 type UserSession struct {
-	ID   uuid.UUID
-	Name string
+	ID      uuid.UUID
+	Name    string
+	Subject string
 }
 
 func (u *UserSession) ParseFromClaims(claims jwt.MapClaims) {
@@ -30,8 +31,10 @@ func (u *UserSession) ParseFromClaims(claims jwt.MapClaims) {
 
 func (u *UserSession) ParseFromIdTokenClaims(claims *oidc.UserInfo) {
 	log.Printf("claims:%v", claims)
-	u.ID = uuid.MustParse(claims.Subject)
+
 	u.Name = claims.Name
+	u.Subject = claims.Subject
+	u.ID = uuid.New()
 }
 
 func (u *UserSession) ToClaims() *jwt.MapClaims {
