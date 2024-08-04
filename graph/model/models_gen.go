@@ -113,17 +113,6 @@ type LinkFilter struct {
 	Domain   *UUIDFilter `json:"domain,omitempty"`
 }
 
-// This input is used to loging a user.
-type LoginInput struct {
-	Email    string `json:"email"`
-	Password string `json:"password"`
-}
-
-// Payload returned after a user is logged in.
-type LoginPayload struct {
-	Token string `json:"token"`
-}
-
 type MapEntry struct {
 	Key   string `json:"key"`
 	Value string `json:"value"`

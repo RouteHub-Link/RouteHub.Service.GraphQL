@@ -111,5 +111,9 @@ func (r *Resolver) DNSVerification() graph.DNSVerificationResolver {
 // Domain returns graph.DomainResolver implementation.
 func (r *Resolver) Domain() graph.DomainResolver { return &domainResolver{r} }
 
+// Mutation returns graph.MutationResolver implementation.
+func (r *Resolver) Mutation() graph.MutationResolver { return &mutationResolver{r} }
+
 type dNSVerificationResolver struct{ *Resolver }
 type domainResolver struct{ *Resolver }
+type mutationResolver struct{ *Resolver }

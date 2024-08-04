@@ -191,10 +191,6 @@ type ComplexityRoot struct {
 		Message   func(childComplexity int) int
 	}
 
-	LoginPayload struct {
-		Token func(childComplexity int) int
-	}
-
 	MetricAnalytics struct {
 		EndAt        func(childComplexity int) int
 		Feeder       func(childComplexity int) int
@@ -211,7 +207,6 @@ type ComplexityRoot struct {
 		CreateOrganization    func(childComplexity int, input model.OrganizationCreateInput) int
 		CreatePlatform        func(childComplexity int, input graph_inputs.PlatformCreateInput) int
 		InviteUser            func(childComplexity int, input graph_inputs.UserInviteInput) int
-		LoginUser             func(childComplexity int, input model.LoginInput) int
 		NewDomainVerification func(childComplexity int, domainID uuid.UUID, forced *bool) int
 		RemoveFromPinnedLinks func(childComplexity int, input model.PinnedLinkInput) int
 		RequestCrawl          func(childComplexity int, input model.CrawlRequestInput) int
@@ -408,7 +403,6 @@ type LinkValidationResolver interface {
 	CreatedBy(ctx context.Context, obj *database_models.LinkValidation) (*database_models.User, error)
 }
 type MutationResolver interface {
-	LoginUser(ctx context.Context, input model.LoginInput) (*model.LoginPayload, error)
 	CreateDomain(ctx context.Context, input model.DomainCreateInput) (*database_models.Domain, error)
 	NewDomainVerification(ctx context.Context, domainID uuid.UUID, forced *bool) (*database_models.DNSVerification, error)
 	CreateLink(ctx context.Context, input model.LinkCreateInput) (*database_models.Link, error)
@@ -1085,13 +1079,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Log.Message(childComplexity), true
 
-	case "LoginPayload.token":
-		if e.complexity.LoginPayload.Token == nil {
-			break
-		}
-
-		return e.complexity.LoginPayload.Token(childComplexity), true
-
 	case "MetricAnalytics.endAt":
 		if e.complexity.MetricAnalytics.EndAt == nil {
 			break
@@ -1205,18 +1192,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.InviteUser(childComplexity, args["input"].(graph_inputs.UserInviteInput)), true
-
-	case "Mutation.loginUser":
-		if e.complexity.Mutation.LoginUser == nil {
-			break
-		}
-
-		args, err := ec.field_Mutation_loginUser_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Mutation.LoginUser(childComplexity, args["input"].(model.LoginInput)), true
 
 	case "Mutation.newDomainVerification":
 		if e.complexity.Mutation.NewDomainVerification == nil {
@@ -2105,7 +2080,6 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputIntFilter,
 		ec.unmarshalInputLinkCreateInput,
 		ec.unmarshalInputLinkFilter,
-		ec.unmarshalInputLoginInput,
 		ec.unmarshalInputMapEntry,
 		ec.unmarshalInputMapFilter,
 		ec.unmarshalInputMapInEntry,
@@ -2221,7 +2195,7 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 	return introspection.WrapTypeFromDef(ec.Schema(), ec.Schema().Types[name]), nil
 }
 
-//go:embed "schemas/auth.gql" "schemas/domain.gql" "schemas/link.gql" "schemas/metrics.gql" "schemas/organization.gql" "schemas/platform.gql" "schemas/schema.gql" "schemas/sgorm-gqlgen-relay-generated.gql" "schemas/user.gql"
+//go:embed "schemas/domain.gql" "schemas/link.gql" "schemas/metrics.gql" "schemas/organization.gql" "schemas/platform.gql" "schemas/schema.gql" "schemas/sgorm-gqlgen-relay-generated.gql" "schemas/user.gql"
 var sourcesFS embed.FS
 
 func sourceData(filename string) string {
@@ -2233,7 +2207,6 @@ func sourceData(filename string) string {
 }
 
 var sources = []*ast.Source{
-	{Name: "schemas/auth.gql", Input: sourceData("schemas/auth.gql"), BuiltIn: false},
 	{Name: "schemas/domain.gql", Input: sourceData("schemas/domain.gql"), BuiltIn: false},
 	{Name: "schemas/link.gql", Input: sourceData("schemas/link.gql"), BuiltIn: false},
 	{Name: "schemas/metrics.gql", Input: sourceData("schemas/metrics.gql"), BuiltIn: false},
@@ -2361,21 +2334,6 @@ func (ec *executionContext) field_Mutation_inviteUser_args(ctx context.Context, 
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
 		arg0, err = ec.unmarshalNUserInviteInput2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚋinputsᚐUserInviteInput(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["input"] = arg0
-	return args, nil
-}
-
-func (ec *executionContext) field_Mutation_loginUser_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 model.LoginInput
-	if tmp, ok := rawArgs["input"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNLoginInput2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐLoginInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -7413,50 +7371,6 @@ func (ec *executionContext) fieldContext_Log_message(_ context.Context, field gr
 	return fc, nil
 }
 
-func (ec *executionContext) _LoginPayload_token(ctx context.Context, field graphql.CollectedField, obj *model.LoginPayload) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_LoginPayload_token(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Token, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_LoginPayload_token(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "LoginPayload",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
 func (ec *executionContext) _MetricAnalytics_feeder(ctx context.Context, field graphql.CollectedField, obj *model.MetricAnalytics) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_MetricAnalytics_feeder(ctx, field)
 	if err != nil {
@@ -7717,65 +7631,6 @@ func (ec *executionContext) fieldContext_MetricAnalytics_endAt(_ context.Context
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type DateTime does not have child fields")
 		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Mutation_loginUser(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_loginUser(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().LoginUser(rctx, fc.Args["input"].(model.LoginInput))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(*model.LoginPayload)
-	fc.Result = res
-	return ec.marshalNLoginPayload2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐLoginPayload(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Mutation_loginUser(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Mutation",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "token":
-				return ec.fieldContext_LoginPayload_token(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type LoginPayload", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_loginUser_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
 	}
 	return fc, nil
 }
@@ -18462,40 +18317,6 @@ func (ec *executionContext) unmarshalInputLinkFilter(ctx context.Context, obj in
 	return it, nil
 }
 
-func (ec *executionContext) unmarshalInputLoginInput(ctx context.Context, obj interface{}) (model.LoginInput, error) {
-	var it model.LoginInput
-	asMap := map[string]interface{}{}
-	for k, v := range obj.(map[string]interface{}) {
-		asMap[k] = v
-	}
-
-	fieldsInOrder := [...]string{"email", "password"}
-	for _, k := range fieldsInOrder {
-		v, ok := asMap[k]
-		if !ok {
-			continue
-		}
-		switch k {
-		case "email":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("email"))
-			data, err := ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Email = data
-		case "password":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("password"))
-			data, err := ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Password = data
-		}
-	}
-
-	return it, nil
-}
-
 func (ec *executionContext) unmarshalInputMapEntry(ctx context.Context, obj interface{}) (model.MapEntry, error) {
 	var it model.MapEntry
 	asMap := map[string]interface{}{}
@@ -21246,45 +21067,6 @@ func (ec *executionContext) _Log(ctx context.Context, sel ast.SelectionSet, obj 
 	return out
 }
 
-var loginPayloadImplementors = []string{"LoginPayload"}
-
-func (ec *executionContext) _LoginPayload(ctx context.Context, sel ast.SelectionSet, obj *model.LoginPayload) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, loginPayloadImplementors)
-
-	out := graphql.NewFieldSet(fields)
-	deferred := make(map[string]*graphql.FieldSet)
-	for i, field := range fields {
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("LoginPayload")
-		case "token":
-			out.Values[i] = ec._LoginPayload_token(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-	out.Dispatch(ctx)
-	if out.Invalids > 0 {
-		return graphql.Null
-	}
-
-	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
-
-	for label, dfs := range deferred {
-		ec.processDeferredGroup(graphql.DeferredGroup{
-			Label:    label,
-			Path:     graphql.GetPath(ctx),
-			FieldSet: dfs,
-			Context:  ctx,
-		})
-	}
-
-	return out
-}
-
 var metricAnalyticsImplementors = []string{"MetricAnalytics"}
 
 func (ec *executionContext) _MetricAnalytics(ctx context.Context, sel ast.SelectionSet, obj *model.MetricAnalytics) graphql.Marshaler {
@@ -21368,13 +21150,6 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Mutation")
-		case "loginUser":
-			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_loginUser(ctx, field)
-			})
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
 		case "createDomain":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_createDomain(ctx, field)
@@ -24136,25 +23911,6 @@ func (ec *executionContext) marshalNLog2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋrout
 		return graphql.Null
 	}
 	return ec._Log(ctx, sel, v)
-}
-
-func (ec *executionContext) unmarshalNLoginInput2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐLoginInput(ctx context.Context, v interface{}) (model.LoginInput, error) {
-	res, err := ec.unmarshalInputLoginInput(ctx, v)
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalNLoginPayload2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐLoginPayload(ctx context.Context, sel ast.SelectionSet, v model.LoginPayload) graphql.Marshaler {
-	return ec._LoginPayload(ctx, sel, &v)
-}
-
-func (ec *executionContext) marshalNLoginPayload2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐLoginPayload(ctx context.Context, sel ast.SelectionSet, v *model.LoginPayload) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._LoginPayload(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalNMetricAnalytics2ᚕᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐMetricAnalyticsᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.MetricAnalytics) graphql.Marshaler {
