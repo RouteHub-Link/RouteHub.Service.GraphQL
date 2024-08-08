@@ -2,20 +2,20 @@ services:
   domain_utils_host: http://localhost:9001
 
 database:
-  host: route-hub
-  port: 26257
-  user: routehub
-  password: xxxx
+  host: localhost
+  port: 5432
+  user: postgres
+  password: postgres
   database: RouteHub
   application_name: RouteHub-GraphQL
   type:
     migrate: true
     seed: true
-    provider: embed
+    provider: postgres
   seed:
-    admin:
-      email: admin@r4l.com
-      password: admin
+    admins:
+      - subject: "248978326325721044"
+      - subject: "248979334530971655"
     organization:
       name: RouteHub
       description: RouteHub is a GraphQL API for managing routes
@@ -45,15 +45,13 @@ casbin:
     database: casbin
     collection: casbin_rule
 
-authorizer:
-  client_id: b20008b0-adec-499a-ac91-272d4c92cdcb
-  client_secret: xxx
-  token_url: http://localhost:8080/oauth/token
-  response_mode: form_post
-  response_type: code
+zitadel:
+  client_id: 11111111111
+  callback: /oauth2/callback
   scope: openid profile email
-  authorizer_url: http://localhost:8080/authorize
-  issuer: http://localhost:8080
-  callback: /oauth/callback
-  
-
+  authorizer_url: http://localhost:7077/oauth/v2/authorize
+  token_url: http://localhost:7077/oauth/v2/token
+  issuer: http://localhost:7077
+  domain: 'localhost'
+  port: 7077
+  insecure: true
