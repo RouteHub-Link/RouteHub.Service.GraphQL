@@ -110,3 +110,9 @@ models:
   OpenGraphXInput:
     model:
       - github.com/RouteHub-Link/routehub-service-graphql/database/types.OpenGraphX
+  LinkContentInput:
+    model:
+      - github.com/RouteHub-Link/routehub-service-graphql/database/types.LinkContent
+  MetaDescriptionInput:
+    model:
+      - github.com/RouteHub-Link/routehub-service-graphql/database/types.MetaDescription

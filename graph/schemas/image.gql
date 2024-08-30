@@ -1,0 +1,25 @@
+type ImageDescription {
+	src:    String!
+	alt:    String
+	height: String
+	width:  String
+}
+
+input ImageDescriptionInput {
+    src:    String!
+    alt:    String
+    height: String
+    width:  String
+}
+
+type ASocialMedia {
+    icon: String!
+    link: String!
+    target: String!
+}
+
+input ASocialMediaInput {
+    icon: String!
+    link: String!
+    target: String!
+}

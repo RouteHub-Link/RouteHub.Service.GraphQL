@@ -17,13 +17,13 @@ func (ps PlatformService) CreatePlatform(input graph_inputs.PlatformCreateInput,
 	// TODO Check that domain in user relations organization -> Permissions permissions can be checked by directive
 
 	platform = database_models.Platform{
-		ID:                uuid.New(),
-		Name:              input.Name,
-		DomainId:          input.DomainID,
-		RedirectionChoice: input.RedirectionChoice,
-		OpenGraph:         input.OpenGraph,
-		CreatedBy:         userId,
-		Status:            database_enums.StatusStatePasive,
+		ID:                  uuid.New(),
+		Name:                input.Name,
+		DomainId:            input.DomainID,
+		RedirectionChoice:   input.RedirectionChoice,
+		PlatformDescription: input.PlatformDescription,
+		CreatedBy:           userId,
+		Status:              database_enums.StatusStatePasive,
 	}
 
 	err = ps.DB.Create(&platform).Error

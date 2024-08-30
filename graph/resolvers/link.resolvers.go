@@ -6,6 +6,7 @@ package graph
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"time"
 
@@ -63,11 +64,6 @@ func (r *linkResolver) Analytics(ctx context.Context, obj *database_models.Link)
 	return mock, nil
 }
 
-// OpenGraph is the resolver for the openGraph field.
-func (r *linkResolver) OpenGraph(ctx context.Context, obj *database_models.Link) ([]*database_types.OpenGraph, error) {
-	return []*database_types.OpenGraph{obj.OpenGraph}, nil
-}
-
 // RedirectionOptions is the resolver for the redirectionOptions field.
 func (r *linkResolver) RedirectionOptions(ctx context.Context, obj *database_models.Link) (database_enums.RedirectionOptions, error) {
 	return obj.RedirectionChoice, nil
@@ -91,6 +87,11 @@ func (r *linkResolver) Crawls(ctx context.Context, obj *database_models.Link) ([
 // Link is the resolver for the link field.
 func (r *linkCrawlResolver) Link(ctx context.Context, obj *database_models.LinkCrawl) (*database_models.Link, error) {
 	return r.ServiceContainer.LinkService.GetLinkById(obj.LinkId)
+}
+
+// Result is the resolver for the result field.
+func (r *linkCrawlResolver) Result(ctx context.Context, obj *database_models.LinkCrawl) (*database_types.LinkContent, error) {
+	panic(fmt.Errorf("not implemented: Result - result"))
 }
 
 // CrawledBy is the resolver for the crawledBy field.

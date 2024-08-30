@@ -124,38 +124,39 @@ func Seed() {
 
 	var platform *database_models.Platform
 	if platform_count == 0 {
-		og := &database_types.OpenGraph{}
-		ogData := `{
-			"title": "Route Hub Shortener",
-			"description": "R4L Route Hub B2B Shortener",
-			"alternateImage": "cdn.link.r4l.cc/alternate",
-			"favIcon": "cdn.link.r4l.cc/favicon",
-			"image": "cdn.link.r4l.cc/image",
-			"locale": "tr-TR",
-			"siteName": "Shorten Route for Links CC",
-			"type": "website",
-			"url": "https://s.r4l.cc",
-			"x": {
-			  "creator": "@runaho",
-			  "card": "R4L Shorten Link",
-			  "description": "Route Hub Link Shortener B2B Main",
-			  "image": "s.r4l.cc/image",
-			  "site": "https://routehub.link",
-			  "title": "Route Hub Shortener",
-			  "type": "website",
-			  "url": "https://s.r4l.cc"
-			}
-		}`
-		og.ParseFromJson(ogData)
-
+		/*
+			og := &database_types.MetaDescription{}
+			ogData := `{
+				"title": "Route Hub Shortener",
+				"description": "R4L Route Hub B2B Shortener",
+				"alternateImage": "cdn.link.r4l.cc/alternate",
+				"favIcon": "cdn.link.r4l.cc/favicon",
+				"image": "cdn.link.r4l.cc/image",
+				"locale": "tr-TR",
+				"siteName": "Shorten Route for Links CC",
+				"type": "website",
+				"url": "https://s.r4l.cc",
+				"x": {
+				  "creator": "@runaho",
+				  "card": "R4L Shorten Link",
+				  "description": "Route Hub Link Shortener B2B Main",
+				  "image": "s.r4l.cc/image",
+				  "site": "https://routehub.link",
+				  "title": "Route Hub Shortener",
+				  "type": "website",
+				  "url": "https://s.r4l.cc"
+				}
+			}`
+			og.ParseFromJson(ogData)
+		*/
 		platform = &database_models.Platform{
 			ID:                uuid.MustParse("12058bdf-8940-43b3-bd90-13487e4c8fc4"),
 			Name:              "First Platform",
 			DomainId:          domain.ID,
 			RedirectionChoice: database_enums.RedirectionOptionsTimed,
-			OpenGraph:         og,
-			CreatedBy:         user.ID,
-			Status:            database_enums.StatusStateActive,
+			//OpenGraph:         og,
+			CreatedBy: user.ID,
+			Status:    database_enums.StatusStateActive,
 		}
 
 		DB.Create(&platform)
@@ -186,30 +187,32 @@ func Seed() {
 	DB.Model(&database_models.Link{}).Count(&link_count)
 
 	if link_count == 0 {
-		ogData := `{
-			"title": "My 10 Day GO Learning Journey",
-			"description": "In this blog i will share my experiences on GO & also i will give you whole 10 day learning exp.",
-			"alternateImage": "cdn.link.r4l.cc/alternate",
-			"favIcon": "cdn.link.r4l.cc/favicon",
-			"image": "cdn.link.r4l.cc/image",
-			"locale": "tr-TR",
-			"siteName": "Shorten Route for Links CC",
-			"type": "blog",
-			"url": "https://blog.guneskorkmaz.net/my-go-learning-journey",
-			"x": {
-			  "creator": "@runaho",
-			  "card": "R4L Shorten Link",
-			  "description": "Route Hub Link Shortener B2B Main",
-			  "image": "s.r4l.cc/image",
-			  "site": "https://routehub.link",
-			  "title": "Route Hub Shortener",
-			  "type": "website",
-			  "url": "https://blog.guneskorkmaz.net/my-go-learning-journey"
-			}
-		  }`
+		/*
+			ogData := `{
+				"title": "My 10 Day GO Learning Journey",
+				"description": "In this blog i will share my experiences on GO & also i will give you whole 10 day learning exp.",
+				"alternateImage": "cdn.link.r4l.cc/alternate",
+				"favIcon": "cdn.link.r4l.cc/favicon",
+				"image": "cdn.link.r4l.cc/image",
+				"locale": "tr-TR",
+				"siteName": "Shorten Route for Links CC",
+				"type": "blog",
+				"url": "https://blog.guneskorkmaz.net/my-go-learning-journey",
+				"x": {
+				  "creator": "@runaho",
+				  "card": "R4L Shorten Link",
+				  "description": "Route Hub Link Shortener B2B Main",
+				  "image": "s.r4l.cc/image",
+				  "site": "https://routehub.link",
+				  "title": "Route Hub Shortener",
+				  "type": "website",
+				  "url": "https://blog.guneskorkmaz.net/my-go-learning-journey"
+				}
+			  }`
 
-		og := &database_types.OpenGraph{}
-		og.ParseFromJson(ogData)
+			og := &database_types.MetaDescription{}
+			og.ParseFromJson(ogData)
+		*/
 
 		link := &database_models.Link{
 			ID:                uuid.MustParse("c7d3a1e0-0c4d-4c1f-8f2c-6c4e6d6f7f3c"),
@@ -219,7 +222,7 @@ func Seed() {
 			Path:              "my-go-learning-journey",
 			State:             database_enums.StatusStateActive,
 			RedirectionChoice: database_enums.RedirectionOptionsTimed,
-			OpenGraph:         og,
+			//OpenGraph:         og,
 		}
 
 		DB.Create(link)

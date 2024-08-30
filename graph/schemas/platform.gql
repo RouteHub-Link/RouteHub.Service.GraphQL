@@ -12,7 +12,7 @@ type Platform @platformPermission(permission: PLATFORM_READ) {
   "This is a simple name of the platform nothing special."
   name: String!
   "Default SEO options for the client application."
-  openGraph: OpenGraph!
+  platformDescription: PlatformDescription!
   "Default redirection options for the client application behavior."
   redirectionChoice: RedirectionOptions!
   "Owner of the platform."
@@ -41,7 +41,7 @@ input PlatformCreateInput @organizationPermission(permission: PLATFORM_CREATE) {
   organizationId: UUID!
   domainId: UUID!
   name: String!
-  openGraph: OpenGraphInput!
+  platformDescription: PlatformDescriptionInput!
   redirectionChoice: RedirectionOptions!
   templates: [TemplateInput]
 }
@@ -62,7 +62,7 @@ type Template {
   id: UUID!
   name: String!
   platform: Platform!
-  openGraph: OpenGraph!
+  platformDescription: PlatformDescription!
   redirectionChoice: RedirectionOptions!
   state: StatusState!
   createdBy: User!
@@ -74,11 +74,10 @@ type Template {
 
 input TemplateInput {
   name: String!
-  openGraph: OpenGraphInput!
+  templateDescription: PlatformDescriptionInput!
   redirectionChoice: RedirectionOptions!
   state: StatusState!
 }
-
 
 extend type Query {
   "This query can retrive user related platforms via organization relations."

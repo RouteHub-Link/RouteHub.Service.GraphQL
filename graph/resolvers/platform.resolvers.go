@@ -81,7 +81,18 @@ func (r *queryResolver) Platforms(ctx context.Context) ([]*database_models.Platf
 	return r.ServiceContainer.PlatformService.GetPlatformsByUser(userSession.ID)
 }
 
+// PlatformDescription is the resolver for the platformDescription field.
+func (r *platformCreateInputResolver) PlatformDescription(ctx context.Context, obj *graph_inputs.PlatformCreateInput, data *model.PlatformDescriptionInput) error {
+	panic(fmt.Errorf("not implemented: PlatformDescription - platformDescription"))
+}
+
 // Platform returns graph.PlatformResolver implementation.
 func (r *Resolver) Platform() graph.PlatformResolver { return &platformResolver{r} }
 
+// PlatformCreateInput returns graph.PlatformCreateInputResolver implementation.
+func (r *Resolver) PlatformCreateInput() graph.PlatformCreateInputResolver {
+	return &platformCreateInputResolver{r}
+}
+
 type platformResolver struct{ *Resolver }
+type platformCreateInputResolver struct{ *Resolver }

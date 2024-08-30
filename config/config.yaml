@@ -14,8 +14,8 @@ database:
     provider: postgres
   seed:
     admins:
-      - subject: "248978326325721044"
-      - subject: "248979334530971655"
+      - subject: "278978826325721091"
+      - subject: "278979034530971651"
     organization:
       name: RouteHub
       description: RouteHub is a GraphQL API for managing routes
@@ -46,12 +46,12 @@ casbin:
     collection: casbin_rule
 
 zitadel:
-  client_id: 11111111111
+  client_id: 278962924343590915
   callback: /oauth2/callback
   scope: openid profile email
-  authorizer_url: http://localhost:7077/oauth/v2/authorize
-  token_url: http://localhost:7077/oauth/v2/token
-  issuer: http://localhost:7077
-  domain: 'localhost'
+  authorizer_url: http://5.75.150.147:7077/oauth/v2/authorize
+  token_url: http://5.75.150.147:7077/oauth/v2/token
+  issuer: http://5.75.150.147:7077
+  domain: '5.75.150.147'
   port: 7077
   insecure: true

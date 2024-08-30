@@ -9,15 +9,16 @@ import (
 )
 
 type Platform struct {
-	ID                uuid.UUID                         `gorm:"type:uuid;primary_key;"`
-	Name              string                            `gorm:"type:varchar(255);not null;"`
-	Slug              string                            `gorm:"type:varchar(255);not null;"`
-	CreatedBy         uuid.UUID                         `gorm:"type:uuid;not null;"`
-	DomainId          uuid.UUID                         `gorm:"type:uuid;not null;field:domain_id"`
-	OpenGraph         *database_types.OpenGraph         `json:"openGraph" gorm:"serializer:json"`
-	PinnedLinks       *[]database_types.PinnedLink      `json:"pinnedLinks" gorm:"serializer:json"`
-	RedirectionChoice database_enums.RedirectionOptions `json:"redirectionChoice" gorm:"serializer:json"`
-	Status            database_enums.StatusState        `json:"status" gorm:"serializer:json"`
+	ID                  uuid.UUID                           `gorm:"type:uuid;primary_key;"`
+	Name                string                              `gorm:"type:varchar(255);not null;"`
+	Slug                string                              `gorm:"type:varchar(255);not null;"`
+	CreatedBy           uuid.UUID                           `gorm:"type:uuid;not null;"`
+	DomainId            uuid.UUID                           `gorm:"type:uuid;not null;field:domain_id"`
+	PlatformDescription *database_types.PlatformDescription `json:"platform_description" gorm:"serializer:json"`
+	PinnedLinks         *[]database_types.PinnedLink        `json:"pinnedLinks" gorm:"serializer:json"`
+	RedirectionChoice   database_enums.RedirectionOptions   `json:"redirectionChoice" gorm:"serializer:json"`
+	Status              database_enums.StatusState          `json:"status" gorm:"serializer:json"`
+	TCPAddr             string                              `json:"tcpAddr" gorm:"type:varchar(255);not null;"`
 
 	CreatedAt time.Time  `json:"createdAt" gorm:"autoCreateTime"`
 	UpdatedAt *time.Time `json:"updatedAt,omitempty" gorm:"autoUpdateTime:milli"`

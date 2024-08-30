@@ -9,18 +9,18 @@ import (
 )
 
 type LinkCrawl struct {
-	ID          uuid.UUID                  `json:"id"`
-	LinkId      uuid.UUID                  `json:"link" gorm:"type:uuid;not null;field:link_id"`
-	TaskId      uuid.UUID                  `json:"task,omitempty" gorm:"type:uuid;"`
-	Target      string                     `json:"target,omitempty" gorm:"not null;"`
-	CrawlStatus database_enums.CrawlStatus `json:"crawlStatus,omitempty" gorm:"serializer:json;not null;field:crawl_status"`
-	Logs        []*database_types.Log      `json:"logs,omitempty" gorm:"serializer:json;not null;"`
-	Result      *database_types.OpenGraph  `json:"result,omitempty" gorm:"serializer:json;field:open_graph"`
-	CreatedBy   uuid.UUID                  `gorm:"type:uuid;not null;"`
-	CreatedAt   time.Time                  `gorm:"autoCreateTime"`
-	UpdatedAt   *time.Time                 `gorm:"autoUpdateTime:milli"`
-	StartAt     *time.Time                 `gorm:"field:updated_at;"`
-	EndAt       *time.Time                 `gorm:"field:end_at;"`
+	ID          uuid.UUID                       `json:"id"`
+	LinkId      uuid.UUID                       `json:"link" gorm:"type:uuid;not null;field:link_id"`
+	TaskId      uuid.UUID                       `json:"task,omitempty" gorm:"type:uuid;"`
+	Target      string                          `json:"target,omitempty" gorm:"not null;"`
+	CrawlStatus database_enums.CrawlStatus      `json:"crawlStatus,omitempty" gorm:"serializer:json;not null;field:crawl_status"`
+	Logs        []*database_types.Log           `json:"logs,omitempty" gorm:"serializer:json;not null;"`
+	Result      *database_types.MetaDescription `json:"result,omitempty" gorm:"serializer:json;field:open_graph"`
+	CreatedBy   uuid.UUID                       `gorm:"type:uuid;not null;"`
+	CreatedAt   time.Time                       `gorm:"autoCreateTime"`
+	UpdatedAt   *time.Time                      `gorm:"autoUpdateTime:milli"`
+	StartAt     *time.Time                      `gorm:"field:updated_at;"`
+	EndAt       *time.Time                      `gorm:"field:end_at;"`
 }
 
 func (lc *LinkCrawl) Requested(link *Link, userId uuid.UUID, log *database_types.Log) {
@@ -58,7 +58,7 @@ func (lc *LinkCrawl) Started(log *database_types.Log) {
 	lc.StartAt = &startedTime
 }
 
-func (lc *LinkCrawl) Finished(result *database_types.OpenGraph, log *database_types.Log, isSuccess bool) {
+func (lc *LinkCrawl) Finished(result *database_types.MetaDescription, log *database_types.Log, isSuccess bool) {
 	finishedTime := time.Now()
 	if isSuccess {
 		lc.CrawlStatus = database_enums.CrawlStatusSuccess

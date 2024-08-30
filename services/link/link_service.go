@@ -34,7 +34,8 @@ func (ls LinkService) CreateLink(input model.LinkCreateInput, userId uuid.UUID, 
 		RedirectionChoice: *input.RedirectionOptions,
 		State:             database_enums.StatusStatePasive,
 		CreatedBy:         userId,
-		OpenGraph:         input.OpenGraph,
+		LinkContent:       input.LinkContent,
+		//OpenGraph:         input.OpenGraph,
 	}
 
 	err = ls.DB.Create(&link).Error

@@ -9,6 +9,7 @@ require (
 	github.com/casbin/mongodb-adapter/v3 v3.6.0
 	github.com/cloudmatelabs/gorm-gqlgen-relay v1.3.2
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
+	github.com/eclipse/paho.mqtt.golang v1.5.0
 	github.com/fergusstrange/embedded-postgres v1.25.0
 	github.com/go-resty/resty/v2 v2.13.1
 	github.com/gocolly/colly/v2 v2.1.0
@@ -50,7 +51,7 @@ require (
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
 	github.com/gorilla/securecookie v1.1.2 // indirect
-	github.com/gorilla/websocket v1.5.0 // indirect
+	github.com/gorilla/websocket v1.5.3 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20221227161230-091c0ba34f0a // indirect
 	github.com/jackc/pgx/v5 v5.4.3 // indirect

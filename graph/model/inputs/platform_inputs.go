@@ -8,10 +8,10 @@ import (
 )
 
 type PlatformCreateInput struct {
-	OrganizationID    uuid.UUID                         `json:"organizationId"`
-	DomainID          uuid.UUID                         `json:"domainId"`
-	Name              string                            `json:"name"`
-	OpenGraph         *database_types.OpenGraph         `json:"openGraph"`
-	RedirectionChoice database_enums.RedirectionOptions `json:"redirectionChoice"`
-	Templates         []model.TemplateInput             `json:"templates,omitempty"`
+	OrganizationID      uuid.UUID                           `json:"organizationId"`
+	DomainID            uuid.UUID                           `json:"domainId"`
+	Name                string                              `json:"name"`
+	PlatformDescription *database_types.PlatformDescription `json:"openGraph"`
+	RedirectionChoice   database_enums.RedirectionOptions   `json:"redirectionChoice"`
+	Templates           []model.TemplateInput               `json:"templates,omitempty"`
 }
