@@ -116,3 +116,27 @@ models:
   MetaDescriptionInput:
     model:
       - github.com/RouteHub-Link/routehub-service-graphql/database/types.MetaDescription
+  NavbarDescriptionInput:
+    model:
+      - github.com/RouteHub-Link/routehub-service-graphql/database/types.NavbarDescription
+  FooterDescriptionInput:
+    model:
+      - github.com/RouteHub-Link/routehub-service-graphql/database/types.FooterDescription
+  SocialMediaContainerInput:
+    model:
+      - github.com/RouteHub-Link/routehub-service-graphql/database/types.SocialMediaContainer
+  ASocialMediaInput:
+    model:
+      - github.com/RouteHub-Link/routehub-service-graphql/database/types.ASocialMedia
+  ImageDescriptionInput:
+    model:
+      - github.com/RouteHub-Link/routehub-service-graphql/database/types.ImageDescription
+  NavbarItemInput:
+    model:
+      - github.com/RouteHub-Link/routehub-service-graphql/database/types.NavbarItem
+  NavbarButtonInput:
+    model:
+      - github.com/RouteHub-Link/routehub-service-graphql/database/types.NavbarButton
+  PlatformDescriptionInput:
+    model:
+      - github.com/RouteHub-Link/routehub-service-graphql/database/types.PlatformDescription

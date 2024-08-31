@@ -64,6 +64,11 @@ func PlatformPermissionDirectiveHandler(ctx context.Context, obj interface{}, ne
 }
 
 func getPlatformId(obj interface{}) (*uuid.UUID, error) {
+	platform, platformOk := obj.(*database_models.Platform)
+	if platformOk {
+		return &platform.ID, nil
+	}
+
 	platformId, platformIdOk := obj.(map[string]interface{})["platformId"].(string)
 	if platformIdOk {
 		uid := (uuid.MustParse(platformId))

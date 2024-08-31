@@ -27,11 +27,12 @@ func OrganizationPermissionDirectiveHandler(ctx context.Context, obj interface{}
 	}
 
 	if fc.Parent.Object == "Mutation" {
-		_orgId, ok := obj.(map[string]interface{})["organizationId"].(string)
-		if !ok {
-			return nil, gqlerror.Errorf("organizationId not found in obj")
+		uuid, err := getOrganizationId(obj)
+		if err != nil {
+			return nil, err
 		}
-		organizationId = _orgId
+
+		organizationId = uuid.String()
 	} else {
 		reflectFields := reflect.ValueOf(obj).Elem()
 		if reflectFields.Type() != reflect.TypeOf(database_models.Organization{}) {
@@ -61,4 +62,19 @@ func OrganizationPermissionDirectiveHandler(ctx context.Context, obj interface{}
 	}
 
 	return nil, gqlerror.Errorf("Access Denied")
+}
+
+func getOrganizationId(obj interface{}) (*uuid.UUID, error) {
+	_org, ok := obj.(*database_models.Organization)
+	if ok {
+		return &_org.ID, nil
+	}
+
+	_orgId, ok := obj.(map[string]interface{})["organizationId"].(string)
+	if ok {
+		uid := uuid.MustParse(_orgId)
+		return &uid, nil
+	}
+
+	return nil, gqlerror.Errorf("organization.id, organizationId not found in obj")
 }

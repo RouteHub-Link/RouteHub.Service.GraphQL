@@ -14,12 +14,6 @@ import (
 	"github.com/google/uuid"
 )
 
-type ASocialMediaInput struct {
-	Icon   string `json:"icon"`
-	Link   string `json:"link"`
-	Target string `json:"target"`
-}
-
 type AnalyticReport struct {
 	Link         *database_models.Link   `json:"link"`
 	Domain       *database_models.Domain `json:"domain"`
@@ -76,12 +70,6 @@ type FloatFilter struct {
 	IsNull   *bool     `json:"isNull,omitempty"`
 }
 
-type FooterDescriptionInput struct {
-	ShowRouteHubBranding *bool                      `json:"showRouteHubBranding,omitempty"`
-	CompanyBrandingHTML  *string                    `json:"companyBrandingHtml,omitempty"`
-	SocialMediaContainer *SocialMediaContainerInput `json:"socialMediaContainer,omitempty"`
-}
-
 type IDFilter struct {
 	Equal        *string  `json:"equal,omitempty"`
 	EqualFold    *string  `json:"equalFold,omitempty"`
@@ -97,13 +85,6 @@ type IDFilter struct {
 	HasPrefix    *string  `json:"hasPrefix,omitempty"`
 	HasSuffix    *string  `json:"hasSuffix,omitempty"`
 	IsNull       *bool    `json:"isNull,omitempty"`
-}
-
-type ImageDescriptionInput struct {
-	Src    string  `json:"src"`
-	Alt    *string `json:"alt,omitempty"`
-	Height *string `json:"height,omitempty"`
-	Width  *string `json:"width,omitempty"`
 }
 
 type IntFilter struct {
@@ -169,31 +150,6 @@ type MetricAnalytics struct {
 }
 
 type Mutation struct {
-}
-
-type NavbarButtonInput struct {
-	Text       *string `json:"text,omitempty"`
-	URL        *string `json:"url,omitempty"`
-	Icon       *string `json:"icon,omitempty"`
-	Target     *string `json:"target,omitempty"`
-	ColorClass *string `json:"colorClass,omitempty"`
-}
-
-type NavbarDescriptionInput struct {
-	BrandImg   *ImageDescriptionInput `json:"brandImg,omitempty"`
-	BrandURL   *string                `json:"brandURL,omitempty"`
-	BrandName  *string                `json:"brandName,omitempty"`
-	Target     *string                `json:"target,omitempty"`
-	StartItems []*NavbarItemInput     `json:"startItems,omitempty"`
-	EndButtons []*NavbarButtonInput   `json:"endButtons,omitempty"`
-}
-
-type NavbarItemInput struct {
-	Text     *string            `json:"text,omitempty"`
-	URL      *string            `json:"url,omitempty"`
-	Target   *string            `json:"target,omitempty"`
-	Icon     *string            `json:"icon,omitempty"`
-	Dropdown []*NavbarItemInput `json:"dropdown,omitempty"`
 }
 
 type ObservationAnalytic struct {
@@ -262,20 +218,7 @@ type PlatformDeployment struct {
 	DeletedAt *time.Time                `json:"deletedAt,omitempty"`
 }
 
-type PlatformDescriptionInput struct {
-	MetaDescription   *database_types.MetaDescription `json:"metaDescription,omitempty"`
-	NavbarDescription *NavbarDescriptionInput         `json:"navbarDescription,omitempty"`
-	FooterDescription *FooterDescriptionInput         `json:"footerDescription,omitempty"`
-}
-
 type Query struct {
-}
-
-type SocialMediaContainerInput struct {
-	SocialMediaPeddingClass *string              `json:"socialMediaPeddingClass,omitempty"`
-	SocialMediaColorClass   *string              `json:"socialMediaColorClass,omitempty"`
-	SocialMediaSizeClass    *string              `json:"socialMediaSizeClass,omitempty"`
-	SocialMediaLinks        []*ASocialMediaInput `json:"socialMediaLinks,omitempty"`
 }
 
 type SocialMediaInput struct {
@@ -316,10 +259,10 @@ type Template struct {
 }
 
 type TemplateInput struct {
-	Name                string                            `json:"name"`
-	TemplateDescription *PlatformDescriptionInput         `json:"templateDescription"`
-	RedirectionChoice   database_enums.RedirectionOptions `json:"redirectionChoice"`
-	State               database_enums.StatusState        `json:"state"`
+	Name                string                              `json:"name"`
+	TemplateDescription *database_types.PlatformDescription `json:"templateDescription"`
+	RedirectionChoice   database_enums.RedirectionOptions   `json:"redirectionChoice"`
+	State               database_enums.StatusState          `json:"state"`
 }
 
 type TimeFilter struct {

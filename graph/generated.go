@@ -59,7 +59,6 @@ type ResolverRoot interface {
 	User() UserResolver
 	UserInvite() UserInviteResolver
 	OrganizationsWithPermissionsInput() OrganizationsWithPermissionsInputResolver
-	PlatformCreateInput() PlatformCreateInputResolver
 	PlatformsWithPermissionsInput() PlatformsWithPermissionsInputResolver
 }
 
@@ -264,6 +263,7 @@ type ComplexityRoot struct {
 		RemoveFromPinnedLinks func(childComplexity int, input model.PinnedLinkInput) int
 		RequestCrawl          func(childComplexity int, input model.CrawlRequestInput) int
 		UpdateOrganization    func(childComplexity int, input model.OrganizationUpdateInput) int
+		UpdatePlatform        func(childComplexity int, input graph_inputs.PlatformUpdateInput) int
 		UpdateUserInvitation  func(childComplexity int, input model.UpdateUserInviteInput) int
 	}
 
@@ -480,6 +480,7 @@ type MutationResolver interface {
 	CreateOrganization(ctx context.Context, input model.OrganizationCreateInput) (*database_models.Organization, error)
 	UpdateOrganization(ctx context.Context, input model.OrganizationUpdateInput) (*database_models.Organization, error)
 	CreatePlatform(ctx context.Context, input graph_inputs.PlatformCreateInput) (*database_models.Platform, error)
+	UpdatePlatform(ctx context.Context, input graph_inputs.PlatformUpdateInput) (*database_models.Platform, error)
 	InviteUser(ctx context.Context, input graph_inputs.UserInviteInput) (*database_relations.UserInvite, error)
 	UpdateUserInvitation(ctx context.Context, input model.UpdateUserInviteInput) (database_enums.InvitationStatus, error)
 }
@@ -528,9 +529,6 @@ type UserInviteResolver interface {
 
 type OrganizationsWithPermissionsInputResolver interface {
 	Permissions(ctx context.Context, obj *database_relations.OrganizationsWithPermissions, data []database_enums.OrganizationPermission) error
-}
-type PlatformCreateInputResolver interface {
-	PlatformDescription(ctx context.Context, obj *graph_inputs.PlatformCreateInput, data *model.PlatformDescriptionInput) error
 }
 type PlatformsWithPermissionsInputResolver interface {
 	Permissions(ctx context.Context, obj *database_relations.PlatformsWithPermissions, data []database_enums.PlatformPermission) error
@@ -1571,6 +1569,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.UpdateOrganization(childComplexity, args["input"].(model.OrganizationUpdateInput)), true
 
+	case "Mutation.updatePlatform":
+		if e.complexity.Mutation.UpdatePlatform == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updatePlatform_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdatePlatform(childComplexity, args["input"].(graph_inputs.PlatformUpdateInput)), true
+
 	case "Mutation.updateUserInvitation":
 		if e.complexity.Mutation.UpdateUserInvitation == nil {
 			break
@@ -2462,6 +2472,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputOrganizationsWithPermissionsInput,
 		ec.unmarshalInputPlatformCreateInput,
 		ec.unmarshalInputPlatformDescriptionInput,
+		ec.unmarshalInputPlatformUpdateInput,
 		ec.unmarshalInputPlatformsWithPermissionsInput,
 		ec.unmarshalInputSocialMediaContainerInput,
 		ec.unmarshalInputSocialMediaInput,
@@ -2779,6 +2790,21 @@ func (ec *executionContext) field_Mutation_updateOrganization_args(ctx context.C
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
 		arg0, err = ec.unmarshalNOrganizationUpdateInput2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐOrganizationUpdateInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_updatePlatform_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 graph_inputs.PlatformUpdateInput
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalNPlatformUpdateInput2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚋinputsᚐPlatformUpdateInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -10574,6 +10600,121 @@ func (ec *executionContext) fieldContext_Mutation_createPlatform(ctx context.Con
 	return fc, nil
 }
 
+func (ec *executionContext) _Mutation_updatePlatform(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_updatePlatform(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Mutation().UpdatePlatform(rctx, fc.Args["input"].(graph_inputs.PlatformUpdateInput))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			permission, err := ec.unmarshalNPlatformPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐPlatformPermission(ctx, "PLATFORM_READ")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.PlatformPermission == nil {
+				return nil, errors.New("directive platformPermission is not implemented")
+			}
+			return ec.directives.PlatformPermission(ctx, nil, directive0, permission)
+		}
+		directive2 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Auth == nil {
+				return nil, errors.New("directive auth is not implemented")
+			}
+			return ec.directives.Auth(ctx, nil, directive1)
+		}
+
+		tmp, err := directive2(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*database_models.Platform); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/RouteHub-Link/routehub-service-graphql/database/models.Platform`, tmp)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*database_models.Platform)
+	fc.Result = res
+	return ec.marshalNPlatform2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋmodelsᚐPlatform(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_updatePlatform(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Platform_id(ctx, field)
+			case "name":
+				return ec.fieldContext_Platform_name(ctx, field)
+			case "platformDescription":
+				return ec.fieldContext_Platform_platformDescription(ctx, field)
+			case "redirectionChoice":
+				return ec.fieldContext_Platform_redirectionChoice(ctx, field)
+			case "organization":
+				return ec.fieldContext_Platform_organization(ctx, field)
+			case "domain":
+				return ec.fieldContext_Platform_domain(ctx, field)
+			case "permissions":
+				return ec.fieldContext_Platform_permissions(ctx, field)
+			case "deployments":
+				return ec.fieldContext_Platform_deployments(ctx, field)
+			case "links":
+				return ec.fieldContext_Platform_links(ctx, field)
+			case "analytics":
+				return ec.fieldContext_Platform_analytics(ctx, field)
+			case "analyticReports":
+				return ec.fieldContext_Platform_analyticReports(ctx, field)
+			case "status":
+				return ec.fieldContext_Platform_status(ctx, field)
+			case "templates":
+				return ec.fieldContext_Platform_templates(ctx, field)
+			case "pinnedLinks":
+				return ec.fieldContext_Platform_pinnedLinks(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Platform", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_updatePlatform_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Mutation_inviteUser(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Mutation_inviteUser(ctx, field)
 	if err != nil {
@@ -11130,7 +11271,7 @@ func (ec *executionContext) _NavbarDescription_startItems(ctx context.Context, f
 	}
 	res := resTmp.(*[]database_types.NavbarItem)
 	fc.Result = res
-	return ec.marshalONavbarItem2ᚖᚕgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐNavbarItemᚄ(ctx, field.Selections, res)
+	return ec.marshalONavbarItem2ᚖᚕgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐNavbarItem(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_NavbarDescription_startItems(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -11400,7 +11541,7 @@ func (ec *executionContext) _NavbarItem_dropdown(ctx context.Context, field grap
 	}
 	res := resTmp.(*[]database_types.NavbarItem)
 	fc.Result = res
-	return ec.marshalONavbarItem2ᚖᚕgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐNavbarItemᚄ(ctx, field.Selections, res)
+	return ec.marshalONavbarItem2ᚖᚕgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐNavbarItem(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_NavbarItem_dropdown(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -19845,8 +19986,8 @@ func (ec *executionContext) fieldContext___Type_specifiedByURL(_ context.Context
 
 // region    **************************** input.gotpl *****************************
 
-func (ec *executionContext) unmarshalInputASocialMediaInput(ctx context.Context, obj interface{}) (model.ASocialMediaInput, error) {
-	var it model.ASocialMediaInput
+func (ec *executionContext) unmarshalInputASocialMediaInput(ctx context.Context, obj interface{}) (database_types.ASocialMedia, error) {
+	var it database_types.ASocialMedia
 	asMap := map[string]interface{}{}
 	for k, v := range obj.(map[string]interface{}) {
 		asMap[k] = v
@@ -20196,8 +20337,8 @@ func (ec *executionContext) unmarshalInputFloatFilter(ctx context.Context, obj i
 	return it, nil
 }
 
-func (ec *executionContext) unmarshalInputFooterDescriptionInput(ctx context.Context, obj interface{}) (model.FooterDescriptionInput, error) {
-	var it model.FooterDescriptionInput
+func (ec *executionContext) unmarshalInputFooterDescriptionInput(ctx context.Context, obj interface{}) (database_types.FooterDescription, error) {
+	var it database_types.FooterDescription
 	asMap := map[string]interface{}{}
 	for k, v := range obj.(map[string]interface{}) {
 		asMap[k] = v
@@ -20212,21 +20353,21 @@ func (ec *executionContext) unmarshalInputFooterDescriptionInput(ctx context.Con
 		switch k {
 		case "showRouteHubBranding":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("showRouteHubBranding"))
-			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			data, err := ec.unmarshalOBoolean2bool(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.ShowRouteHubBranding = data
 		case "companyBrandingHtml":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("companyBrandingHtml"))
-			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.CompanyBrandingHTML = data
+			it.CompanyBrandingHtml = data
 		case "socialMediaContainer":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("socialMediaContainer"))
-			data, err := ec.unmarshalOSocialMediaContainerInput2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐSocialMediaContainerInput(ctx, v)
+			data, err := ec.unmarshalOSocialMediaContainerInput2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐSocialMediaContainer(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -20355,8 +20496,8 @@ func (ec *executionContext) unmarshalInputIDFilter(ctx context.Context, obj inte
 	return it, nil
 }
 
-func (ec *executionContext) unmarshalInputImageDescriptionInput(ctx context.Context, obj interface{}) (model.ImageDescriptionInput, error) {
-	var it model.ImageDescriptionInput
+func (ec *executionContext) unmarshalInputImageDescriptionInput(ctx context.Context, obj interface{}) (database_types.ImageDescription, error) {
+	var it database_types.ImageDescription
 	asMap := map[string]interface{}{}
 	for k, v := range obj.(map[string]interface{}) {
 		asMap[k] = v
@@ -20375,24 +20516,24 @@ func (ec *executionContext) unmarshalInputImageDescriptionInput(ctx context.Cont
 			if err != nil {
 				return it, err
 			}
-			it.Src = data
+			it.SRC = data
 		case "alt":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("alt"))
-			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.Alt = data
 		case "height":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("height"))
-			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.Height = data
 		case "width":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("width"))
-			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -21087,8 +21228,8 @@ func (ec *executionContext) unmarshalInputMetaDescriptionInput(ctx context.Conte
 	return it, nil
 }
 
-func (ec *executionContext) unmarshalInputNavbarButtonInput(ctx context.Context, obj interface{}) (model.NavbarButtonInput, error) {
-	var it model.NavbarButtonInput
+func (ec *executionContext) unmarshalInputNavbarButtonInput(ctx context.Context, obj interface{}) (database_types.NavbarButton, error) {
+	var it database_types.NavbarButton
 	asMap := map[string]interface{}{}
 	for k, v := range obj.(map[string]interface{}) {
 		asMap[k] = v
@@ -21103,35 +21244,35 @@ func (ec *executionContext) unmarshalInputNavbarButtonInput(ctx context.Context,
 		switch k {
 		case "text":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("text"))
-			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.Text = data
 		case "url":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("url"))
-			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.URL = data
 		case "icon":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("icon"))
-			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.Icon = data
 		case "target":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("target"))
-			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.Target = data
 		case "colorClass":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("colorClass"))
-			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -21142,8 +21283,8 @@ func (ec *executionContext) unmarshalInputNavbarButtonInput(ctx context.Context,
 	return it, nil
 }
 
-func (ec *executionContext) unmarshalInputNavbarDescriptionInput(ctx context.Context, obj interface{}) (model.NavbarDescriptionInput, error) {
-	var it model.NavbarDescriptionInput
+func (ec *executionContext) unmarshalInputNavbarDescriptionInput(ctx context.Context, obj interface{}) (database_types.NavbarDescription, error) {
+	var it database_types.NavbarDescription
 	asMap := map[string]interface{}{}
 	for k, v := range obj.(map[string]interface{}) {
 		asMap[k] = v
@@ -21158,42 +21299,42 @@ func (ec *executionContext) unmarshalInputNavbarDescriptionInput(ctx context.Con
 		switch k {
 		case "brandImg":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("brandImg"))
-			data, err := ec.unmarshalOImageDescriptionInput2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐImageDescriptionInput(ctx, v)
+			data, err := ec.unmarshalOImageDescriptionInput2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐImageDescription(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.BrandImg = data
 		case "brandURL":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("brandURL"))
-			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.BrandURL = data
 		case "brandName":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("brandName"))
-			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.BrandName = data
 		case "target":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("target"))
-			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.Target = data
 		case "startItems":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("startItems"))
-			data, err := ec.unmarshalONavbarItemInput2ᚕᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐNavbarItemInputᚄ(ctx, v)
+			data, err := ec.unmarshalONavbarItemInput2ᚖᚕgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐNavbarItemᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.StartItems = data
 		case "endButtons":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("endButtons"))
-			data, err := ec.unmarshalONavbarButtonInput2ᚕᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐNavbarButtonInputᚄ(ctx, v)
+			data, err := ec.unmarshalONavbarButtonInput2ᚖᚕgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐNavbarButtonᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -21204,8 +21345,8 @@ func (ec *executionContext) unmarshalInputNavbarDescriptionInput(ctx context.Con
 	return it, nil
 }
 
-func (ec *executionContext) unmarshalInputNavbarItemInput(ctx context.Context, obj interface{}) (model.NavbarItemInput, error) {
-	var it model.NavbarItemInput
+func (ec *executionContext) unmarshalInputNavbarItemInput(ctx context.Context, obj interface{}) (database_types.NavbarItem, error) {
+	var it database_types.NavbarItem
 	asMap := map[string]interface{}{}
 	for k, v := range obj.(map[string]interface{}) {
 		asMap[k] = v
@@ -21220,35 +21361,35 @@ func (ec *executionContext) unmarshalInputNavbarItemInput(ctx context.Context, o
 		switch k {
 		case "text":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("text"))
-			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.Text = data
 		case "url":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("url"))
-			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.URL = data
 		case "target":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("target"))
-			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.Target = data
 		case "icon":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("icon"))
-			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.Icon = data
 		case "dropdown":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("dropdown"))
-			data, err := ec.unmarshalONavbarItemInput2ᚕᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐNavbarItemInputᚄ(ctx, v)
+			data, err := ec.unmarshalONavbarItemInput2ᚖᚕgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐNavbarItem(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -21696,7 +21837,7 @@ func (ec *executionContext) unmarshalInputPlatformCreateInput(ctx context.Contex
 		case "platformDescription":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("platformDescription"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
-				return ec.unmarshalNPlatformDescriptionInput2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐPlatformDescriptionInput(ctx, v)
+				return ec.unmarshalNPlatformDescriptionInput2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐPlatformDescription(ctx, v)
 			}
 			directive1 := func(ctx context.Context) (interface{}, error) {
 				permission, err := ec.unmarshalNOrganizationPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐOrganizationPermission(ctx, "PLATFORM_CREATE")
@@ -21713,12 +21854,12 @@ func (ec *executionContext) unmarshalInputPlatformCreateInput(ctx context.Contex
 			if err != nil {
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
-			if data, ok := tmp.(*model.PlatformDescriptionInput); ok {
-				if err = ec.resolvers.PlatformCreateInput().PlatformDescription(ctx, &it, data); err != nil {
-					return it, err
-				}
+			if data, ok := tmp.(*database_types.PlatformDescription); ok {
+				it.PlatformDescription = data
+			} else if tmp == nil {
+				it.PlatformDescription = nil
 			} else {
-				err := fmt.Errorf(`unexpected type %T from directive, should be *github.com/RouteHub-Link/routehub-service-graphql/graph/model.PlatformDescriptionInput`, tmp)
+				err := fmt.Errorf(`unexpected type %T from directive, should be *github.com/RouteHub-Link/routehub-service-graphql/database/types.PlatformDescription`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "redirectionChoice":
@@ -21781,8 +21922,8 @@ func (ec *executionContext) unmarshalInputPlatformCreateInput(ctx context.Contex
 	return it, nil
 }
 
-func (ec *executionContext) unmarshalInputPlatformDescriptionInput(ctx context.Context, obj interface{}) (model.PlatformDescriptionInput, error) {
-	var it model.PlatformDescriptionInput
+func (ec *executionContext) unmarshalInputPlatformDescriptionInput(ctx context.Context, obj interface{}) (database_types.PlatformDescription, error) {
+	var it database_types.PlatformDescription
 	asMap := map[string]interface{}{}
 	for k, v := range obj.(map[string]interface{}) {
 		asMap[k] = v
@@ -21797,25 +21938,231 @@ func (ec *executionContext) unmarshalInputPlatformDescriptionInput(ctx context.C
 		switch k {
 		case "metaDescription":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("metaDescription"))
-			data, err := ec.unmarshalOMetaDescriptionInput2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐMetaDescription(ctx, v)
+			data, err := ec.unmarshalOMetaDescriptionInput2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐMetaDescription(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.MetaDescription = data
 		case "navbarDescription":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("navbarDescription"))
-			data, err := ec.unmarshalONavbarDescriptionInput2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐNavbarDescriptionInput(ctx, v)
+			data, err := ec.unmarshalONavbarDescriptionInput2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐNavbarDescription(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.NavbarDescription = data
 		case "footerDescription":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("footerDescription"))
-			data, err := ec.unmarshalOFooterDescriptionInput2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐFooterDescriptionInput(ctx, v)
+			data, err := ec.unmarshalOFooterDescriptionInput2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐFooterDescription(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.FooterDescription = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputPlatformUpdateInput(ctx context.Context, obj interface{}) (graph_inputs.PlatformUpdateInput, error) {
+	var it graph_inputs.PlatformUpdateInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"platformId", "organizationId", "name", "platformDescription", "redirectionChoice", "templates", "status"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "platformId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("platformId"))
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalNUUID2githubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				permission, err := ec.unmarshalNPlatformPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐPlatformPermission(ctx, "PLATFORM_UPDATE")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.PlatformPermission == nil {
+					return nil, errors.New("directive platformPermission is not implemented")
+				}
+				return ec.directives.PlatformPermission(ctx, obj, directive0, permission)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(uuid.UUID); ok {
+				it.PlatformID = data
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be github.com/google/uuid.UUID`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "organizationId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("organizationId"))
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalNUUID2githubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				permission, err := ec.unmarshalNPlatformPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐPlatformPermission(ctx, "PLATFORM_UPDATE")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.PlatformPermission == nil {
+					return nil, errors.New("directive platformPermission is not implemented")
+				}
+				return ec.directives.PlatformPermission(ctx, obj, directive0, permission)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(uuid.UUID); ok {
+				it.OrganizationID = data
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be github.com/google/uuid.UUID`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "name":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalNString2string(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				permission, err := ec.unmarshalNPlatformPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐPlatformPermission(ctx, "PLATFORM_UPDATE")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.PlatformPermission == nil {
+					return nil, errors.New("directive platformPermission is not implemented")
+				}
+				return ec.directives.PlatformPermission(ctx, obj, directive0, permission)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(string); ok {
+				it.Name = data
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be string`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "platformDescription":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("platformDescription"))
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalNPlatformDescriptionInput2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐPlatformDescription(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				permission, err := ec.unmarshalNPlatformPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐPlatformPermission(ctx, "PLATFORM_UPDATE")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.PlatformPermission == nil {
+					return nil, errors.New("directive platformPermission is not implemented")
+				}
+				return ec.directives.PlatformPermission(ctx, obj, directive0, permission)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*database_types.PlatformDescription); ok {
+				it.PlatformDescription = data
+			} else if tmp == nil {
+				it.PlatformDescription = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *github.com/RouteHub-Link/routehub-service-graphql/database/types.PlatformDescription`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "redirectionChoice":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("redirectionChoice"))
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalNRedirectionOptions2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐRedirectionOptions(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				permission, err := ec.unmarshalNPlatformPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐPlatformPermission(ctx, "PLATFORM_UPDATE")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.PlatformPermission == nil {
+					return nil, errors.New("directive platformPermission is not implemented")
+				}
+				return ec.directives.PlatformPermission(ctx, obj, directive0, permission)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*database_enums.RedirectionOptions); ok {
+				it.RedirectionChoice = data
+			} else if tmp == nil {
+				it.RedirectionChoice = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *github.com/RouteHub-Link/routehub-service-graphql/database/enums.RedirectionOptions`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "templates":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("templates"))
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalOTemplateInput2ᚕgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐTemplateInput(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				permission, err := ec.unmarshalNPlatformPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐPlatformPermission(ctx, "PLATFORM_UPDATE")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.PlatformPermission == nil {
+					return nil, errors.New("directive platformPermission is not implemented")
+				}
+				return ec.directives.PlatformPermission(ctx, obj, directive0, permission)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.([]model.TemplateInput); ok {
+				it.Templates = data
+			} else if tmp == nil {
+				it.Templates = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be []github.com/RouteHub-Link/routehub-service-graphql/graph/model.TemplateInput`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "status":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("status"))
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalNStatusState2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐStatusState(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				permission, err := ec.unmarshalNPlatformPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐPlatformPermission(ctx, "PLATFORM_UPDATE")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.PlatformPermission == nil {
+					return nil, errors.New("directive platformPermission is not implemented")
+				}
+				return ec.directives.PlatformPermission(ctx, obj, directive0, permission)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(database_enums.StatusState); ok {
+				it.Status = data
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be github.com/RouteHub-Link/routehub-service-graphql/database/enums.StatusState`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
 		}
 	}
 
@@ -21858,8 +22205,8 @@ func (ec *executionContext) unmarshalInputPlatformsWithPermissionsInput(ctx cont
 	return it, nil
 }
 
-func (ec *executionContext) unmarshalInputSocialMediaContainerInput(ctx context.Context, obj interface{}) (model.SocialMediaContainerInput, error) {
-	var it model.SocialMediaContainerInput
+func (ec *executionContext) unmarshalInputSocialMediaContainerInput(ctx context.Context, obj interface{}) (database_types.SocialMediaContainer, error) {
+	var it database_types.SocialMediaContainer
 	asMap := map[string]interface{}{}
 	for k, v := range obj.(map[string]interface{}) {
 		asMap[k] = v
@@ -21874,28 +22221,28 @@ func (ec *executionContext) unmarshalInputSocialMediaContainerInput(ctx context.
 		switch k {
 		case "socialMediaPeddingClass":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("socialMediaPeddingClass"))
-			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.SocialMediaPeddingClass = data
 		case "socialMediaColorClass":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("socialMediaColorClass"))
-			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.SocialMediaColorClass = data
 		case "socialMediaSizeClass":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("socialMediaSizeClass"))
-			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.SocialMediaSizeClass = data
 		case "socialMediaLinks":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("socialMediaLinks"))
-			data, err := ec.unmarshalOASocialMediaInput2ᚕᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐASocialMediaInputᚄ(ctx, v)
+			data, err := ec.unmarshalOASocialMediaInput2ᚖᚕgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐASocialMediaᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -22088,7 +22435,7 @@ func (ec *executionContext) unmarshalInputTemplateInput(ctx context.Context, obj
 			it.Name = data
 		case "templateDescription":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("templateDescription"))
-			data, err := ec.unmarshalNPlatformDescriptionInput2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐPlatformDescriptionInput(ctx, v)
+			data, err := ec.unmarshalNPlatformDescriptionInput2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐPlatformDescription(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -24147,6 +24494,13 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		case "createPlatform":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_createPlatform(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "updatePlatform":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_updatePlatform(ctx, field)
 			})
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
@@ -26416,9 +26770,9 @@ func (ec *executionContext) marshalNASocialMedia2githubᚗcomᚋRouteHubᚑLink�
 	return ec._ASocialMedia(ctx, sel, &v)
 }
 
-func (ec *executionContext) unmarshalNASocialMediaInput2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐASocialMediaInput(ctx context.Context, v interface{}) (*model.ASocialMediaInput, error) {
+func (ec *executionContext) unmarshalNASocialMediaInput2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐASocialMedia(ctx context.Context, v interface{}) (database_types.ASocialMedia, error) {
 	res, err := ec.unmarshalInputASocialMediaInput(ctx, v)
-	return &res, graphql.ErrorOnPath(ctx, err)
+	return res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) marshalNAccountPhone2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐAccountPhone(ctx context.Context, sel ast.SelectionSet, v database_types.AccountPhone) graphql.Marshaler {
@@ -27040,18 +27394,14 @@ func (ec *executionContext) marshalNNavbarButton2githubᚗcomᚋRouteHubᚑLink�
 	return ec._NavbarButton(ctx, sel, &v)
 }
 
-func (ec *executionContext) unmarshalNNavbarButtonInput2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐNavbarButtonInput(ctx context.Context, v interface{}) (*model.NavbarButtonInput, error) {
+func (ec *executionContext) unmarshalNNavbarButtonInput2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐNavbarButton(ctx context.Context, v interface{}) (database_types.NavbarButton, error) {
 	res, err := ec.unmarshalInputNavbarButtonInput(ctx, v)
-	return &res, graphql.ErrorOnPath(ctx, err)
+	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNNavbarItem2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐNavbarItem(ctx context.Context, sel ast.SelectionSet, v database_types.NavbarItem) graphql.Marshaler {
-	return ec._NavbarItem(ctx, sel, &v)
-}
-
-func (ec *executionContext) unmarshalNNavbarItemInput2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐNavbarItemInput(ctx context.Context, v interface{}) (*model.NavbarItemInput, error) {
+func (ec *executionContext) unmarshalNNavbarItemInput2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐNavbarItem(ctx context.Context, v interface{}) (database_types.NavbarItem, error) {
 	res, err := ec.unmarshalInputNavbarItemInput(ctx, v)
-	return &res, graphql.ErrorOnPath(ctx, err)
+	return res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalNObject2string(ctx context.Context, v interface{}) (string, error) {
@@ -27459,12 +27809,7 @@ func (ec *executionContext) marshalNPlatformDescription2ᚖgithubᚗcomᚋRouteH
 	return ec._PlatformDescription(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNPlatformDescriptionInput2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐPlatformDescriptionInput(ctx context.Context, v interface{}) (model.PlatformDescriptionInput, error) {
-	res, err := ec.unmarshalInputPlatformDescriptionInput(ctx, v)
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) unmarshalNPlatformDescriptionInput2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐPlatformDescriptionInput(ctx context.Context, v interface{}) (*model.PlatformDescriptionInput, error) {
+func (ec *executionContext) unmarshalNPlatformDescriptionInput2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐPlatformDescription(ctx context.Context, v interface{}) (*database_types.PlatformDescription, error) {
 	res, err := ec.unmarshalInputPlatformDescriptionInput(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
@@ -27540,6 +27885,11 @@ func (ec *executionContext) marshalNPlatformPermission2ᚕgithubᚗcomᚋRouteHu
 	return ret
 }
 
+func (ec *executionContext) unmarshalNPlatformUpdateInput2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚋinputsᚐPlatformUpdateInput(ctx context.Context, v interface{}) (graph_inputs.PlatformUpdateInput, error) {
+	res, err := ec.unmarshalInputPlatformUpdateInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalNPlatformsWithPermissionsInput2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋrelationsᚐPlatformsWithPermissions(ctx context.Context, v interface{}) (database_relations.PlatformsWithPermissions, error) {
 	res, err := ec.unmarshalInputPlatformsWithPermissionsInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -27569,6 +27919,22 @@ func (ec *executionContext) unmarshalNRedirectionOptions2githubᚗcomᚋRouteHub
 }
 
 func (ec *executionContext) marshalNRedirectionOptions2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐRedirectionOptions(ctx context.Context, sel ast.SelectionSet, v database_enums.RedirectionOptions) graphql.Marshaler {
+	return v
+}
+
+func (ec *executionContext) unmarshalNRedirectionOptions2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐRedirectionOptions(ctx context.Context, v interface{}) (*database_enums.RedirectionOptions, error) {
+	var res = new(database_enums.RedirectionOptions)
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNRedirectionOptions2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐRedirectionOptions(ctx context.Context, sel ast.SelectionSet, v *database_enums.RedirectionOptions) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
 	return v
 }
 
@@ -28198,7 +28564,7 @@ func (ec *executionContext) marshalOASocialMedia2ᚖᚕgithubᚗcomᚋRouteHub�
 	return ec.marshalOASocialMedia2ᚕgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐASocialMediaᚄ(ctx, sel, *v)
 }
 
-func (ec *executionContext) unmarshalOASocialMediaInput2ᚕᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐASocialMediaInputᚄ(ctx context.Context, v interface{}) ([]*model.ASocialMediaInput, error) {
+func (ec *executionContext) unmarshalOASocialMediaInput2ᚕgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐASocialMediaᚄ(ctx context.Context, v interface{}) ([]database_types.ASocialMedia, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -28207,15 +28573,23 @@ func (ec *executionContext) unmarshalOASocialMediaInput2ᚕᚖgithubᚗcomᚋRou
 		vSlice = graphql.CoerceList(v)
 	}
 	var err error
-	res := make([]*model.ASocialMediaInput, len(vSlice))
+	res := make([]database_types.ASocialMedia, len(vSlice))
 	for i := range vSlice {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
-		res[i], err = ec.unmarshalNASocialMediaInput2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐASocialMediaInput(ctx, vSlice[i])
+		res[i], err = ec.unmarshalNASocialMediaInput2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐASocialMedia(ctx, vSlice[i])
 		if err != nil {
 			return nil, err
 		}
 	}
 	return res, nil
+}
+
+func (ec *executionContext) unmarshalOASocialMediaInput2ᚖᚕgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐASocialMediaᚄ(ctx context.Context, v interface{}) (*[]database_types.ASocialMedia, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalOASocialMediaInput2ᚕgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐASocialMediaᚄ(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) marshalOAnalyticReport2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐAnalyticReport(ctx context.Context, sel ast.SelectionSet, v *model.AnalyticReport) graphql.Marshaler {
@@ -28379,12 +28753,9 @@ func (ec *executionContext) marshalOFooterDescription2githubᚗcomᚋRouteHubᚑ
 	return ec._FooterDescription(ctx, sel, &v)
 }
 
-func (ec *executionContext) unmarshalOFooterDescriptionInput2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐFooterDescriptionInput(ctx context.Context, v interface{}) (*model.FooterDescriptionInput, error) {
-	if v == nil {
-		return nil, nil
-	}
+func (ec *executionContext) unmarshalOFooterDescriptionInput2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐFooterDescription(ctx context.Context, v interface{}) (database_types.FooterDescription, error) {
 	res, err := ec.unmarshalInputFooterDescriptionInput(ctx, v)
-	return &res, graphql.ErrorOnPath(ctx, err)
+	return res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalOID2ᚕstringᚄ(ctx context.Context, v interface{}) ([]string, error) {
@@ -28448,7 +28819,7 @@ func (ec *executionContext) marshalOImageDescription2ᚖgithubᚗcomᚋRouteHub�
 	return ec._ImageDescription(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalOImageDescriptionInput2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐImageDescriptionInput(ctx context.Context, v interface{}) (*model.ImageDescriptionInput, error) {
+func (ec *executionContext) unmarshalOImageDescriptionInput2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐImageDescription(ctx context.Context, v interface{}) (*database_types.ImageDescription, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -28677,6 +29048,11 @@ func (ec *executionContext) marshalOMetaDescription2ᚖgithubᚗcomᚋRouteHub�
 	return ec._MetaDescription(ctx, sel, v)
 }
 
+func (ec *executionContext) unmarshalOMetaDescriptionInput2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐMetaDescription(ctx context.Context, v interface{}) (database_types.MetaDescription, error) {
+	res, err := ec.unmarshalInputMetaDescriptionInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalOMetaDescriptionInput2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐMetaDescription(ctx context.Context, v interface{}) (*database_types.MetaDescription, error) {
 	if v == nil {
 		return nil, nil
@@ -28736,7 +29112,7 @@ func (ec *executionContext) marshalONavbarButton2ᚖᚕgithubᚗcomᚋRouteHub�
 	return ec.marshalONavbarButton2ᚕgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐNavbarButtonᚄ(ctx, sel, *v)
 }
 
-func (ec *executionContext) unmarshalONavbarButtonInput2ᚕᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐNavbarButtonInputᚄ(ctx context.Context, v interface{}) ([]*model.NavbarButtonInput, error) {
+func (ec *executionContext) unmarshalONavbarButtonInput2ᚕgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐNavbarButtonᚄ(ctx context.Context, v interface{}) ([]database_types.NavbarButton, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -28745,10 +29121,10 @@ func (ec *executionContext) unmarshalONavbarButtonInput2ᚕᚖgithubᚗcomᚋRou
 		vSlice = graphql.CoerceList(v)
 	}
 	var err error
-	res := make([]*model.NavbarButtonInput, len(vSlice))
+	res := make([]database_types.NavbarButton, len(vSlice))
 	for i := range vSlice {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
-		res[i], err = ec.unmarshalNNavbarButtonInput2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐNavbarButtonInput(ctx, vSlice[i])
+		res[i], err = ec.unmarshalNNavbarButtonInput2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐNavbarButton(ctx, vSlice[i])
 		if err != nil {
 			return nil, err
 		}
@@ -28756,19 +29132,28 @@ func (ec *executionContext) unmarshalONavbarButtonInput2ᚕᚖgithubᚗcomᚋRou
 	return res, nil
 }
 
+func (ec *executionContext) unmarshalONavbarButtonInput2ᚖᚕgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐNavbarButtonᚄ(ctx context.Context, v interface{}) (*[]database_types.NavbarButton, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalONavbarButtonInput2ᚕgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐNavbarButtonᚄ(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) marshalONavbarDescription2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐNavbarDescription(ctx context.Context, sel ast.SelectionSet, v database_types.NavbarDescription) graphql.Marshaler {
 	return ec._NavbarDescription(ctx, sel, &v)
 }
 
-func (ec *executionContext) unmarshalONavbarDescriptionInput2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐNavbarDescriptionInput(ctx context.Context, v interface{}) (*model.NavbarDescriptionInput, error) {
-	if v == nil {
-		return nil, nil
-	}
+func (ec *executionContext) unmarshalONavbarDescriptionInput2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐNavbarDescription(ctx context.Context, v interface{}) (database_types.NavbarDescription, error) {
 	res, err := ec.unmarshalInputNavbarDescriptionInput(ctx, v)
-	return &res, graphql.ErrorOnPath(ctx, err)
+	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalONavbarItem2ᚕgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐNavbarItemᚄ(ctx context.Context, sel ast.SelectionSet, v []database_types.NavbarItem) graphql.Marshaler {
+func (ec *executionContext) marshalONavbarItem2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐNavbarItem(ctx context.Context, sel ast.SelectionSet, v database_types.NavbarItem) graphql.Marshaler {
+	return ec._NavbarItem(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalONavbarItem2ᚕgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐNavbarItem(ctx context.Context, sel ast.SelectionSet, v []database_types.NavbarItem) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
@@ -28795,7 +29180,7 @@ func (ec *executionContext) marshalONavbarItem2ᚕgithubᚗcomᚋRouteHubᚑLink
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNNavbarItem2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐNavbarItem(ctx, sel, v[i])
+			ret[i] = ec.marshalONavbarItem2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐNavbarItem(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -28806,20 +29191,19 @@ func (ec *executionContext) marshalONavbarItem2ᚕgithubᚗcomᚋRouteHubᚑLink
 	}
 	wg.Wait()
 
-	for _, e := range ret {
-		if e == graphql.Null {
-			return graphql.Null
-		}
-	}
-
 	return ret
 }
 
-func (ec *executionContext) marshalONavbarItem2ᚖᚕgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐNavbarItemᚄ(ctx context.Context, sel ast.SelectionSet, v *[]database_types.NavbarItem) graphql.Marshaler {
-	return ec.marshalONavbarItem2ᚕgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐNavbarItemᚄ(ctx, sel, *v)
+func (ec *executionContext) marshalONavbarItem2ᚖᚕgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐNavbarItem(ctx context.Context, sel ast.SelectionSet, v *[]database_types.NavbarItem) graphql.Marshaler {
+	return ec.marshalONavbarItem2ᚕgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐNavbarItem(ctx, sel, *v)
 }
 
-func (ec *executionContext) unmarshalONavbarItemInput2ᚕᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐNavbarItemInputᚄ(ctx context.Context, v interface{}) ([]*model.NavbarItemInput, error) {
+func (ec *executionContext) unmarshalONavbarItemInput2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐNavbarItem(ctx context.Context, v interface{}) (database_types.NavbarItem, error) {
+	res, err := ec.unmarshalInputNavbarItemInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalONavbarItemInput2ᚕgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐNavbarItem(ctx context.Context, v interface{}) ([]database_types.NavbarItem, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -28828,15 +29212,51 @@ func (ec *executionContext) unmarshalONavbarItemInput2ᚕᚖgithubᚗcomᚋRoute
 		vSlice = graphql.CoerceList(v)
 	}
 	var err error
-	res := make([]*model.NavbarItemInput, len(vSlice))
+	res := make([]database_types.NavbarItem, len(vSlice))
 	for i := range vSlice {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
-		res[i], err = ec.unmarshalNNavbarItemInput2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐNavbarItemInput(ctx, vSlice[i])
+		res[i], err = ec.unmarshalONavbarItemInput2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐNavbarItem(ctx, vSlice[i])
 		if err != nil {
 			return nil, err
 		}
 	}
 	return res, nil
+}
+
+func (ec *executionContext) unmarshalONavbarItemInput2ᚕgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐNavbarItemᚄ(ctx context.Context, v interface{}) ([]database_types.NavbarItem, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		vSlice = graphql.CoerceList(v)
+	}
+	var err error
+	res := make([]database_types.NavbarItem, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNNavbarItemInput2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐNavbarItem(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) unmarshalONavbarItemInput2ᚖᚕgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐNavbarItem(ctx context.Context, v interface{}) (*[]database_types.NavbarItem, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalONavbarItemInput2ᚕgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐNavbarItem(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalONavbarItemInput2ᚖᚕgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐNavbarItemᚄ(ctx context.Context, v interface{}) (*[]database_types.NavbarItem, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalONavbarItemInput2ᚕgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐNavbarItemᚄ(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalOObject2ᚕstringᚄ(ctx context.Context, v interface{}) ([]string, error) {
@@ -28914,7 +29334,7 @@ func (ec *executionContext) marshalOSocialMediaContainer2ᚖgithubᚗcomᚋRoute
 	return ec._SocialMediaContainer(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalOSocialMediaContainerInput2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐSocialMediaContainerInput(ctx context.Context, v interface{}) (*model.SocialMediaContainerInput, error) {
+func (ec *executionContext) unmarshalOSocialMediaContainerInput2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐSocialMediaContainer(ctx context.Context, v interface{}) (*database_types.SocialMediaContainer, error) {
 	if v == nil {
 		return nil, nil
 	}

@@ -46,6 +46,17 @@ input PlatformCreateInput @organizationPermission(permission: PLATFORM_CREATE) {
   templates: [TemplateInput]
 }
 
+input PlatformUpdateInput @platformPermission(permission: PLATFORM_UPDATE) {
+  platformId: UUID!
+  organizationId: UUID!
+  name: String!
+  platformDescription: PlatformDescriptionInput!
+  redirectionChoice: RedirectionOptions!
+  templates: [TemplateInput]
+  status: StatusState!
+
+}
+
 "Platform deployment is not implemented"
 type PlatformDeployment {
   id: UUID!
@@ -87,4 +98,5 @@ extend type Query {
 extend type Mutation {
   "This mutation is used for creating a platform for an organization."
   createPlatform(input: PlatformCreateInput!): Platform! @auth
+  updatePlatform(input: PlatformUpdateInput!): Platform! @auth
 }

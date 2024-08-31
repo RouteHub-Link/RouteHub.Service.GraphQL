@@ -39,5 +39,7 @@ func Serve() {
 	http.Handle("/query", srv)
 
 	log.Printf("You can interact with the GraphQL API using http://localhost:%s/query", applicationConfig.GraphQL.PortAsString)
+	log.Printf("For logging in, you can use the link http://localhost:%s/oauth2/login", applicationConfig.GraphQL.PortAsString)
+
 	log.Fatal(http.ListenAndServe(":"+applicationConfig.GraphQL.PortAsString, nil))
 }

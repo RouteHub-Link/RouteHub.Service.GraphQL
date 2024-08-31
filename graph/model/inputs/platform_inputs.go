@@ -15,3 +15,13 @@ type PlatformCreateInput struct {
 	RedirectionChoice   database_enums.RedirectionOptions   `json:"redirectionChoice"`
 	Templates           []model.TemplateInput               `json:"templates,omitempty"`
 }
+
+type PlatformUpdateInput struct {
+	PlatformID          uuid.UUID                           `json:"platformId"`
+	OrganizationID      uuid.UUID                           `json:"organizationId"`
+	Name                string                              `json:"name,omitempty"`
+	PlatformDescription *database_types.PlatformDescription `json:"platformDescription,omitempty"`
+	RedirectionChoice   *database_enums.RedirectionOptions  `json:"redirectionChoice,omitempty"`
+	Templates           []model.TemplateInput               `json:"templates,omitempty"`
+	Status              database_enums.StatusState          `json:"status"`
+}

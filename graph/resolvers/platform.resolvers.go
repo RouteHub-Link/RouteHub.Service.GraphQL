@@ -25,6 +25,14 @@ func (r *mutationResolver) CreatePlatform(ctx context.Context, input graph_input
 	return &platform, err
 }
 
+// UpdatePlatform is the resolver for the updatePlatform field.
+func (r *mutationResolver) UpdatePlatform(ctx context.Context, input graph_inputs.PlatformUpdateInput) (*database_models.Platform, error) {
+	platformService := r.ServiceContainer.PlatformService
+	userSession := auth.ForContext(ctx)
+
+	return platformService.UpdatePlatform(input, userSession.ID)
+}
+
 // Organization is the resolver for the organization field.
 func (r *platformResolver) Organization(ctx context.Context, obj *database_models.Platform) (*database_models.Organization, error) {
 	return r.ServiceContainer.PlatformService.GetPlatformOrganization(obj.ID)
@@ -81,18 +89,7 @@ func (r *queryResolver) Platforms(ctx context.Context) ([]*database_models.Platf
 	return r.ServiceContainer.PlatformService.GetPlatformsByUser(userSession.ID)
 }
 
-// PlatformDescription is the resolver for the platformDescription field.
-func (r *platformCreateInputResolver) PlatformDescription(ctx context.Context, obj *graph_inputs.PlatformCreateInput, data *model.PlatformDescriptionInput) error {
-	panic(fmt.Errorf("not implemented: PlatformDescription - platformDescription"))
-}
-
 // Platform returns graph.PlatformResolver implementation.
 func (r *Resolver) Platform() graph.PlatformResolver { return &platformResolver{r} }
 
-// PlatformCreateInput returns graph.PlatformCreateInputResolver implementation.
-func (r *Resolver) PlatformCreateInput() graph.PlatformCreateInputResolver {
-	return &platformCreateInputResolver{r}
-}
-
 type platformResolver struct{ *Resolver }
-type platformCreateInputResolver struct{ *Resolver }

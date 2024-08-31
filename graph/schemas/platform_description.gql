@@ -16,7 +16,7 @@ type NavbarDescription  {
 	brandURL:String
 	brandName:String
 	target:String
-	startItems: [NavbarItem!]
+	startItems: [NavbarItem]
 	endButtons: [NavbarButton!]
 }
 
@@ -34,7 +34,7 @@ type NavbarItem  {
 	url: String
 	target: String
 	icon: String
-	dropdown: [NavbarItem!]
+	dropdown: [NavbarItem]
 }
 
 input NavbarItemInput  {
@@ -42,7 +42,7 @@ input NavbarItemInput  {
   url: String
   target: String
   icon: String
-  dropdown: [NavbarItemInput!]
+  dropdown: [NavbarItemInput]
 }
 
 type NavbarButton  {
