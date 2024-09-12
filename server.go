@@ -33,13 +33,16 @@ func Serve() {
 
 	if applicationConfig.GraphQL.Playground {
 		http.Handle("/playground", playground.ApolloSandboxHandler("GraphQL playground", "/query"))
-		log.Printf("GraphQL playground enabled Connect to http://localhost:%s/ for GraphQL playground", applicationConfig.GraphQL.PortAsString)
+		log.Printf("GraphQL playground enabled Connect to %s/ for GraphQL playground", applicationConfig.Host)
 	}
 
 	http.Handle("/query", srv)
+	http.Handle("/healthz", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+	}))
 
-	log.Printf("You can interact with the GraphQL API using http://localhost:%s/query", applicationConfig.GraphQL.PortAsString)
-	log.Printf("For logging in, you can use the link http://localhost:%s/oauth2/login", applicationConfig.GraphQL.PortAsString)
+	log.Printf("You can interact with the GraphQL API using %s/query", applicationConfig.Host)
+	log.Printf("For logging in, you can use the link %s/oauth2/login", applicationConfig.Host)
 
 	log.Fatal(http.ListenAndServe(":"+applicationConfig.GraphQL.PortAsString, nil))
 }

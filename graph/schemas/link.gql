@@ -86,6 +86,14 @@ input LinkCreateInput @platformPermission(permission: LINK_CREATE) {
     LinkContent: LinkContentInput
 }
 
+input LinkUpdateInput @platformPermission(permission: LINK_UPDATE) {
+    linkId: UUID!
+    target: String
+    path: String
+    redirectionOptions: RedirectionOptions
+    LinkContent: LinkContentInput
+}
+
 type LinkContent {
     title: String
     subtitle: String
@@ -127,6 +135,8 @@ extend type Mutation {
     createLink(input: LinkCreateInput!): Link! @auth
     "This mutation is used for requesting a crawl for a link. Link crawling status can be checked in link query with crawls field."
     requestCrawl(input: CrawlRequestInput!): LinkCrawl! @auth
+
+    updateLink(input: LinkUpdateInput!): Link! @auth
 
     addToPinnedLinks(input: pinnedLinkInput!): Link! @auth
     removeFromPinnedLinks(input: pinnedLinkInput!): Link! @auth

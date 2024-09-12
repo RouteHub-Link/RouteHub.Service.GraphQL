@@ -262,6 +262,7 @@ type ComplexityRoot struct {
 		NewDomainVerification func(childComplexity int, domainID uuid.UUID, forced *bool) int
 		RemoveFromPinnedLinks func(childComplexity int, input model.PinnedLinkInput) int
 		RequestCrawl          func(childComplexity int, input model.CrawlRequestInput) int
+		UpdateLink            func(childComplexity int, input graph_inputs.LinkUpdateInput) int
 		UpdateOrganization    func(childComplexity int, input model.OrganizationUpdateInput) int
 		UpdatePlatform        func(childComplexity int, input graph_inputs.PlatformUpdateInput) int
 		UpdateUserInvitation  func(childComplexity int, input model.UpdateUserInviteInput) int
@@ -475,6 +476,7 @@ type MutationResolver interface {
 	NewDomainVerification(ctx context.Context, domainID uuid.UUID, forced *bool) (*database_models.DNSVerification, error)
 	CreateLink(ctx context.Context, input model.LinkCreateInput) (*database_models.Link, error)
 	RequestCrawl(ctx context.Context, input model.CrawlRequestInput) (*database_models.LinkCrawl, error)
+	UpdateLink(ctx context.Context, input graph_inputs.LinkUpdateInput) (*database_models.Link, error)
 	AddToPinnedLinks(ctx context.Context, input model.PinnedLinkInput) (*database_models.Link, error)
 	RemoveFromPinnedLinks(ctx context.Context, input model.PinnedLinkInput) (*database_models.Link, error)
 	CreateOrganization(ctx context.Context, input model.OrganizationCreateInput) (*database_models.Organization, error)
@@ -1557,6 +1559,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.RequestCrawl(childComplexity, args["input"].(model.CrawlRequestInput)), true
 
+	case "Mutation.updateLink":
+		if e.complexity.Mutation.UpdateLink == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateLink_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateLink(childComplexity, args["input"].(graph_inputs.LinkUpdateInput)), true
+
 	case "Mutation.updateOrganization":
 		if e.complexity.Mutation.UpdateOrganization == nil {
 			break
@@ -2459,6 +2473,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputLinkContentInput,
 		ec.unmarshalInputLinkCreateInput,
 		ec.unmarshalInputLinkFilter,
+		ec.unmarshalInputLinkUpdateInput,
 		ec.unmarshalInputMapEntry,
 		ec.unmarshalInputMapFilter,
 		ec.unmarshalInputMapInEntry,
@@ -2775,6 +2790,21 @@ func (ec *executionContext) field_Mutation_requestCrawl_args(ctx context.Context
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
 		arg0, err = ec.unmarshalNCrawlRequestInput2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐCrawlRequestInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_updateLink_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 graph_inputs.LinkUpdateInput
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalNLinkUpdateInput2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚋinputsᚐLinkUpdateInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -10023,6 +10053,125 @@ func (ec *executionContext) fieldContext_Mutation_requestCrawl(ctx context.Conte
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_requestCrawl_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_updateLink(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_updateLink(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Mutation().UpdateLink(rctx, fc.Args["input"].(graph_inputs.LinkUpdateInput))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			permission, err := ec.unmarshalNPlatformPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐPlatformPermission(ctx, "LINK_READ")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.PlatformPermission == nil {
+				return nil, errors.New("directive platformPermission is not implemented")
+			}
+			return ec.directives.PlatformPermission(ctx, nil, directive0, permission)
+		}
+		directive2 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Auth == nil {
+				return nil, errors.New("directive auth is not implemented")
+			}
+			return ec.directives.Auth(ctx, nil, directive1)
+		}
+
+		tmp, err := directive2(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*database_models.Link); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/RouteHub-Link/routehub-service-graphql/database/models.Link`, tmp)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*database_models.Link)
+	fc.Result = res
+	return ec.marshalNLink2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋmodelsᚐLink(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_updateLink(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Link_id(ctx, field)
+			case "target":
+				return ec.fieldContext_Link_target(ctx, field)
+			case "path":
+				return ec.fieldContext_Link_path(ctx, field)
+			case "creator":
+				return ec.fieldContext_Link_creator(ctx, field)
+			case "platform":
+				return ec.fieldContext_Link_platform(ctx, field)
+			case "domain":
+				return ec.fieldContext_Link_domain(ctx, field)
+			case "analytics":
+				return ec.fieldContext_Link_analytics(ctx, field)
+			case "LinkContent":
+				return ec.fieldContext_Link_LinkContent(ctx, field)
+			case "redirectionOptions":
+				return ec.fieldContext_Link_redirectionOptions(ctx, field)
+			case "state":
+				return ec.fieldContext_Link_state(ctx, field)
+			case "validations":
+				return ec.fieldContext_Link_validations(ctx, field)
+			case "lastValidation":
+				return ec.fieldContext_Link_lastValidation(ctx, field)
+			case "crawls":
+				return ec.fieldContext_Link_crawls(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Link_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Link_updatedAt(ctx, field)
+			case "deletedAt":
+				return ec.fieldContext_Link_deletedAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Link", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_updateLink_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -20882,6 +21031,160 @@ func (ec *executionContext) unmarshalInputLinkFilter(ctx context.Context, obj in
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputLinkUpdateInput(ctx context.Context, obj interface{}) (graph_inputs.LinkUpdateInput, error) {
+	var it graph_inputs.LinkUpdateInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"linkId", "target", "path", "redirectionOptions", "LinkContent"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "linkId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("linkId"))
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalNUUID2githubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				permission, err := ec.unmarshalNPlatformPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐPlatformPermission(ctx, "LINK_UPDATE")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.PlatformPermission == nil {
+					return nil, errors.New("directive platformPermission is not implemented")
+				}
+				return ec.directives.PlatformPermission(ctx, obj, directive0, permission)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(uuid.UUID); ok {
+				it.LinkID = data
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be github.com/google/uuid.UUID`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "target":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("target"))
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				permission, err := ec.unmarshalNPlatformPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐPlatformPermission(ctx, "LINK_UPDATE")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.PlatformPermission == nil {
+					return nil, errors.New("directive platformPermission is not implemented")
+				}
+				return ec.directives.PlatformPermission(ctx, obj, directive0, permission)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*string); ok {
+				it.Target = data
+			} else if tmp == nil {
+				it.Target = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "path":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("path"))
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				permission, err := ec.unmarshalNPlatformPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐPlatformPermission(ctx, "LINK_UPDATE")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.PlatformPermission == nil {
+					return nil, errors.New("directive platformPermission is not implemented")
+				}
+				return ec.directives.PlatformPermission(ctx, obj, directive0, permission)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*string); ok {
+				it.Path = data
+			} else if tmp == nil {
+				it.Path = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "redirectionOptions":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("redirectionOptions"))
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalORedirectionOptions2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐRedirectionOptions(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				permission, err := ec.unmarshalNPlatformPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐPlatformPermission(ctx, "LINK_UPDATE")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.PlatformPermission == nil {
+					return nil, errors.New("directive platformPermission is not implemented")
+				}
+				return ec.directives.PlatformPermission(ctx, obj, directive0, permission)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*database_enums.RedirectionOptions); ok {
+				it.RedirectionOptions = data
+			} else if tmp == nil {
+				it.RedirectionOptions = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *github.com/RouteHub-Link/routehub-service-graphql/database/enums.RedirectionOptions`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "LinkContent":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("LinkContent"))
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalOLinkContentInput2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐLinkContent(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				permission, err := ec.unmarshalNPlatformPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐPlatformPermission(ctx, "LINK_UPDATE")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.PlatformPermission == nil {
+					return nil, errors.New("directive platformPermission is not implemented")
+				}
+				return ec.directives.PlatformPermission(ctx, obj, directive0, permission)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*database_types.LinkContent); ok {
+				it.LinkContent = data
+			} else if tmp == nil {
+				it.LinkContent = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *github.com/RouteHub-Link/routehub-service-graphql/database/types.LinkContent`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputMapEntry(ctx context.Context, obj interface{}) (model.MapEntry, error) {
 	var it model.MapEntry
 	asMap := map[string]interface{}{}
@@ -24463,6 +24766,13 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
+		case "updateLink":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_updateLink(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		case "addToPinnedLinks":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_addToPinnedLinks(ctx, field)
@@ -27270,6 +27580,11 @@ func (ec *executionContext) marshalNLinkEdge2ᚖgithubᚗcomᚋcloudmatelabsᚋg
 		return graphql.Null
 	}
 	return ec._LinkEdge(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNLinkUpdateInput2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚋinputsᚐLinkUpdateInput(ctx context.Context, v interface{}) (graph_inputs.LinkUpdateInput, error) {
+	res, err := ec.unmarshalInputLinkUpdateInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) marshalNLinkValidation2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋmodelsᚐLinkValidation(ctx context.Context, sel ast.SelectionSet, v *database_models.LinkValidation) graphql.Marshaler {

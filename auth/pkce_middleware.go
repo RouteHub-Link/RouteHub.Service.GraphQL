@@ -63,8 +63,7 @@ func ConfigureOauth(h http.Handler) (err error) {
 		_applicationConfig := applicationConfig.ConfigurationService{}.Get()
 		authConfig = _applicationConfig.AuthConfig
 
-		host := strings.Join([]string{"http://localhost:", _applicationConfig.GraphQL.PortAsString}, "")
-		redirectURL := strings.Join([]string{host, authConfig.Callback}, "")
+		redirectURL := strings.Join([]string{_applicationConfig.Host, authConfig.Callback}, "")
 
 		if authConfig.Insecure {
 			zitadelInstance = zitadel.New(authConfig.Domain, zitadel.WithInsecure(authConfig.Port))

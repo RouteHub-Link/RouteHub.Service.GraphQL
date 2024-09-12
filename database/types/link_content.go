@@ -13,6 +13,19 @@ type LinkContent struct {
 	AdditionalFooter   *string
 }
 
+func (lc LinkContent) UnmarshalJSON(data []byte) error {
+	type Alias LinkContent
+	aux := &struct {
+		*Alias
+	}{
+		Alias: (*Alias)(&lc),
+	}
+	if err := json.Unmarshal(data, &aux); err != nil {
+		return err
+	}
+	return nil
+}
+
 type MetaDescription struct {
 	Title         string
 	FavIcon       string

@@ -5,6 +5,8 @@ import (
 	database_models "github.com/RouteHub-Link/routehub-service-graphql/database/models"
 	database_relations "github.com/RouteHub-Link/routehub-service-graphql/database/relations"
 	graph_inputs "github.com/RouteHub-Link/routehub-service-graphql/graph/model/inputs"
+	"github.com/RouteHub-Link/routehub-service-graphql/services/hub"
+	"github.com/RouteHub-Link/routehub-service-graphql/services/hub/publish"
 	"github.com/google/uuid"
 	"github.com/vektah/gqlparser/v2/gqlerror"
 	"gorm.io/gorm"
@@ -84,7 +86,21 @@ func (ps PlatformService) UpdatePlatform(input graph_inputs.PlatformUpdateInput,
 	_platform.Status = input.Status
 
 	err = ps.DB.Save(_platform).Error
+	if err != nil {
+		return nil, err
+	}
 	platform = _platform
+
+	hubService, err := hub.NewHubService(*platform)
+	if err != nil {
+		return
+	}
+
+	_platformPublisher := publish.NewPlatformEvents(hubService)
+	err = _platformPublisher.PubSet(*platform)
+
+	mqcc := *hubService.MQC.Client
+	mqcc.Disconnect(250)
 
 	return
 }

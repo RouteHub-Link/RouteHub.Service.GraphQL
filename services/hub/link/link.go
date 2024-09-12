@@ -11,6 +11,7 @@ import (
 type Link struct {
 	ID      uuid.UUID
 	Key     string
+	Target  string
 	Options redirection.Option
 	Content *database_types.LinkContent
 }
@@ -18,6 +19,7 @@ type Link struct {
 func (l *Link) MapFromDatabaseLink(dbLink database_models.Link) {
 	l.ID = dbLink.ID
 	l.Key = dbLink.Path
+	l.Target = dbLink.Target
 
 	switch dbLink.RedirectionChoice {
 	case database_enums.RedirectionOptionsTimed:
@@ -40,6 +42,7 @@ func (l *Link) ToDatabaseLink() database_models.Link {
 
 	dbLink.ID = l.ID
 	dbLink.Path = l.Key
+	dbLink.Target = l.Target
 
 	switch l.Options {
 	case redirection.OptionTimed:

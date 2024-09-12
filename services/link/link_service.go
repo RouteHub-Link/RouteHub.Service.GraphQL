@@ -6,6 +6,9 @@ import (
 	database_models "github.com/RouteHub-Link/routehub-service-graphql/database/models"
 	database_types "github.com/RouteHub-Link/routehub-service-graphql/database/types"
 	"github.com/RouteHub-Link/routehub-service-graphql/graph/model"
+	graph_inputs "github.com/RouteHub-Link/routehub-service-graphql/graph/model/inputs"
+	"github.com/RouteHub-Link/routehub-service-graphql/services/hub"
+	"github.com/RouteHub-Link/routehub-service-graphql/services/hub/publish"
 	"github.com/google/uuid"
 	gonanoid "github.com/matoous/go-nanoid/v2"
 	"gorm.io/gorm"
@@ -42,6 +45,61 @@ func (ls LinkService) CreateLink(input model.LinkCreateInput, userId uuid.UUID, 
 	if err != nil {
 		return
 	}
+
+	hubService, err := hub.NewHubServiceFromPlatformId(link.PlatformID)
+	if err != nil {
+		return
+	}
+
+	linkPub := publish.NewLinkEvents(hubService)
+	err = linkPub.PubSet(*link)
+
+	return
+}
+
+func (ls LinkService) UpdateLink(input graph_inputs.LinkUpdateInput, userId uuid.UUID) (link *database_models.Link, err error) {
+	link, err = ls.GetLinkById(input.LinkID)
+	if err != nil {
+		return
+	}
+
+	targetChanged := false
+	if input.Target != nil && *input.Target != link.Target {
+		targetChanged = true
+		link.Target = *input.Target
+	}
+
+	if input.RedirectionOptions != nil {
+		link.RedirectionChoice = *input.RedirectionOptions
+	}
+
+	if input.LinkContent != nil {
+		link.LinkContent = input.LinkContent
+	}
+
+	if input.Path != nil {
+		link.Path = *input.Path
+	}
+
+	if targetChanged {
+		// todo add validation task
+	}
+
+	err = ls.DB.Save(&link).Error
+	if err != nil {
+		return
+	}
+
+	hubService, err := hub.NewHubServiceFromPlatformId(link.PlatformID)
+	if err != nil {
+		return
+	}
+
+	linkPub := publish.NewLinkEvents(hubService)
+	err = linkPub.PubSet(*link)
+
+	mqcc := *hubService.MQC.Client
+	mqcc.Disconnect(250)
 
 	return
 }

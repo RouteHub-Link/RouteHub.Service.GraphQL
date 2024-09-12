@@ -17,6 +17,7 @@ import (
 	database_types "github.com/RouteHub-Link/routehub-service-graphql/database/types"
 	"github.com/RouteHub-Link/routehub-service-graphql/graph"
 	"github.com/RouteHub-Link/routehub-service-graphql/graph/model"
+	graph_inputs "github.com/RouteHub-Link/routehub-service-graphql/graph/model/inputs"
 	services_domain_utils "github.com/RouteHub-Link/routehub-service-graphql/services/domain_utils"
 	"github.com/RouteHub-Link/routehub-service-graphql/worker"
 	"github.com/cloudmatelabs/gorm-gqlgen-relay/relay"
@@ -194,6 +195,16 @@ func (r *mutationResolver) RequestCrawl(ctx context.Context, input model.CrawlRe
 	crawls, err := r.ServiceContainer.LinkService.GetCrawls(link.ID)
 
 	return crawls[len(crawls)-1], err
+}
+
+// UpdateLink is the resolver for the updateLink field.
+func (r *mutationResolver) UpdateLink(ctx context.Context, input graph_inputs.LinkUpdateInput) (*database_models.Link, error) {
+	userSession := auth.ForContext(ctx)
+	if userSession == nil {
+		return nil, gqlerror.Errorf("Access Denied")
+	}
+
+	return r.ServiceContainer.LinkService.UpdateLink(input, userSession.ID)
 }
 
 // AddToPinnedLinks is the resolver for the addToPinnedLinks field.

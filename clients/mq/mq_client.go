@@ -17,7 +17,7 @@ type MQTTClient struct {
 func NewMQTTClient(tcpAddr string) (*MQTTClient, error) {
 	rc := MQTTClient{
 		tcpAddr: tcpAddr,
-		Timeout: 15 * time.Minute,
+		Timeout: 30 * time.Second,
 	}
 
 	hostName := os.Getenv("HOSTNAME")

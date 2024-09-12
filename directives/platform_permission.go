@@ -69,6 +69,11 @@ func getPlatformId(obj interface{}) (*uuid.UUID, error) {
 		return &platform.ID, nil
 	}
 
+	link, linkOk := obj.(*database_models.Link)
+	if linkOk {
+		return &link.PlatformID, nil
+	}
+
 	platformId, platformIdOk := obj.(map[string]interface{})["platformId"].(string)
 	if platformIdOk {
 		uid := (uuid.MustParse(platformId))

@@ -209,7 +209,10 @@ func Seed() {
 
 		policies.NewPolicyBuilder(auth_casbin.CasbinEnforcer, user.ID, "allow").
 			PlatformRead(platform.ID).
-			PlatformUpdate(platform.ID)
+			PlatformUpdate(platform.ID).
+			PlatformLinkRead(platform.ID).
+			PlatformLinkUpdate(platform.ID).
+			PlatformLinkCreate(platform.ID)
 	}
 
 	var link_count int64
@@ -234,19 +237,19 @@ func Seed() {
 				RedirectionDelay:   &redirectionDelay,
 				MetaDescription: &database_types.MetaDescription{
 					Title:         "Example Domains",
-					FavIcon:       "https://www.iana.org/_img/2022/iana-logo-header.svg",
+					FavIcon:       "https://bucket.r4l.cc/routehub-images/logoipsum-218.svg",
 					Description:   link_subtitle,
 					Locale:        "en-US",
 					OGTitle:       "Example Domains",
 					OGDescription: link_subtitle,
-					OGURL:         "https://www.iana.org/help/example-domains",
+					OGURL:         "https://bucket.r4l.cc/routehub-images/logoipsum-218.svg",
 					OGSiteName:    "Example Domains",
 					OGMetaType:    "website",
 					OGLocale:      "en-US",
-					OGBigImage:    "https://www.iana.org/_img/2022/iana-logo-header.svg",
+					OGBigImage:    "https://bucket.r4l.cc/routehub-images/logoipsum-218.svg",
 					OGBigWidth:    "1200",
 					OGBigHeight:   "630",
-					OGSmallImage:  "https://www.iana.org/_img/2022/iana-logo-header.svg",
+					OGSmallImage:  "https://bucket.r4l.cc/routehub-images/logoipsum-218.svg",
 					OGSmallWidth:  "600",
 					OGSmallHeight: "315",
 					OGCard:        "summary_large_image",

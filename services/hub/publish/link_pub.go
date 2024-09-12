@@ -31,7 +31,7 @@ func (lp *LinkPub) PubSet(dbLink database_models.Link) error {
 	mqc := lp.hubService.MQC
 	client := *mqc.Client
 
-	token := client.Publish(mq.MQE_LINK_SET.AsTopic(), 3, true, jsonLink)
+	token := client.Publish(mq.MQE_LINK_SET.AsTopic(), 1, false, jsonLink)
 	token.WaitTimeout(mqc.Timeout)
 
 	return token.Error()
@@ -43,7 +43,7 @@ func (lp *LinkPub) PubDel(dbLink database_models.Link) error {
 	mqc := lp.hubService.MQC
 	client := *mqc.Client
 
-	token := client.Publish(mq.MQE_LINK_DEL.AsTopic(), 3, true, linkTarget)
+	token := client.Publish(mq.MQE_LINK_DEL.AsTopic(), 1, false, linkTarget)
 	token.WaitTimeout(mqc.Timeout)
 
 	return token.Error()
