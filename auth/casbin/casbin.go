@@ -1,7 +1,6 @@
 package auth_casbin
 
 import (
-	"context"
 	"log/slog"
 	"os"
 	"sync"
@@ -10,10 +9,10 @@ import (
 	"github.com/RouteHub-Link/routehub-service-graphql/config"
 	"github.com/casbin/casbin/v2"
 	"github.com/casbin/casbin/v2/persist"
-	mongodbadapter "github.com/casbin/mongodb-adapter/v3"
+	gormadapter "github.com/casbin/gorm-adapter/v3"
+	"gorm.io/gorm"
+
 	"github.com/google/uuid"
-	"go.mongodb.org/mongo-driver/event"
-	mongooptions "go.mongodb.org/mongo-driver/mongo/options"
 )
 
 var (
@@ -29,10 +28,11 @@ var (
 
 type CasbinConfigurer struct {
 	CasbinConfig config.CasbinConfig
+	database     *gorm.DB
 }
 
-func NewCasbinConfigurer(casbinConfig config.CasbinConfig) CasbinConfigurer {
-	cc := CasbinConfigurer{CasbinConfig: casbinConfig}
+func NewCasbinConfigurer(casbinConfig config.CasbinConfig, database *gorm.DB) CasbinConfigurer {
+	cc := CasbinConfigurer{CasbinConfig: casbinConfig, database: database}
 
 	cc.getLogger()
 	cc.getAdapter()
@@ -64,24 +64,7 @@ func (cc CasbinConfigurer) getLogger() *slog.Logger {
 
 func (cc CasbinConfigurer) getAdapter() persist.Adapter {
 	onceAdapter.Do(func() {
-		ctx := context.Background()
-
-		mongoClientOption := mongooptions.Client().ApplyURI(cc.CasbinConfig.Mongo.URI)
-
-		monitor := &event.CommandMonitor{
-			Started: func(_ context.Context, e *event.CommandStartedEvent) {
-				if e.CommandName != "endSessions" {
-					casbinMongoLogger.LogAttrs(ctx, slog.LevelDebug, "Casbin MongoDB Command", slog.String("Database", e.DatabaseName), slog.String("CommandName", e.CommandName), slog.Any("Command", e.Command))
-				}
-			},
-		}
-
-		mongoClientOption.SetMonitor(monitor)
-
-		a, err := mongodbadapter.NewAdapterWithCollectionName(mongoClientOption, cc.CasbinConfig.Mongo.Database, cc.CasbinConfig.Mongo.Collection)
-		if err != nil {
-			panic(err)
-		}
+		a, _ := gormadapter.NewAdapterByDB(cc.database)
 		CasbinAdapter = a
 	})
 

@@ -21,7 +21,9 @@ func Init() {
 	config = configuration.ConfigurationService{}.Get()
 
 	connectionSelector()
+}
 
+func MigrateAndSeed() {
 	if config.Database.Type.Migrate {
 		Migrate(DB)
 	}

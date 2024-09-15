@@ -17,7 +17,7 @@ import (
 type ApplicationConfig struct {
 	GraphQL      GraphqlConfig  `koanf:"graphql"`
 	Database     DatabaseConfig `koanf:"database"`
-	Redis        RedisConfig    `koanf:"redis"`
+	RedisConfig  RedisConfig    `koanf:"redis"`
 	Services     ServicesConfig `koanf:"services"`
 	CasbinConfig CasbinConfig   `koanf:"casbin"`
 	AuthConfig   AuthConfig     `koanf:"zitadel"`
@@ -68,9 +68,8 @@ type ServicesConfig struct {
 }
 
 type CasbinConfig struct {
-	Model    string            `koanf:"model"`
-	LogLevel string            `koanf:"log_level"`
-	Mongo    CasbinMongoConfig `koanf:"mongodb"`
+	Model    string `koanf:"model"`
+	LogLevel string `koanf:"log_level"`
 }
 
 type AuthConfig struct {
