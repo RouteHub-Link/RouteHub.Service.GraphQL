@@ -10,7 +10,7 @@ RUN CGO_ENABLED=0 GOOS=linux go build -o /entrypoint
 FROM gcr.io/distroless/static-debian12 AS release-stage
 WORKDIR /
 COPY --from=build-stage /entrypoint /entrypoint
-COPY --from=build-stage /app/config/authorization /config/authorization
+COPY --from=build-stage /app/config/authorization/rbac_model.conf /config/authorization/rbac.model.conf
 EXPOSE 8080
 USER nonroot:nonroot
 ENTRYPOINT ["/entrypoint"]
