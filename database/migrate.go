@@ -6,7 +6,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func Migrate(db *gorm.DB) {
+func migrate(db *gorm.DB) {
 	db.AutoMigrate(
 		&database_models.User{},
 		&database_models.Organization{},

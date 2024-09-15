@@ -53,6 +53,11 @@ type DatabaseConfig struct {
 	Type            DatabaseTypeConfig `koanf:"type"`
 	Seed            *Seed              `koanf:"seed"`
 }
+
+func (d DatabaseConfig) GetPostgreDSN() string {
+	return "postgresql://" + d.User + ":" + d.Password + "@" + d.Host + ":" + d.PortAsString + "/" + d.Database + "?application_name=" + d.ApplicationName
+}
+
 type DatabaseTypeConfig struct {
 	Migrate  bool     `koanf:"migrate"`
 	Seed     bool     `koanf:"seed"`

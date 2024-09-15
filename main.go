@@ -10,9 +10,11 @@ var applicationConfig = Configuration.ConfigurationService{}.Get()
 
 func main() {
 	database.Init()
-	auth_casbin.NewCasbinConfigurer(applicationConfig.CasbinConfig, database.DB)
+	database.Migration()
 
-	database.MigrateAndSeed()
+	auth_casbin.NewCasbinConfigurer(applicationConfig.CasbinConfig, applicationConfig.Database)
+
+	database.Seed()
 
 	Serve()
 }

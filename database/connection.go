@@ -19,21 +19,28 @@ var (
 
 func Init() {
 	config = configuration.ConfigurationService{}.Get()
+	log.Println("Database Init Called")
 
 	connectionSelector()
 }
 
-func MigrateAndSeed() {
+func Migration() {
+	log.Println("Database Migrate Called")
 	if config.Database.Type.Migrate {
-		Migrate(DB)
+		log.Println("Database Migrate Started")
+		migrate(DB)
 	}
+}
 
+func Seed() {
+	log.Println("Database Seed Called")
 	if config.Database.Type.Seed {
+		log.Println("Database Seed Started")
 		if config.Database.Seed == nil {
 			log.Fatal("Seed data not found in config")
 		}
 
-		Seed()
+		seed()
 	}
 }
 
@@ -68,16 +75,27 @@ func getLogger() logger.Interface {
 }
 
 func setupPostgres(gormConfig *gorm.Config, config *configuration.ApplicationConfig) {
-	dsn := "postgresql://" + config.Database.User + ":" + config.Database.Password + "@" + config.Database.Host + ":" + config.Database.PortAsString + "/" + config.Database.Database + "?application_name=" + config.Database.ApplicationName
-	db, err := gorm.Open(postgres.Open(dsn), gormConfig)
+	log.Println("Database Provider: Postgres")
+
+	dsn := config.Database.GetPostgreDSN()
+	log.Println("Database Connection String: ", dsn)
+
+	_dialector := postgres.Open(dsn)
+
+	db, err := gorm.Open(_dialector, gormConfig)
 	if err != nil {
 		log.Fatal(err)
 	}
 	DB = db
+
+	log.Println("Database Connection Established")
 }
 
 func setupEmbeded(gormConfig *gorm.Config, config *configuration.ApplicationConfig) {
+	log.Println("Database Provider: Embeded")
 	RunEmbeddedPostgres()
+	log.Println("Database Running in Embeded Mode")
+
 	go InterruptEmbedded()
 	db, err := gorm.Open(
 		postgres.Open("host=127.0.0.1 user=postgres password=1234 dbname=postgres port="+config.Database.PortAsString+" sslmode=disable TimeZone=UTC"),
@@ -87,4 +105,5 @@ func setupEmbeded(gormConfig *gorm.Config, config *configuration.ApplicationConf
 		log.Fatal(err)
 	}
 	DB = db
+	log.Println("Database Connection Established")
 }

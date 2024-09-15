@@ -1,6 +1,8 @@
 package database
 
 import (
+	"log"
+
 	auth_casbin "github.com/RouteHub-Link/routehub-service-graphql/auth/casbin"
 	"github.com/RouteHub-Link/routehub-service-graphql/auth/policies"
 	database_enums "github.com/RouteHub-Link/routehub-service-graphql/database/enums"
@@ -10,7 +12,8 @@ import (
 	"github.com/google/uuid"
 )
 
-func Seed() {
+func seed() {
+	log.Println("Database Seed Called")
 	seedData := config.Database.Seed
 
 	var user_count int64
