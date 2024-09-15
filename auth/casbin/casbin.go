@@ -1,6 +1,7 @@
 package auth_casbin
 
 import (
+	"log"
 	"log/slog"
 	"os"
 	"sync"
@@ -10,29 +11,28 @@ import (
 	"github.com/casbin/casbin/v2"
 	"github.com/casbin/casbin/v2/persist"
 	gormadapter "github.com/casbin/gorm-adapter/v3"
-	"gorm.io/gorm"
 
 	"github.com/google/uuid"
 )
 
 var (
-	CasbinAdapter     persist.Adapter
-	CasbinEnforcer    *casbin.SyncedCachedEnforcer
-	onceLogger        sync.Once
-	onceAdapter       sync.Once
-	onceEnforcer      sync.Once
-	casbinMongoLogger *slog.Logger
-	casbinSlog        *CasbinSlogLogger
-	level             slog.Level
+	CasbinAdapter  persist.Adapter
+	CasbinEnforcer *casbin.SyncedCachedEnforcer
+	onceLogger     sync.Once
+	onceAdapter    sync.Once
+	onceEnforcer   sync.Once
+	casbinLogger   *slog.Logger
+	casbinSlog     *CasbinSlogLogger
+	level          slog.Level
 )
 
 type CasbinConfigurer struct {
-	CasbinConfig config.CasbinConfig
-	database     *gorm.DB
+	CasbinConfig   config.CasbinConfig
+	databaseConfig config.DatabaseConfig
 }
 
-func NewCasbinConfigurer(casbinConfig config.CasbinConfig, database *gorm.DB) CasbinConfigurer {
-	cc := CasbinConfigurer{CasbinConfig: casbinConfig, database: database}
+func NewCasbinConfigurer(casbinConfig config.CasbinConfig, databaseConfig config.DatabaseConfig) CasbinConfigurer {
+	cc := CasbinConfigurer{CasbinConfig: casbinConfig, databaseConfig: databaseConfig}
 
 	cc.getLogger()
 	cc.getAdapter()
@@ -55,18 +55,28 @@ func (cc CasbinConfigurer) getLogger() *slog.Logger {
 			Level: slog.Level(level),
 		}
 
-		casbinMongoLogger = slog.New(slog.NewJSONHandler(os.Stdout, opts))
-		casbinSlog = NewCasbinSlogLogger(casbinMongoLogger)
+		casbinLogger = slog.New(slog.NewJSONHandler(os.Stdout, opts))
+		casbinSlog = NewCasbinSlogLogger(casbinLogger)
 	})
 
-	return casbinMongoLogger
+	if casbinLogger == nil {
+		log.Fatal("Casbin Logger is nil")
+	}
+
+	return casbinLogger
 }
 
 func (cc CasbinConfigurer) getAdapter() persist.Adapter {
 	onceAdapter.Do(func() {
-		a, _ := gormadapter.NewAdapterByDB(cc.database)
+		dsn := cc.databaseConfig.GetPostgreDSN()
+
+		a, _ := gormadapter.NewAdapter(config.Postgres.String(), dsn, true)
 		CasbinAdapter = a
 	})
+
+	if CasbinAdapter == nil {
+		log.Fatal("Casbin Adapter is nil")
+	}
 
 	return CasbinAdapter
 }
@@ -96,11 +106,19 @@ func (cc CasbinConfigurer) initTestPolicy(e *casbin.SyncedCachedEnforcer) (*casb
 
 func (cc CasbinConfigurer) getEnforcer() *casbin.SyncedCachedEnforcer {
 	onceEnforcer.Do(func() {
-		e, _ := casbin.NewSyncedCachedEnforcer(cc.CasbinConfig.Model, cc.getAdapter())
+		e, err := casbin.NewSyncedCachedEnforcer(cc.CasbinConfig.Model, cc.getAdapter())
+		if err != nil {
+			log.Fatal(err)
+		}
+
 		e.SetLogger(casbinSlog)
 		e.EnableLog(true)
 		CasbinEnforcer = e
 	})
+
+	if CasbinEnforcer == nil {
+		log.Fatal("Casbin Enforcer is nil")
+	}
 
 	return CasbinEnforcer
 }
