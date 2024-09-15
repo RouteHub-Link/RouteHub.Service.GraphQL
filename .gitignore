@@ -22,3 +22,4 @@ go.work
 .DS_Store
 routehub-service-graphql
 *.env
+.vscode/
