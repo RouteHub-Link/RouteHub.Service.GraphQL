@@ -6,10 +6,8 @@ import (
 	database_enums "github.com/RouteHub-Link/routehub-service-graphql/database/enums"
 	database_models "github.com/RouteHub-Link/routehub-service-graphql/database/models"
 	database_relations "github.com/RouteHub-Link/routehub-service-graphql/database/relations"
-	database_types "github.com/RouteHub-Link/routehub-service-graphql/database/types"
 	"github.com/RouteHub-Link/routehub-service-graphql/graph/model"
 	graph_inputs "github.com/RouteHub-Link/routehub-service-graphql/graph/model/inputs"
-	services_utils "github.com/RouteHub-Link/routehub-service-graphql/services/utils"
 	"github.com/google/uuid"
 	gonanoid "github.com/matoous/go-nanoid/v2"
 )
@@ -35,7 +33,6 @@ func (u UserService) InviteUser(input graph_inputs.UserInviteInput, invitedById 
 }
 
 func (u UserService) UpdateInvitation(updateUserInviteInput model.UpdateUserInviteInput) (userInvite *database_relations.UserInvite, err error) {
-	// TODO check email already invited or not
 	err = u.DB.Where("code = ?", updateUserInviteInput.Code).First(&userInvite).Error
 	if err != nil {
 		return
@@ -45,7 +42,7 @@ func (u UserService) UpdateInvitation(updateUserInviteInput model.UpdateUserInvi
 		return nil, errors.New("invitation is already used")
 	}
 
-	hashedPassword, err := services_utils.HashPassword(updateUserInviteInput.User.Password)
+	//hashedPassword, err := services_utils.HashPassword(updateUserInviteInput.User.Password)
 	if err != nil {
 		return
 	}
@@ -56,16 +53,17 @@ func (u UserService) UpdateInvitation(updateUserInviteInput model.UpdateUserInvi
 		return
 	}
 
+	// TODO SAVE USER ON ZITADEL
 	user := &database_models.User{
-		ID:       uuid.New(),
-		Email:    userInvite.Email,
-		Fullname: updateUserInviteInput.User.Fullname,
-		Phone: &database_types.AccountPhone{
-			CountryCode: updateUserInviteInput.User.Phone.CountryCode,
-			Number:      updateUserInviteInput.User.Phone.Number,
-		},
-		PasswordHash: hashedPassword,
-		Verified:     true,
+		ID: uuid.New(),
+		//Email:    userInvite.Email,
+		//Fullname: updateUserInviteInput.User.Fullname,
+		//Phone: &database_types.AccountPhone{
+		//	CountryCode: updateUserInviteInput.User.Phone.CountryCode,
+		//	Number:      updateUserInviteInput.User.Phone.Number,
+		//},
+		//PasswordHash: hashedPassword,
+		//Verified:     true,
 	}
 
 	err = u.DB.Create(&user).Error

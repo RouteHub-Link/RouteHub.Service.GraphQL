@@ -1,21 +1,22 @@
+host: http://localhost:8081
 services:
   domain_utils_host: http://localhost:9001
 
 database:
-  host: route-hub
-  port: 26257
-  user: routehub
-  password: xxxx
+  host: localhost
+  port: 5432
+  user: postgres
+  password: postgres
   database: RouteHub
   application_name: RouteHub-GraphQL
   type:
     migrate: true
     seed: true
-    provider: embed
+    provider: postgres
   seed:
-    admin:
-      email: admin@r4l.com
-      password: admin
+    admins:
+      - subject: "278978826325721091"
+      - subject: "278979034530971651"
     organization:
       name: RouteHub
       description: RouteHub is a GraphQL API for managing routes
@@ -44,3 +45,14 @@ casbin:
     uri: mongodb://localhost:27017
     database: casbin
     collection: casbin_rule
+
+zitadel:
+  client_id: 278962924343590915
+  callback: /oauth2/callback
+  scope: openid profile email
+  authorizer_url: http://server.proxy.internal:7077/oauth/v2/authorize
+  token_url: http://server.proxy.internal:7077/oauth/v2/token
+  issuer: http://server.proxy.internal:7077
+  domain: 'server.proxy.internal'
+  port: 7077
+  insecure: true

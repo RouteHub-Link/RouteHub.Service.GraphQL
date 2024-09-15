@@ -1,0 +1,55 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid":830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Launch Package",
+            "type": "go",
+            "request": "launch",
+            "mode": "auto",
+            "program": "${fileDirname}",
+            "env": {
+                "SERVICES.DOMAIN_UTILS_HOST": "http://localhost:9001",
+                "DATABASE.HOST": "localhost",
+                "DATABASE.PORT": "5432",
+                "DATABASE.USER": "postgres",
+                "DATABASE.PASSWORD": "postgres",
+                "DATABASE.DATABASE": "RouteHub",
+                "DATABASE.APPLICATION_NAME": "RouteHub-GraphQL",
+                "DATABASE.TYPE.MIGRATE": "true",
+                "DATABASE.TYPE.SEED": "true",
+                "DATABASE.TYPE.PROVIDER": "postgres",
+                "DATABASE.SEED.ADMINS.0.SUBJECT": "278978826325721091",
+                "DATABASE.SEED.ADMINS.1.SUBJECT": "278979034530971651",
+                "DATABASE.SEED.ORGANIZATION.NAME": "RouteHub",
+                "DATABASE.SEED.ORGANIZATION.DESCRIPTION": "RouteHub is a GraphQL API for managing routes",
+                "DATABASE.SEED.ORGANIZATION.URL": "https://www.routehub.link",
+                "DATABASE.SEED.DOMAIN.NAME": "RouteHub Public Shortener",
+                "DATABASE.SEED.DOMAIN.URL": "https://s.r4l.cc",
+                "REDIS.ADDR": "0.0.0.0:6379",
+                "GRAPHQL.PORT": "8081",
+                "GRAPHQL.PLAYGROUND": "true",
+                "GRAPHQL.DATALOADER.WAIT": "1ms",
+                "GRAPHQL.DATALOADER.CACHE": "true",
+                "GRAPHQL.DATALOADER.LRUE.SIZE": "1000",
+                "GRAPHQL.DATALOADER.LRUE.EXPIRE": "10m",
+                "CASBIN.MODEL": "./config/authorization/rbac_model.conf",
+                "CASBIN.LOG_LEVEL": "DEBUG",
+                "CASBIN.MONGODB.URI": "mongodb://localhost:27017",
+                "CASBIN.MONGODB.DATABASE": "casbin",
+                "CASBIN.MONGODB.COLLECTION": "casbin_rule",
+                "ZITADEL.CLIENT_ID": "278962924343590915",
+                "ZITADEL.CALLBACK": "/oauth2/callback",
+                "ZITADEL.SCOPE": "openid,profile,email",
+                "ZITADEL.AUTHORIZER_URL": "http://5.75.150.147:7077/oauth/v2/authorize",
+                "ZITADEL.TOKEN_URL": "http://5.75.150.147:7077/oauth/v2/token",
+                "ZITADEL.ISSUER": "http://5.75.150.147:7077",
+                "ZITADEL.DOMAIN": "5.75.150.147",
+                "ZITADEL.PORT": "7077",
+                "ZITADEL.INSECURE": "true"
+            },
+        }
+    ]
+}

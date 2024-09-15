@@ -70,12 +70,15 @@ type DirectiveRoot struct {
 }
 
 type ComplexityRoot struct {
+	ASocialMedia struct {
+		Icon   func(childComplexity int) int
+		Link   func(childComplexity int) int
+		Target func(childComplexity int) int
+	}
+
 	AccountPhone struct {
-		CountryCode func(childComplexity int) int
-		CreatedAt   func(childComplexity int) int
-		Number      func(childComplexity int) int
-		UpdatedAt   func(childComplexity int) int
-		Verified    func(childComplexity int) int
+		Number   func(childComplexity int) int
+		Verified func(childComplexity int) int
 	}
 
 	AnalyticReport struct {
@@ -128,6 +131,19 @@ type ComplexityRoot struct {
 		Verifications         func(childComplexity int) int
 	}
 
+	FooterDescription struct {
+		CompanyBrandingHtml  func(childComplexity int) int
+		ShowRouteHubBranding func(childComplexity int) int
+		SocialMediaContainer func(childComplexity int) int
+	}
+
+	ImageDescription struct {
+		Alt    func(childComplexity int) int
+		Height func(childComplexity int) int
+		SRC    func(childComplexity int) int
+		Width  func(childComplexity int) int
+	}
+
 	Industry struct {
 		Name func(childComplexity int) int
 	}
@@ -141,7 +157,7 @@ type ComplexityRoot struct {
 		Domain             func(childComplexity int) int
 		ID                 func(childComplexity int) int
 		LastValidation     func(childComplexity int) int
-		OpenGraph          func(childComplexity int) int
+		LinkContent        func(childComplexity int) int
 		Path               func(childComplexity int) int
 		Platform           func(childComplexity int) int
 		RedirectionOptions func(childComplexity int) int
@@ -155,6 +171,16 @@ type ComplexityRoot struct {
 		Edges      func(childComplexity int) int
 		PageInfo   func(childComplexity int) int
 		TotalCount func(childComplexity int) int
+	}
+
+	LinkContent struct {
+		AdditionalFooter   func(childComplexity int) int
+		AdditionalHead     func(childComplexity int) int
+		MetaDescription    func(childComplexity int) int
+		RedirectionDelay   func(childComplexity int) int
+		RedirectionURLText func(childComplexity int) int
+		Subtitle           func(childComplexity int) int
+		Title              func(childComplexity int) int
 	}
 
 	LinkCrawl struct {
@@ -194,8 +220,27 @@ type ComplexityRoot struct {
 		Message   func(childComplexity int) int
 	}
 
-	LoginPayload struct {
-		Token func(childComplexity int) int
+	MetaDescription struct {
+		Description   func(childComplexity int) int
+		FavIcon       func(childComplexity int) int
+		Locale        func(childComplexity int) int
+		OGBigHeight   func(childComplexity int) int
+		OGBigImage    func(childComplexity int) int
+		OGBigWidth    func(childComplexity int) int
+		OGCard        func(childComplexity int) int
+		OGCreator     func(childComplexity int) int
+		OGDescription func(childComplexity int) int
+		OGLocale      func(childComplexity int) int
+		OGMetaType    func(childComplexity int) int
+		OGSite        func(childComplexity int) int
+		OGSiteName    func(childComplexity int) int
+		OGSmallHeight func(childComplexity int) int
+		OGSmallImage  func(childComplexity int) int
+		OGSmallWidth  func(childComplexity int) int
+		OGTitle       func(childComplexity int) int
+		OGType        func(childComplexity int) int
+		OGURL         func(childComplexity int) int
+		Title         func(childComplexity int) int
 	}
 
 	MetricAnalytics struct {
@@ -213,14 +258,39 @@ type ComplexityRoot struct {
 		CreateLink            func(childComplexity int, input model.LinkCreateInput) int
 		CreateOrganization    func(childComplexity int, input model.OrganizationCreateInput) int
 		CreatePlatform        func(childComplexity int, input graph_inputs.PlatformCreateInput) int
-		CreateUser            func(childComplexity int, input model.UserCreateInput) int
 		InviteUser            func(childComplexity int, input graph_inputs.UserInviteInput) int
-		LoginUser             func(childComplexity int, input model.LoginInput) int
 		NewDomainVerification func(childComplexity int, domainID uuid.UUID, forced *bool) int
 		RemoveFromPinnedLinks func(childComplexity int, input model.PinnedLinkInput) int
 		RequestCrawl          func(childComplexity int, input model.CrawlRequestInput) int
+		UpdateLink            func(childComplexity int, input graph_inputs.LinkUpdateInput) int
 		UpdateOrganization    func(childComplexity int, input model.OrganizationUpdateInput) int
+		UpdatePlatform        func(childComplexity int, input graph_inputs.PlatformUpdateInput) int
 		UpdateUserInvitation  func(childComplexity int, input model.UpdateUserInviteInput) int
+	}
+
+	NavbarButton struct {
+		ColorClass func(childComplexity int) int
+		Icon       func(childComplexity int) int
+		Target     func(childComplexity int) int
+		Text       func(childComplexity int) int
+		URL        func(childComplexity int) int
+	}
+
+	NavbarDescription struct {
+		BrandImg   func(childComplexity int) int
+		BrandName  func(childComplexity int) int
+		BrandURL   func(childComplexity int) int
+		EndButtons func(childComplexity int) int
+		StartItems func(childComplexity int) int
+		Target     func(childComplexity int) int
+	}
+
+	NavbarItem struct {
+		Dropdown func(childComplexity int) int
+		Icon     func(childComplexity int) int
+		Target   func(childComplexity int) int
+		Text     func(childComplexity int) int
+		URL      func(childComplexity int) int
 	}
 
 	ObservationAnalytic struct {
@@ -236,30 +306,6 @@ type ComplexityRoot struct {
 		Success           func(childComplexity int) int
 		UpdatedAt         func(childComplexity int) int
 		Useragent         func(childComplexity int) int
-	}
-
-	OpenGraph struct {
-		AlternateImage func(childComplexity int) int
-		Description    func(childComplexity int) int
-		FavIcon        func(childComplexity int) int
-		Image          func(childComplexity int) int
-		Locale         func(childComplexity int) int
-		SiteName       func(childComplexity int) int
-		Title          func(childComplexity int) int
-		Type           func(childComplexity int) int
-		URL            func(childComplexity int) int
-		X              func(childComplexity int) int
-	}
-
-	OpenGraphX struct {
-		Card        func(childComplexity int) int
-		Creator     func(childComplexity int) int
-		Description func(childComplexity int) int
-		Image       func(childComplexity int) int
-		Site        func(childComplexity int) int
-		Title       func(childComplexity int) int
-		Type        func(childComplexity int) int
-		URL         func(childComplexity int) int
 	}
 
 	Organization struct {
@@ -293,20 +339,20 @@ type ComplexityRoot struct {
 	}
 
 	Platform struct {
-		AnalyticReports   func(childComplexity int) int
-		Analytics         func(childComplexity int) int
-		Deployments       func(childComplexity int) int
-		Domain            func(childComplexity int) int
-		ID                func(childComplexity int) int
-		Links             func(childComplexity int) int
-		Name              func(childComplexity int) int
-		OpenGraph         func(childComplexity int) int
-		Organization      func(childComplexity int) int
-		Permissions       func(childComplexity int) int
-		PinnedLinks       func(childComplexity int) int
-		RedirectionChoice func(childComplexity int) int
-		Status            func(childComplexity int) int
-		Templates         func(childComplexity int) int
+		AnalyticReports     func(childComplexity int) int
+		Analytics           func(childComplexity int) int
+		Deployments         func(childComplexity int) int
+		Domain              func(childComplexity int) int
+		ID                  func(childComplexity int) int
+		Links               func(childComplexity int) int
+		Name                func(childComplexity int) int
+		Organization        func(childComplexity int) int
+		Permissions         func(childComplexity int) int
+		PinnedLinks         func(childComplexity int) int
+		PlatformDescription func(childComplexity int) int
+		RedirectionChoice   func(childComplexity int) int
+		Status              func(childComplexity int) int
+		Templates           func(childComplexity int) int
 	}
 
 	PlatformDeployment struct {
@@ -318,6 +364,12 @@ type ComplexityRoot struct {
 		Platform  func(childComplexity int) int
 		Status    func(childComplexity int) int
 		UpdatedAt func(childComplexity int) int
+	}
+
+	PlatformDescription struct {
+		FooterDescription func(childComplexity int) int
+		MetaDescription   func(childComplexity int) int
+		NavbarDescription func(childComplexity int) int
 	}
 
 	Query struct {
@@ -335,18 +387,25 @@ type ComplexityRoot struct {
 		URL  func(childComplexity int) int
 	}
 
+	SocialMediaContainer struct {
+		SocialMediaColorClass   func(childComplexity int) int
+		SocialMediaLinks        func(childComplexity int) int
+		SocialMediaPeddingClass func(childComplexity int) int
+		SocialMediaSizeClass    func(childComplexity int) int
+	}
+
 	Template struct {
-		CreatedAt         func(childComplexity int) int
-		CreatedBy         func(childComplexity int) int
-		DeletedAt         func(childComplexity int) int
-		EditedBy          func(childComplexity int) int
-		ID                func(childComplexity int) int
-		Name              func(childComplexity int) int
-		OpenGraph         func(childComplexity int) int
-		Platform          func(childComplexity int) int
-		RedirectionChoice func(childComplexity int) int
-		State             func(childComplexity int) int
-		UpdatedAt         func(childComplexity int) int
+		CreatedAt           func(childComplexity int) int
+		CreatedBy           func(childComplexity int) int
+		DeletedAt           func(childComplexity int) int
+		EditedBy            func(childComplexity int) int
+		ID                  func(childComplexity int) int
+		Name                func(childComplexity int) int
+		Platform            func(childComplexity int) int
+		PlatformDescription func(childComplexity int) int
+		RedirectionChoice   func(childComplexity int) int
+		State               func(childComplexity int) int
+		UpdatedAt           func(childComplexity int) int
 	}
 
 	User struct {
@@ -396,7 +455,7 @@ type LinkResolver interface {
 
 	Domain(ctx context.Context, obj *database_models.Link) (*database_models.Domain, error)
 	Analytics(ctx context.Context, obj *database_models.Link) ([]*model.MetricAnalytics, error)
-	OpenGraph(ctx context.Context, obj *database_models.Link) ([]*database_types.OpenGraph, error)
+
 	RedirectionOptions(ctx context.Context, obj *database_models.Link) (database_enums.RedirectionOptions, error)
 
 	Validations(ctx context.Context, obj *database_models.Link) ([]*database_models.LinkValidation, error)
@@ -406,23 +465,24 @@ type LinkResolver interface {
 type LinkCrawlResolver interface {
 	Link(ctx context.Context, obj *database_models.LinkCrawl) (*database_models.Link, error)
 
+	Result(ctx context.Context, obj *database_models.LinkCrawl) (*database_types.LinkContent, error)
 	CrawledBy(ctx context.Context, obj *database_models.LinkCrawl) (*database_models.User, error)
 }
 type LinkValidationResolver interface {
 	CreatedBy(ctx context.Context, obj *database_models.LinkValidation) (*database_models.User, error)
 }
 type MutationResolver interface {
-	LoginUser(ctx context.Context, input model.LoginInput) (*model.LoginPayload, error)
 	CreateDomain(ctx context.Context, input model.DomainCreateInput) (*database_models.Domain, error)
 	NewDomainVerification(ctx context.Context, domainID uuid.UUID, forced *bool) (*database_models.DNSVerification, error)
 	CreateLink(ctx context.Context, input model.LinkCreateInput) (*database_models.Link, error)
 	RequestCrawl(ctx context.Context, input model.CrawlRequestInput) (*database_models.LinkCrawl, error)
+	UpdateLink(ctx context.Context, input graph_inputs.LinkUpdateInput) (*database_models.Link, error)
 	AddToPinnedLinks(ctx context.Context, input model.PinnedLinkInput) (*database_models.Link, error)
 	RemoveFromPinnedLinks(ctx context.Context, input model.PinnedLinkInput) (*database_models.Link, error)
 	CreateOrganization(ctx context.Context, input model.OrganizationCreateInput) (*database_models.Organization, error)
 	UpdateOrganization(ctx context.Context, input model.OrganizationUpdateInput) (*database_models.Organization, error)
 	CreatePlatform(ctx context.Context, input graph_inputs.PlatformCreateInput) (*database_models.Platform, error)
-	CreateUser(ctx context.Context, input model.UserCreateInput) (*database_models.User, error)
+	UpdatePlatform(ctx context.Context, input graph_inputs.PlatformUpdateInput) (*database_models.Platform, error)
 	InviteUser(ctx context.Context, input graph_inputs.UserInviteInput) (*database_relations.UserInvite, error)
 	UpdateUserInvitation(ctx context.Context, input model.UpdateUserInviteInput) (database_enums.InvitationStatus, error)
 }
@@ -454,6 +514,11 @@ type QueryResolver interface {
 	Invites(ctx context.Context) ([]*database_relations.UserInvite, error)
 }
 type UserResolver interface {
+	Avatar(ctx context.Context, obj *database_models.User) (string, error)
+	Email(ctx context.Context, obj *database_models.User) (string, error)
+	Fullname(ctx context.Context, obj *database_models.User) (string, error)
+	Verified(ctx context.Context, obj *database_models.User) (bool, error)
+	Phone(ctx context.Context, obj *database_models.User) (*database_types.AccountPhone, error)
 	Organizations(ctx context.Context, obj *database_models.User) ([]*database_models.Organization, error)
 	Platforms(ctx context.Context, obj *database_models.User) ([]*database_models.Platform, error)
 	Invites(ctx context.Context, obj *database_models.User) ([]*database_relations.UserInvite, error)
@@ -490,19 +555,26 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 	_ = ec
 	switch typeName + "." + field {
 
-	case "AccountPhone.countryCode":
-		if e.complexity.AccountPhone.CountryCode == nil {
+	case "ASocialMedia.icon":
+		if e.complexity.ASocialMedia.Icon == nil {
 			break
 		}
 
-		return e.complexity.AccountPhone.CountryCode(childComplexity), true
+		return e.complexity.ASocialMedia.Icon(childComplexity), true
 
-	case "AccountPhone.createdAt":
-		if e.complexity.AccountPhone.CreatedAt == nil {
+	case "ASocialMedia.link":
+		if e.complexity.ASocialMedia.Link == nil {
 			break
 		}
 
-		return e.complexity.AccountPhone.CreatedAt(childComplexity), true
+		return e.complexity.ASocialMedia.Link(childComplexity), true
+
+	case "ASocialMedia.target":
+		if e.complexity.ASocialMedia.Target == nil {
+			break
+		}
+
+		return e.complexity.ASocialMedia.Target(childComplexity), true
 
 	case "AccountPhone.number":
 		if e.complexity.AccountPhone.Number == nil {
@@ -510,13 +582,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.AccountPhone.Number(childComplexity), true
-
-	case "AccountPhone.updatedAt":
-		if e.complexity.AccountPhone.UpdatedAt == nil {
-			break
-		}
-
-		return e.complexity.AccountPhone.UpdatedAt(childComplexity), true
 
 	case "AccountPhone.verified":
 		if e.complexity.AccountPhone.Verified == nil {
@@ -791,6 +856,55 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Domain.Verifications(childComplexity), true
 
+	case "FooterDescription.companyBrandingHtml":
+		if e.complexity.FooterDescription.CompanyBrandingHtml == nil {
+			break
+		}
+
+		return e.complexity.FooterDescription.CompanyBrandingHtml(childComplexity), true
+
+	case "FooterDescription.showRouteHubBranding":
+		if e.complexity.FooterDescription.ShowRouteHubBranding == nil {
+			break
+		}
+
+		return e.complexity.FooterDescription.ShowRouteHubBranding(childComplexity), true
+
+	case "FooterDescription.socialMediaContainer":
+		if e.complexity.FooterDescription.SocialMediaContainer == nil {
+			break
+		}
+
+		return e.complexity.FooterDescription.SocialMediaContainer(childComplexity), true
+
+	case "ImageDescription.alt":
+		if e.complexity.ImageDescription.Alt == nil {
+			break
+		}
+
+		return e.complexity.ImageDescription.Alt(childComplexity), true
+
+	case "ImageDescription.height":
+		if e.complexity.ImageDescription.Height == nil {
+			break
+		}
+
+		return e.complexity.ImageDescription.Height(childComplexity), true
+
+	case "ImageDescription.src":
+		if e.complexity.ImageDescription.SRC == nil {
+			break
+		}
+
+		return e.complexity.ImageDescription.SRC(childComplexity), true
+
+	case "ImageDescription.width":
+		if e.complexity.ImageDescription.Width == nil {
+			break
+		}
+
+		return e.complexity.ImageDescription.Width(childComplexity), true
+
 	case "Industry.name":
 		if e.complexity.Industry.Name == nil {
 			break
@@ -854,12 +968,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Link.LastValidation(childComplexity), true
 
-	case "Link.openGraph":
-		if e.complexity.Link.OpenGraph == nil {
+	case "Link.LinkContent":
+		if e.complexity.Link.LinkContent == nil {
 			break
 		}
 
-		return e.complexity.Link.OpenGraph(childComplexity), true
+		return e.complexity.Link.LinkContent(childComplexity), true
 
 	case "Link.path":
 		if e.complexity.Link.Path == nil {
@@ -930,6 +1044,55 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.LinkConnection.TotalCount(childComplexity), true
+
+	case "LinkContent.additionalFooter":
+		if e.complexity.LinkContent.AdditionalFooter == nil {
+			break
+		}
+
+		return e.complexity.LinkContent.AdditionalFooter(childComplexity), true
+
+	case "LinkContent.additionalHead":
+		if e.complexity.LinkContent.AdditionalHead == nil {
+			break
+		}
+
+		return e.complexity.LinkContent.AdditionalHead(childComplexity), true
+
+	case "LinkContent.metaDescription":
+		if e.complexity.LinkContent.MetaDescription == nil {
+			break
+		}
+
+		return e.complexity.LinkContent.MetaDescription(childComplexity), true
+
+	case "LinkContent.redirectionDelay":
+		if e.complexity.LinkContent.RedirectionDelay == nil {
+			break
+		}
+
+		return e.complexity.LinkContent.RedirectionDelay(childComplexity), true
+
+	case "LinkContent.redirectionURLText":
+		if e.complexity.LinkContent.RedirectionURLText == nil {
+			break
+		}
+
+		return e.complexity.LinkContent.RedirectionURLText(childComplexity), true
+
+	case "LinkContent.subtitle":
+		if e.complexity.LinkContent.Subtitle == nil {
+			break
+		}
+
+		return e.complexity.LinkContent.Subtitle(childComplexity), true
+
+	case "LinkContent.title":
+		if e.complexity.LinkContent.Title == nil {
+			break
+		}
+
+		return e.complexity.LinkContent.Title(childComplexity), true
 
 	case "LinkCrawl.crawlStatus":
 		if e.complexity.LinkCrawl.CrawlStatus == nil {
@@ -1106,12 +1269,145 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Log.Message(childComplexity), true
 
-	case "LoginPayload.token":
-		if e.complexity.LoginPayload.Token == nil {
+	case "MetaDescription.description":
+		if e.complexity.MetaDescription.Description == nil {
 			break
 		}
 
-		return e.complexity.LoginPayload.Token(childComplexity), true
+		return e.complexity.MetaDescription.Description(childComplexity), true
+
+	case "MetaDescription.favIcon":
+		if e.complexity.MetaDescription.FavIcon == nil {
+			break
+		}
+
+		return e.complexity.MetaDescription.FavIcon(childComplexity), true
+
+	case "MetaDescription.locale":
+		if e.complexity.MetaDescription.Locale == nil {
+			break
+		}
+
+		return e.complexity.MetaDescription.Locale(childComplexity), true
+
+	case "MetaDescription.ogBigHeight":
+		if e.complexity.MetaDescription.OGBigHeight == nil {
+			break
+		}
+
+		return e.complexity.MetaDescription.OGBigHeight(childComplexity), true
+
+	case "MetaDescription.ogBigImage":
+		if e.complexity.MetaDescription.OGBigImage == nil {
+			break
+		}
+
+		return e.complexity.MetaDescription.OGBigImage(childComplexity), true
+
+	case "MetaDescription.ogBigWidth":
+		if e.complexity.MetaDescription.OGBigWidth == nil {
+			break
+		}
+
+		return e.complexity.MetaDescription.OGBigWidth(childComplexity), true
+
+	case "MetaDescription.ogCard":
+		if e.complexity.MetaDescription.OGCard == nil {
+			break
+		}
+
+		return e.complexity.MetaDescription.OGCard(childComplexity), true
+
+	case "MetaDescription.ogCreator":
+		if e.complexity.MetaDescription.OGCreator == nil {
+			break
+		}
+
+		return e.complexity.MetaDescription.OGCreator(childComplexity), true
+
+	case "MetaDescription.ogDescription":
+		if e.complexity.MetaDescription.OGDescription == nil {
+			break
+		}
+
+		return e.complexity.MetaDescription.OGDescription(childComplexity), true
+
+	case "MetaDescription.ogLocale":
+		if e.complexity.MetaDescription.OGLocale == nil {
+			break
+		}
+
+		return e.complexity.MetaDescription.OGLocale(childComplexity), true
+
+	case "MetaDescription.ogMetaType":
+		if e.complexity.MetaDescription.OGMetaType == nil {
+			break
+		}
+
+		return e.complexity.MetaDescription.OGMetaType(childComplexity), true
+
+	case "MetaDescription.ogSite":
+		if e.complexity.MetaDescription.OGSite == nil {
+			break
+		}
+
+		return e.complexity.MetaDescription.OGSite(childComplexity), true
+
+	case "MetaDescription.ogSiteName":
+		if e.complexity.MetaDescription.OGSiteName == nil {
+			break
+		}
+
+		return e.complexity.MetaDescription.OGSiteName(childComplexity), true
+
+	case "MetaDescription.ogSmallHeight":
+		if e.complexity.MetaDescription.OGSmallHeight == nil {
+			break
+		}
+
+		return e.complexity.MetaDescription.OGSmallHeight(childComplexity), true
+
+	case "MetaDescription.ogSmallImage":
+		if e.complexity.MetaDescription.OGSmallImage == nil {
+			break
+		}
+
+		return e.complexity.MetaDescription.OGSmallImage(childComplexity), true
+
+	case "MetaDescription.ogSmallWidth":
+		if e.complexity.MetaDescription.OGSmallWidth == nil {
+			break
+		}
+
+		return e.complexity.MetaDescription.OGSmallWidth(childComplexity), true
+
+	case "MetaDescription.ogTitle":
+		if e.complexity.MetaDescription.OGTitle == nil {
+			break
+		}
+
+		return e.complexity.MetaDescription.OGTitle(childComplexity), true
+
+	case "MetaDescription.ogType":
+		if e.complexity.MetaDescription.OGType == nil {
+			break
+		}
+
+		return e.complexity.MetaDescription.OGType(childComplexity), true
+
+	case "MetaDescription.ogURL":
+		if e.complexity.MetaDescription.OGURL == nil {
+			break
+		}
+
+		return e.complexity.MetaDescription.OGURL(childComplexity), true
+
+	case "MetaDescription.title":
+		if e.complexity.MetaDescription.Title == nil {
+			break
+		}
+
+		return e.complexity.MetaDescription.Title(childComplexity), true
 
 	case "MetricAnalytics.endAt":
 		if e.complexity.MetricAnalytics.EndAt == nil {
@@ -1215,18 +1511,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.CreatePlatform(childComplexity, args["input"].(graph_inputs.PlatformCreateInput)), true
 
-	case "Mutation.createUser":
-		if e.complexity.Mutation.CreateUser == nil {
-			break
-		}
-
-		args, err := ec.field_Mutation_createUser_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Mutation.CreateUser(childComplexity, args["input"].(model.UserCreateInput)), true
-
 	case "Mutation.inviteUser":
 		if e.complexity.Mutation.InviteUser == nil {
 			break
@@ -1238,18 +1522,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.InviteUser(childComplexity, args["input"].(graph_inputs.UserInviteInput)), true
-
-	case "Mutation.loginUser":
-		if e.complexity.Mutation.LoginUser == nil {
-			break
-		}
-
-		args, err := ec.field_Mutation_loginUser_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Mutation.LoginUser(childComplexity, args["input"].(model.LoginInput)), true
 
 	case "Mutation.newDomainVerification":
 		if e.complexity.Mutation.NewDomainVerification == nil {
@@ -1287,6 +1559,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.RequestCrawl(childComplexity, args["input"].(model.CrawlRequestInput)), true
 
+	case "Mutation.updateLink":
+		if e.complexity.Mutation.UpdateLink == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateLink_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateLink(childComplexity, args["input"].(graph_inputs.LinkUpdateInput)), true
+
 	case "Mutation.updateOrganization":
 		if e.complexity.Mutation.UpdateOrganization == nil {
 			break
@@ -1299,6 +1583,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.UpdateOrganization(childComplexity, args["input"].(model.OrganizationUpdateInput)), true
 
+	case "Mutation.updatePlatform":
+		if e.complexity.Mutation.UpdatePlatform == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updatePlatform_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdatePlatform(childComplexity, args["input"].(graph_inputs.PlatformUpdateInput)), true
+
 	case "Mutation.updateUserInvitation":
 		if e.complexity.Mutation.UpdateUserInvitation == nil {
 			break
@@ -1310,6 +1606,118 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.UpdateUserInvitation(childComplexity, args["input"].(model.UpdateUserInviteInput)), true
+
+	case "NavbarButton.colorClass":
+		if e.complexity.NavbarButton.ColorClass == nil {
+			break
+		}
+
+		return e.complexity.NavbarButton.ColorClass(childComplexity), true
+
+	case "NavbarButton.icon":
+		if e.complexity.NavbarButton.Icon == nil {
+			break
+		}
+
+		return e.complexity.NavbarButton.Icon(childComplexity), true
+
+	case "NavbarButton.target":
+		if e.complexity.NavbarButton.Target == nil {
+			break
+		}
+
+		return e.complexity.NavbarButton.Target(childComplexity), true
+
+	case "NavbarButton.text":
+		if e.complexity.NavbarButton.Text == nil {
+			break
+		}
+
+		return e.complexity.NavbarButton.Text(childComplexity), true
+
+	case "NavbarButton.url":
+		if e.complexity.NavbarButton.URL == nil {
+			break
+		}
+
+		return e.complexity.NavbarButton.URL(childComplexity), true
+
+	case "NavbarDescription.brandImg":
+		if e.complexity.NavbarDescription.BrandImg == nil {
+			break
+		}
+
+		return e.complexity.NavbarDescription.BrandImg(childComplexity), true
+
+	case "NavbarDescription.brandName":
+		if e.complexity.NavbarDescription.BrandName == nil {
+			break
+		}
+
+		return e.complexity.NavbarDescription.BrandName(childComplexity), true
+
+	case "NavbarDescription.brandURL":
+		if e.complexity.NavbarDescription.BrandURL == nil {
+			break
+		}
+
+		return e.complexity.NavbarDescription.BrandURL(childComplexity), true
+
+	case "NavbarDescription.endButtons":
+		if e.complexity.NavbarDescription.EndButtons == nil {
+			break
+		}
+
+		return e.complexity.NavbarDescription.EndButtons(childComplexity), true
+
+	case "NavbarDescription.startItems":
+		if e.complexity.NavbarDescription.StartItems == nil {
+			break
+		}
+
+		return e.complexity.NavbarDescription.StartItems(childComplexity), true
+
+	case "NavbarDescription.target":
+		if e.complexity.NavbarDescription.Target == nil {
+			break
+		}
+
+		return e.complexity.NavbarDescription.Target(childComplexity), true
+
+	case "NavbarItem.dropdown":
+		if e.complexity.NavbarItem.Dropdown == nil {
+			break
+		}
+
+		return e.complexity.NavbarItem.Dropdown(childComplexity), true
+
+	case "NavbarItem.icon":
+		if e.complexity.NavbarItem.Icon == nil {
+			break
+		}
+
+		return e.complexity.NavbarItem.Icon(childComplexity), true
+
+	case "NavbarItem.target":
+		if e.complexity.NavbarItem.Target == nil {
+			break
+		}
+
+		return e.complexity.NavbarItem.Target(childComplexity), true
+
+	case "NavbarItem.text":
+		if e.complexity.NavbarItem.Text == nil {
+			break
+		}
+
+		return e.complexity.NavbarItem.Text(childComplexity), true
+
+	case "NavbarItem.url":
+		if e.complexity.NavbarItem.URL == nil {
+			break
+		}
+
+		return e.complexity.NavbarItem.URL(childComplexity), true
 
 	case "ObservationAnalytic.createdAt":
 		if e.complexity.ObservationAnalytic.CreatedAt == nil {
@@ -1394,132 +1802,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.ObservationAnalytic.Useragent(childComplexity), true
-
-	case "OpenGraph.alternateImage":
-		if e.complexity.OpenGraph.AlternateImage == nil {
-			break
-		}
-
-		return e.complexity.OpenGraph.AlternateImage(childComplexity), true
-
-	case "OpenGraph.description":
-		if e.complexity.OpenGraph.Description == nil {
-			break
-		}
-
-		return e.complexity.OpenGraph.Description(childComplexity), true
-
-	case "OpenGraph.favIcon":
-		if e.complexity.OpenGraph.FavIcon == nil {
-			break
-		}
-
-		return e.complexity.OpenGraph.FavIcon(childComplexity), true
-
-	case "OpenGraph.image":
-		if e.complexity.OpenGraph.Image == nil {
-			break
-		}
-
-		return e.complexity.OpenGraph.Image(childComplexity), true
-
-	case "OpenGraph.locale":
-		if e.complexity.OpenGraph.Locale == nil {
-			break
-		}
-
-		return e.complexity.OpenGraph.Locale(childComplexity), true
-
-	case "OpenGraph.siteName":
-		if e.complexity.OpenGraph.SiteName == nil {
-			break
-		}
-
-		return e.complexity.OpenGraph.SiteName(childComplexity), true
-
-	case "OpenGraph.title":
-		if e.complexity.OpenGraph.Title == nil {
-			break
-		}
-
-		return e.complexity.OpenGraph.Title(childComplexity), true
-
-	case "OpenGraph.type":
-		if e.complexity.OpenGraph.Type == nil {
-			break
-		}
-
-		return e.complexity.OpenGraph.Type(childComplexity), true
-
-	case "OpenGraph.url":
-		if e.complexity.OpenGraph.URL == nil {
-			break
-		}
-
-		return e.complexity.OpenGraph.URL(childComplexity), true
-
-	case "OpenGraph.x":
-		if e.complexity.OpenGraph.X == nil {
-			break
-		}
-
-		return e.complexity.OpenGraph.X(childComplexity), true
-
-	case "OpenGraphX.card":
-		if e.complexity.OpenGraphX.Card == nil {
-			break
-		}
-
-		return e.complexity.OpenGraphX.Card(childComplexity), true
-
-	case "OpenGraphX.creator":
-		if e.complexity.OpenGraphX.Creator == nil {
-			break
-		}
-
-		return e.complexity.OpenGraphX.Creator(childComplexity), true
-
-	case "OpenGraphX.description":
-		if e.complexity.OpenGraphX.Description == nil {
-			break
-		}
-
-		return e.complexity.OpenGraphX.Description(childComplexity), true
-
-	case "OpenGraphX.image":
-		if e.complexity.OpenGraphX.Image == nil {
-			break
-		}
-
-		return e.complexity.OpenGraphX.Image(childComplexity), true
-
-	case "OpenGraphX.site":
-		if e.complexity.OpenGraphX.Site == nil {
-			break
-		}
-
-		return e.complexity.OpenGraphX.Site(childComplexity), true
-
-	case "OpenGraphX.title":
-		if e.complexity.OpenGraphX.Title == nil {
-			break
-		}
-
-		return e.complexity.OpenGraphX.Title(childComplexity), true
-
-	case "OpenGraphX.type":
-		if e.complexity.OpenGraphX.Type == nil {
-			break
-		}
-
-		return e.complexity.OpenGraphX.Type(childComplexity), true
-
-	case "OpenGraphX.url":
-		if e.complexity.OpenGraphX.URL == nil {
-			break
-		}
-
-		return e.complexity.OpenGraphX.URL(childComplexity), true
 
 	case "Organization.description":
 		if e.complexity.Organization.Description == nil {
@@ -1717,13 +1999,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Platform.Name(childComplexity), true
 
-	case "Platform.openGraph":
-		if e.complexity.Platform.OpenGraph == nil {
-			break
-		}
-
-		return e.complexity.Platform.OpenGraph(childComplexity), true
-
 	case "Platform.organization":
 		if e.complexity.Platform.Organization == nil {
 			break
@@ -1744,6 +2019,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Platform.PinnedLinks(childComplexity), true
+
+	case "Platform.platformDescription":
+		if e.complexity.Platform.PlatformDescription == nil {
+			break
+		}
+
+		return e.complexity.Platform.PlatformDescription(childComplexity), true
 
 	case "Platform.redirectionChoice":
 		if e.complexity.Platform.RedirectionChoice == nil {
@@ -1822,6 +2104,27 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.PlatformDeployment.UpdatedAt(childComplexity), true
 
+	case "PlatformDescription.footerDescription":
+		if e.complexity.PlatformDescription.FooterDescription == nil {
+			break
+		}
+
+		return e.complexity.PlatformDescription.FooterDescription(childComplexity), true
+
+	case "PlatformDescription.metaDescription":
+		if e.complexity.PlatformDescription.MetaDescription == nil {
+			break
+		}
+
+		return e.complexity.PlatformDescription.MetaDescription(childComplexity), true
+
+	case "PlatformDescription.navbarDescription":
+		if e.complexity.PlatformDescription.NavbarDescription == nil {
+			break
+		}
+
+		return e.complexity.PlatformDescription.NavbarDescription(childComplexity), true
+
 	case "Query.invites":
 		if e.complexity.Query.Invites == nil {
 			break
@@ -1890,6 +2193,34 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.SocialMedia.URL(childComplexity), true
 
+	case "SocialMediaContainer.socialMediaColorClass":
+		if e.complexity.SocialMediaContainer.SocialMediaColorClass == nil {
+			break
+		}
+
+		return e.complexity.SocialMediaContainer.SocialMediaColorClass(childComplexity), true
+
+	case "SocialMediaContainer.socialMediaLinks":
+		if e.complexity.SocialMediaContainer.SocialMediaLinks == nil {
+			break
+		}
+
+		return e.complexity.SocialMediaContainer.SocialMediaLinks(childComplexity), true
+
+	case "SocialMediaContainer.socialMediaPeddingClass":
+		if e.complexity.SocialMediaContainer.SocialMediaPeddingClass == nil {
+			break
+		}
+
+		return e.complexity.SocialMediaContainer.SocialMediaPeddingClass(childComplexity), true
+
+	case "SocialMediaContainer.socialMediaSizeClass":
+		if e.complexity.SocialMediaContainer.SocialMediaSizeClass == nil {
+			break
+		}
+
+		return e.complexity.SocialMediaContainer.SocialMediaSizeClass(childComplexity), true
+
 	case "Template.createdAt":
 		if e.complexity.Template.CreatedAt == nil {
 			break
@@ -1932,19 +2263,19 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Template.Name(childComplexity), true
 
-	case "Template.openGraph":
-		if e.complexity.Template.OpenGraph == nil {
-			break
-		}
-
-		return e.complexity.Template.OpenGraph(childComplexity), true
-
 	case "Template.platform":
 		if e.complexity.Template.Platform == nil {
 			break
 		}
 
 		return e.complexity.Template.Platform(childComplexity), true
+
+	case "Template.platformDescription":
+		if e.complexity.Template.PlatformDescription == nil {
+			break
+		}
+
+		return e.complexity.Template.PlatformDescription(childComplexity), true
 
 	case "Template.redirectionChoice":
 		if e.complexity.Template.RedirectionChoice == nil {
@@ -2129,35 +2460,42 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	rc := graphql.GetOperationContext(ctx)
 	ec := executionContext{rc, e, 0, 0, make(chan graphql.DeferredResult)}
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
-		ec.unmarshalInputAccountPhoneInput,
+		ec.unmarshalInputASocialMediaInput,
 		ec.unmarshalInputBooleanFilter,
 		ec.unmarshalInputClientInformationInput,
 		ec.unmarshalInputCrawlRequestInput,
 		ec.unmarshalInputDomainCreateInput,
 		ec.unmarshalInputFloatFilter,
+		ec.unmarshalInputFooterDescriptionInput,
 		ec.unmarshalInputIDFilter,
+		ec.unmarshalInputImageDescriptionInput,
 		ec.unmarshalInputIntFilter,
+		ec.unmarshalInputLinkContentInput,
 		ec.unmarshalInputLinkCreateInput,
 		ec.unmarshalInputLinkFilter,
-		ec.unmarshalInputLoginInput,
+		ec.unmarshalInputLinkUpdateInput,
 		ec.unmarshalInputMapEntry,
 		ec.unmarshalInputMapFilter,
 		ec.unmarshalInputMapInEntry,
+		ec.unmarshalInputMetaDescriptionInput,
+		ec.unmarshalInputNavbarButtonInput,
+		ec.unmarshalInputNavbarDescriptionInput,
+		ec.unmarshalInputNavbarItemInput,
 		ec.unmarshalInputObservationInput,
-		ec.unmarshalInputOpenGraphInput,
-		ec.unmarshalInputOpenGraphXInput,
 		ec.unmarshalInputOrganizationCreateInput,
 		ec.unmarshalInputOrganizationUpdateInput,
 		ec.unmarshalInputOrganizationsWithPermissionsInput,
 		ec.unmarshalInputPlatformCreateInput,
+		ec.unmarshalInputPlatformDescriptionInput,
+		ec.unmarshalInputPlatformUpdateInput,
 		ec.unmarshalInputPlatformsWithPermissionsInput,
+		ec.unmarshalInputSocialMediaContainerInput,
 		ec.unmarshalInputSocialMediaInput,
 		ec.unmarshalInputStringFilter,
 		ec.unmarshalInputTemplateInput,
 		ec.unmarshalInputTimeFilter,
 		ec.unmarshalInputUUIDFilter,
 		ec.unmarshalInputUpdateUserInviteInput,
-		ec.unmarshalInputUserCreateInput,
 		ec.unmarshalInputUserInviteInput,
 		ec.unmarshalInputpinnedLinkInput,
 	)
@@ -2256,7 +2594,7 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 	return introspection.WrapTypeFromDef(ec.Schema(), ec.Schema().Types[name]), nil
 }
 
-//go:embed "schemas/auth.gql" "schemas/domain.gql" "schemas/link.gql" "schemas/metrics.gql" "schemas/organization.gql" "schemas/platform.gql" "schemas/schema.gql" "schemas/sgorm-gqlgen-relay-generated.gql" "schemas/user.gql"
+//go:embed "schemas/domain.gql" "schemas/image.gql" "schemas/link.gql" "schemas/meta.gql" "schemas/metrics.gql" "schemas/organization.gql" "schemas/platform.gql" "schemas/platform_description.gql" "schemas/schema.gql" "schemas/sgorm-gqlgen-relay-generated.gql" "schemas/user.gql"
 var sourcesFS embed.FS
 
 func sourceData(filename string) string {
@@ -2268,12 +2606,14 @@ func sourceData(filename string) string {
 }
 
 var sources = []*ast.Source{
-	{Name: "schemas/auth.gql", Input: sourceData("schemas/auth.gql"), BuiltIn: false},
 	{Name: "schemas/domain.gql", Input: sourceData("schemas/domain.gql"), BuiltIn: false},
+	{Name: "schemas/image.gql", Input: sourceData("schemas/image.gql"), BuiltIn: false},
 	{Name: "schemas/link.gql", Input: sourceData("schemas/link.gql"), BuiltIn: false},
+	{Name: "schemas/meta.gql", Input: sourceData("schemas/meta.gql"), BuiltIn: false},
 	{Name: "schemas/metrics.gql", Input: sourceData("schemas/metrics.gql"), BuiltIn: false},
 	{Name: "schemas/organization.gql", Input: sourceData("schemas/organization.gql"), BuiltIn: false},
 	{Name: "schemas/platform.gql", Input: sourceData("schemas/platform.gql"), BuiltIn: false},
+	{Name: "schemas/platform_description.gql", Input: sourceData("schemas/platform_description.gql"), BuiltIn: false},
 	{Name: "schemas/schema.gql", Input: sourceData("schemas/schema.gql"), BuiltIn: false},
 	{Name: "schemas/sgorm-gqlgen-relay-generated.gql", Input: sourceData("schemas/sgorm-gqlgen-relay-generated.gql"), BuiltIn: false},
 	{Name: "schemas/user.gql", Input: sourceData("schemas/user.gql"), BuiltIn: false},
@@ -2389,21 +2729,6 @@ func (ec *executionContext) field_Mutation_createPlatform_args(ctx context.Conte
 	return args, nil
 }
 
-func (ec *executionContext) field_Mutation_createUser_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 model.UserCreateInput
-	if tmp, ok := rawArgs["input"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNUserCreateInput2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐUserCreateInput(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["input"] = arg0
-	return args, nil
-}
-
 func (ec *executionContext) field_Mutation_inviteUser_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -2411,21 +2736,6 @@ func (ec *executionContext) field_Mutation_inviteUser_args(ctx context.Context, 
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
 		arg0, err = ec.unmarshalNUserInviteInput2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚋinputsᚐUserInviteInput(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["input"] = arg0
-	return args, nil
-}
-
-func (ec *executionContext) field_Mutation_loginUser_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 model.LoginInput
-	if tmp, ok := rawArgs["input"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNLoginInput2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐLoginInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -2488,6 +2798,21 @@ func (ec *executionContext) field_Mutation_requestCrawl_args(ctx context.Context
 	return args, nil
 }
 
+func (ec *executionContext) field_Mutation_updateLink_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 graph_inputs.LinkUpdateInput
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalNLinkUpdateInput2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚋinputsᚐLinkUpdateInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Mutation_updateOrganization_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -2495,6 +2820,21 @@ func (ec *executionContext) field_Mutation_updateOrganization_args(ctx context.C
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
 		arg0, err = ec.unmarshalNOrganizationUpdateInput2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐOrganizationUpdateInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_updatePlatform_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 graph_inputs.PlatformUpdateInput
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalNPlatformUpdateInput2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚋinputsᚐPlatformUpdateInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -2631,6 +2971,138 @@ func (ec *executionContext) field___Type_fields_args(ctx context.Context, rawArg
 
 // region    **************************** field.gotpl *****************************
 
+func (ec *executionContext) _ASocialMedia_icon(ctx context.Context, field graphql.CollectedField, obj *database_types.ASocialMedia) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ASocialMedia_icon(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Icon, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ASocialMedia_icon(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ASocialMedia",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ASocialMedia_link(ctx context.Context, field graphql.CollectedField, obj *database_types.ASocialMedia) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ASocialMedia_link(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Link, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ASocialMedia_link(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ASocialMedia",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ASocialMedia_target(ctx context.Context, field graphql.CollectedField, obj *database_types.ASocialMedia) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ASocialMedia_target(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Target, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ASocialMedia_target(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ASocialMedia",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _AccountPhone_number(ctx context.Context, field graphql.CollectedField, obj *database_types.AccountPhone) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_AccountPhone_number(ctx, field)
 	if err != nil {
@@ -2663,50 +3135,6 @@ func (ec *executionContext) _AccountPhone_number(ctx context.Context, field grap
 }
 
 func (ec *executionContext) fieldContext_AccountPhone_number(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "AccountPhone",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _AccountPhone_countryCode(ctx context.Context, field graphql.CollectedField, obj *database_types.AccountPhone) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_AccountPhone_countryCode(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.CountryCode, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_AccountPhone_countryCode(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "AccountPhone",
 		Field:      field,
@@ -2758,91 +3186,6 @@ func (ec *executionContext) fieldContext_AccountPhone_verified(_ context.Context
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type Boolean does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _AccountPhone_createdAt(ctx context.Context, field graphql.CollectedField, obj *database_types.AccountPhone) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_AccountPhone_createdAt(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.CreatedAt, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(time.Time)
-	fc.Result = res
-	return ec.marshalNDateTime2timeᚐTime(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_AccountPhone_createdAt(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "AccountPhone",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type DateTime does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _AccountPhone_updatedAt(ctx context.Context, field graphql.CollectedField, obj *database_types.AccountPhone) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_AccountPhone_updatedAt(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.UpdatedAt, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*time.Time)
-	fc.Result = res
-	return ec.marshalODateTime2ᚖtimeᚐTime(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_AccountPhone_updatedAt(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "AccountPhone",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type DateTime does not have child fields")
 		},
 	}
 	return fc, nil
@@ -2925,8 +3268,8 @@ func (ec *executionContext) fieldContext_AnalyticReport_link(_ context.Context, 
 				return ec.fieldContext_Link_domain(ctx, field)
 			case "analytics":
 				return ec.fieldContext_Link_analytics(ctx, field)
-			case "openGraph":
-				return ec.fieldContext_Link_openGraph(ctx, field)
+			case "LinkContent":
+				return ec.fieldContext_Link_LinkContent(ctx, field)
 			case "redirectionOptions":
 				return ec.fieldContext_Link_redirectionOptions(ctx, field)
 			case "state":
@@ -4379,8 +4722,8 @@ func (ec *executionContext) fieldContext_Domain_platform(_ context.Context, fiel
 				return ec.fieldContext_Platform_id(ctx, field)
 			case "name":
 				return ec.fieldContext_Platform_name(ctx, field)
-			case "openGraph":
-				return ec.fieldContext_Platform_openGraph(ctx, field)
+			case "platformDescription":
+				return ec.fieldContext_Platform_platformDescription(ctx, field)
 			case "redirectionChoice":
 				return ec.fieldContext_Platform_redirectionChoice(ctx, field)
 			case "organization":
@@ -4863,6 +5206,306 @@ func (ec *executionContext) fieldContext_Domain_deletedAt(_ context.Context, fie
 	return fc, nil
 }
 
+func (ec *executionContext) _FooterDescription_showRouteHubBranding(ctx context.Context, field graphql.CollectedField, obj *database_types.FooterDescription) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_FooterDescription_showRouteHubBranding(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ShowRouteHubBranding, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalOBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_FooterDescription_showRouteHubBranding(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "FooterDescription",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _FooterDescription_companyBrandingHtml(ctx context.Context, field graphql.CollectedField, obj *database_types.FooterDescription) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_FooterDescription_companyBrandingHtml(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CompanyBrandingHtml, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalOString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_FooterDescription_companyBrandingHtml(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "FooterDescription",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _FooterDescription_socialMediaContainer(ctx context.Context, field graphql.CollectedField, obj *database_types.FooterDescription) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_FooterDescription_socialMediaContainer(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.SocialMediaContainer, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*database_types.SocialMediaContainer)
+	fc.Result = res
+	return ec.marshalOSocialMediaContainer2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐSocialMediaContainer(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_FooterDescription_socialMediaContainer(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "FooterDescription",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "socialMediaPeddingClass":
+				return ec.fieldContext_SocialMediaContainer_socialMediaPeddingClass(ctx, field)
+			case "socialMediaColorClass":
+				return ec.fieldContext_SocialMediaContainer_socialMediaColorClass(ctx, field)
+			case "socialMediaSizeClass":
+				return ec.fieldContext_SocialMediaContainer_socialMediaSizeClass(ctx, field)
+			case "socialMediaLinks":
+				return ec.fieldContext_SocialMediaContainer_socialMediaLinks(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type SocialMediaContainer", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ImageDescription_src(ctx context.Context, field graphql.CollectedField, obj *database_types.ImageDescription) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ImageDescription_src(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.SRC, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ImageDescription_src(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ImageDescription",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ImageDescription_alt(ctx context.Context, field graphql.CollectedField, obj *database_types.ImageDescription) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ImageDescription_alt(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Alt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalOString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ImageDescription_alt(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ImageDescription",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ImageDescription_height(ctx context.Context, field graphql.CollectedField, obj *database_types.ImageDescription) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ImageDescription_height(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Height, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalOString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ImageDescription_height(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ImageDescription",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ImageDescription_width(ctx context.Context, field graphql.CollectedField, obj *database_types.ImageDescription) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ImageDescription_width(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Width, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalOString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ImageDescription_width(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ImageDescription",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Industry_name(ctx context.Context, field graphql.CollectedField, obj *database_types.Industry) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Industry_name(ctx, field)
 	if err != nil {
@@ -5282,8 +5925,8 @@ func (ec *executionContext) fieldContext_Link_platform(_ context.Context, field 
 				return ec.fieldContext_Platform_id(ctx, field)
 			case "name":
 				return ec.fieldContext_Platform_name(ctx, field)
-			case "openGraph":
-				return ec.fieldContext_Platform_openGraph(ctx, field)
+			case "platformDescription":
+				return ec.fieldContext_Platform_platformDescription(ctx, field)
 			case "redirectionChoice":
 				return ec.fieldContext_Platform_redirectionChoice(ctx, field)
 			case "organization":
@@ -5493,8 +6136,8 @@ func (ec *executionContext) fieldContext_Link_analytics(_ context.Context, field
 	return fc, nil
 }
 
-func (ec *executionContext) _Link_openGraph(ctx context.Context, field graphql.CollectedField, obj *database_models.Link) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Link_openGraph(ctx, field)
+func (ec *executionContext) _Link_LinkContent(ctx context.Context, field graphql.CollectedField, obj *database_models.Link) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Link_LinkContent(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -5508,7 +6151,7 @@ func (ec *executionContext) _Link_openGraph(ctx context.Context, field graphql.C
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		directive0 := func(rctx context.Context) (interface{}, error) {
 			ctx = rctx // use context from middleware stack in children
-			return ec.resolvers.Link().OpenGraph(rctx, obj)
+			return obj.LinkContent, nil
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
 			permission, err := ec.unmarshalNPlatformPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐPlatformPermission(ctx, "LINK_READ")
@@ -5528,53 +6171,50 @@ func (ec *executionContext) _Link_openGraph(ctx context.Context, field graphql.C
 		if tmp == nil {
 			return nil, nil
 		}
-		if data, ok := tmp.([]*database_types.OpenGraph); ok {
+		if data, ok := tmp.(*database_types.LinkContent); ok {
 			return data, nil
 		}
-		return nil, fmt.Errorf(`unexpected type %T from directive, should be []*github.com/RouteHub-Link/routehub-service-graphql/database/types.OpenGraph`, tmp)
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/RouteHub-Link/routehub-service-graphql/database/types.LinkContent`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
 		return graphql.Null
 	}
 	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
-	res := resTmp.([]*database_types.OpenGraph)
+	res := resTmp.(*database_types.LinkContent)
 	fc.Result = res
-	return ec.marshalOOpenGraph2ᚕᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐOpenGraphᚄ(ctx, field.Selections, res)
+	return ec.marshalNLinkContent2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐLinkContent(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Link_openGraph(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Link_LinkContent(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Link",
 		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
+		IsMethod:   false,
+		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "title":
-				return ec.fieldContext_OpenGraph_title(ctx, field)
-			case "description":
-				return ec.fieldContext_OpenGraph_description(ctx, field)
-			case "favIcon":
-				return ec.fieldContext_OpenGraph_favIcon(ctx, field)
-			case "image":
-				return ec.fieldContext_OpenGraph_image(ctx, field)
-			case "alternateImage":
-				return ec.fieldContext_OpenGraph_alternateImage(ctx, field)
-			case "url":
-				return ec.fieldContext_OpenGraph_url(ctx, field)
-			case "siteName":
-				return ec.fieldContext_OpenGraph_siteName(ctx, field)
-			case "type":
-				return ec.fieldContext_OpenGraph_type(ctx, field)
-			case "locale":
-				return ec.fieldContext_OpenGraph_locale(ctx, field)
-			case "x":
-				return ec.fieldContext_OpenGraph_x(ctx, field)
+				return ec.fieldContext_LinkContent_title(ctx, field)
+			case "subtitle":
+				return ec.fieldContext_LinkContent_subtitle(ctx, field)
+			case "redirectionURLText":
+				return ec.fieldContext_LinkContent_redirectionURLText(ctx, field)
+			case "redirectionDelay":
+				return ec.fieldContext_LinkContent_redirectionDelay(ctx, field)
+			case "additionalHead":
+				return ec.fieldContext_LinkContent_additionalHead(ctx, field)
+			case "additionalFooter":
+				return ec.fieldContext_LinkContent_additionalFooter(ctx, field)
+			case "metaDescription":
+				return ec.fieldContext_LinkContent_metaDescription(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type OpenGraph", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type LinkContent", field.Name)
 		},
 	}
 	return fc, nil
@@ -6324,6 +6964,335 @@ func (ec *executionContext) fieldContext_LinkConnection_totalCount(_ context.Con
 	return fc, nil
 }
 
+func (ec *executionContext) _LinkContent_title(ctx context.Context, field graphql.CollectedField, obj *database_types.LinkContent) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_LinkContent_title(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Title, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalOString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_LinkContent_title(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "LinkContent",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _LinkContent_subtitle(ctx context.Context, field graphql.CollectedField, obj *database_types.LinkContent) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_LinkContent_subtitle(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Subtitle, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalOString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_LinkContent_subtitle(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "LinkContent",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _LinkContent_redirectionURLText(ctx context.Context, field graphql.CollectedField, obj *database_types.LinkContent) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_LinkContent_redirectionURLText(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.RedirectionURLText, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalOString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_LinkContent_redirectionURLText(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "LinkContent",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _LinkContent_redirectionDelay(ctx context.Context, field graphql.CollectedField, obj *database_types.LinkContent) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_LinkContent_redirectionDelay(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.RedirectionDelay, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_LinkContent_redirectionDelay(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "LinkContent",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _LinkContent_additionalHead(ctx context.Context, field graphql.CollectedField, obj *database_types.LinkContent) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_LinkContent_additionalHead(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.AdditionalHead, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_LinkContent_additionalHead(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "LinkContent",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _LinkContent_additionalFooter(ctx context.Context, field graphql.CollectedField, obj *database_types.LinkContent) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_LinkContent_additionalFooter(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.AdditionalFooter, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_LinkContent_additionalFooter(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "LinkContent",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _LinkContent_metaDescription(ctx context.Context, field graphql.CollectedField, obj *database_types.LinkContent) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_LinkContent_metaDescription(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.MetaDescription, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*database_types.MetaDescription)
+	fc.Result = res
+	return ec.marshalOMetaDescription2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐMetaDescription(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_LinkContent_metaDescription(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "LinkContent",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "title":
+				return ec.fieldContext_MetaDescription_title(ctx, field)
+			case "favIcon":
+				return ec.fieldContext_MetaDescription_favIcon(ctx, field)
+			case "description":
+				return ec.fieldContext_MetaDescription_description(ctx, field)
+			case "locale":
+				return ec.fieldContext_MetaDescription_locale(ctx, field)
+			case "ogTitle":
+				return ec.fieldContext_MetaDescription_ogTitle(ctx, field)
+			case "ogDescription":
+				return ec.fieldContext_MetaDescription_ogDescription(ctx, field)
+			case "ogURL":
+				return ec.fieldContext_MetaDescription_ogURL(ctx, field)
+			case "ogSiteName":
+				return ec.fieldContext_MetaDescription_ogSiteName(ctx, field)
+			case "ogMetaType":
+				return ec.fieldContext_MetaDescription_ogMetaType(ctx, field)
+			case "ogLocale":
+				return ec.fieldContext_MetaDescription_ogLocale(ctx, field)
+			case "ogBigImage":
+				return ec.fieldContext_MetaDescription_ogBigImage(ctx, field)
+			case "ogBigWidth":
+				return ec.fieldContext_MetaDescription_ogBigWidth(ctx, field)
+			case "ogBigHeight":
+				return ec.fieldContext_MetaDescription_ogBigHeight(ctx, field)
+			case "ogSmallImage":
+				return ec.fieldContext_MetaDescription_ogSmallImage(ctx, field)
+			case "ogSmallWidth":
+				return ec.fieldContext_MetaDescription_ogSmallWidth(ctx, field)
+			case "ogSmallHeight":
+				return ec.fieldContext_MetaDescription_ogSmallHeight(ctx, field)
+			case "ogCard":
+				return ec.fieldContext_MetaDescription_ogCard(ctx, field)
+			case "ogSite":
+				return ec.fieldContext_MetaDescription_ogSite(ctx, field)
+			case "ogType":
+				return ec.fieldContext_MetaDescription_ogType(ctx, field)
+			case "ogCreator":
+				return ec.fieldContext_MetaDescription_ogCreator(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type MetaDescription", field.Name)
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _LinkCrawl_id(ctx context.Context, field graphql.CollectedField, obj *database_models.LinkCrawl) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_LinkCrawl_id(ctx, field)
 	if err != nil {
@@ -6489,8 +7458,8 @@ func (ec *executionContext) fieldContext_LinkCrawl_link(_ context.Context, field
 				return ec.fieldContext_Link_domain(ctx, field)
 			case "analytics":
 				return ec.fieldContext_Link_analytics(ctx, field)
-			case "openGraph":
-				return ec.fieldContext_Link_openGraph(ctx, field)
+			case "LinkContent":
+				return ec.fieldContext_Link_LinkContent(ctx, field)
 			case "redirectionOptions":
 				return ec.fieldContext_Link_redirectionOptions(ctx, field)
 			case "state":
@@ -6624,7 +7593,7 @@ func (ec *executionContext) _LinkCrawl_result(ctx context.Context, field graphql
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Result, nil
+		return ec.resolvers.LinkCrawl().Result(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -6633,41 +7602,35 @@ func (ec *executionContext) _LinkCrawl_result(ctx context.Context, field graphql
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*database_types.OpenGraph)
+	res := resTmp.(*database_types.LinkContent)
 	fc.Result = res
-	return ec.marshalOOpenGraph2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐOpenGraph(ctx, field.Selections, res)
+	return ec.marshalOLinkContent2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐLinkContent(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_LinkCrawl_result(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "LinkCrawl",
 		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "title":
-				return ec.fieldContext_OpenGraph_title(ctx, field)
-			case "description":
-				return ec.fieldContext_OpenGraph_description(ctx, field)
-			case "favIcon":
-				return ec.fieldContext_OpenGraph_favIcon(ctx, field)
-			case "image":
-				return ec.fieldContext_OpenGraph_image(ctx, field)
-			case "alternateImage":
-				return ec.fieldContext_OpenGraph_alternateImage(ctx, field)
-			case "url":
-				return ec.fieldContext_OpenGraph_url(ctx, field)
-			case "siteName":
-				return ec.fieldContext_OpenGraph_siteName(ctx, field)
-			case "type":
-				return ec.fieldContext_OpenGraph_type(ctx, field)
-			case "locale":
-				return ec.fieldContext_OpenGraph_locale(ctx, field)
-			case "x":
-				return ec.fieldContext_OpenGraph_x(ctx, field)
+				return ec.fieldContext_LinkContent_title(ctx, field)
+			case "subtitle":
+				return ec.fieldContext_LinkContent_subtitle(ctx, field)
+			case "redirectionURLText":
+				return ec.fieldContext_LinkContent_redirectionURLText(ctx, field)
+			case "redirectionDelay":
+				return ec.fieldContext_LinkContent_redirectionDelay(ctx, field)
+			case "additionalHead":
+				return ec.fieldContext_LinkContent_additionalHead(ctx, field)
+			case "additionalFooter":
+				return ec.fieldContext_LinkContent_additionalFooter(ctx, field)
+			case "metaDescription":
+				return ec.fieldContext_LinkContent_metaDescription(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type OpenGraph", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type LinkContent", field.Name)
 		},
 	}
 	return fc, nil
@@ -7031,8 +7994,8 @@ func (ec *executionContext) fieldContext_LinkEdge_node(_ context.Context, field 
 				return ec.fieldContext_Link_domain(ctx, field)
 			case "analytics":
 				return ec.fieldContext_Link_analytics(ctx, field)
-			case "openGraph":
-				return ec.fieldContext_Link_openGraph(ctx, field)
+			case "LinkContent":
+				return ec.fieldContext_Link_LinkContent(ctx, field)
 			case "redirectionOptions":
 				return ec.fieldContext_Link_redirectionOptions(ctx, field)
 			case "state":
@@ -7592,8 +8555,8 @@ func (ec *executionContext) fieldContext_Log_message(_ context.Context, field gr
 	return fc, nil
 }
 
-func (ec *executionContext) _LoginPayload_token(ctx context.Context, field graphql.CollectedField, obj *model.LoginPayload) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_LoginPayload_token(ctx, field)
+func (ec *executionContext) _MetaDescription_title(ctx context.Context, field graphql.CollectedField, obj *database_types.MetaDescription) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_MetaDescription_title(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -7606,26 +8569,802 @@ func (ec *executionContext) _LoginPayload_token(ctx context.Context, field graph
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Token, nil
+		return obj.Title, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
 		return graphql.Null
 	}
 	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
 	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
+	return ec.marshalOString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_LoginPayload_token(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_MetaDescription_title(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
-		Object:     "LoginPayload",
+		Object:     "MetaDescription",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _MetaDescription_favIcon(ctx context.Context, field graphql.CollectedField, obj *database_types.MetaDescription) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_MetaDescription_favIcon(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.FavIcon, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalOString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_MetaDescription_favIcon(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MetaDescription",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _MetaDescription_description(ctx context.Context, field graphql.CollectedField, obj *database_types.MetaDescription) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_MetaDescription_description(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Description, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalOString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_MetaDescription_description(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MetaDescription",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _MetaDescription_locale(ctx context.Context, field graphql.CollectedField, obj *database_types.MetaDescription) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_MetaDescription_locale(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Locale, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalOString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_MetaDescription_locale(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MetaDescription",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _MetaDescription_ogTitle(ctx context.Context, field graphql.CollectedField, obj *database_types.MetaDescription) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_MetaDescription_ogTitle(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.OGTitle, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalOString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_MetaDescription_ogTitle(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MetaDescription",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _MetaDescription_ogDescription(ctx context.Context, field graphql.CollectedField, obj *database_types.MetaDescription) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_MetaDescription_ogDescription(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.OGDescription, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalOString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_MetaDescription_ogDescription(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MetaDescription",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _MetaDescription_ogURL(ctx context.Context, field graphql.CollectedField, obj *database_types.MetaDescription) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_MetaDescription_ogURL(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.OGURL, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalOString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_MetaDescription_ogURL(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MetaDescription",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _MetaDescription_ogSiteName(ctx context.Context, field graphql.CollectedField, obj *database_types.MetaDescription) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_MetaDescription_ogSiteName(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.OGSiteName, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalOString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_MetaDescription_ogSiteName(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MetaDescription",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _MetaDescription_ogMetaType(ctx context.Context, field graphql.CollectedField, obj *database_types.MetaDescription) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_MetaDescription_ogMetaType(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.OGMetaType, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalOString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_MetaDescription_ogMetaType(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MetaDescription",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _MetaDescription_ogLocale(ctx context.Context, field graphql.CollectedField, obj *database_types.MetaDescription) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_MetaDescription_ogLocale(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.OGLocale, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalOString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_MetaDescription_ogLocale(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MetaDescription",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _MetaDescription_ogBigImage(ctx context.Context, field graphql.CollectedField, obj *database_types.MetaDescription) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_MetaDescription_ogBigImage(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.OGBigImage, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalOString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_MetaDescription_ogBigImage(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MetaDescription",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _MetaDescription_ogBigWidth(ctx context.Context, field graphql.CollectedField, obj *database_types.MetaDescription) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_MetaDescription_ogBigWidth(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.OGBigWidth, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalOString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_MetaDescription_ogBigWidth(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MetaDescription",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _MetaDescription_ogBigHeight(ctx context.Context, field graphql.CollectedField, obj *database_types.MetaDescription) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_MetaDescription_ogBigHeight(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.OGBigHeight, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalOString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_MetaDescription_ogBigHeight(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MetaDescription",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _MetaDescription_ogSmallImage(ctx context.Context, field graphql.CollectedField, obj *database_types.MetaDescription) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_MetaDescription_ogSmallImage(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.OGSmallImage, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalOString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_MetaDescription_ogSmallImage(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MetaDescription",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _MetaDescription_ogSmallWidth(ctx context.Context, field graphql.CollectedField, obj *database_types.MetaDescription) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_MetaDescription_ogSmallWidth(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.OGSmallWidth, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalOString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_MetaDescription_ogSmallWidth(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MetaDescription",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _MetaDescription_ogSmallHeight(ctx context.Context, field graphql.CollectedField, obj *database_types.MetaDescription) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_MetaDescription_ogSmallHeight(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.OGSmallHeight, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalOString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_MetaDescription_ogSmallHeight(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MetaDescription",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _MetaDescription_ogCard(ctx context.Context, field graphql.CollectedField, obj *database_types.MetaDescription) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_MetaDescription_ogCard(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.OGCard, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalOString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_MetaDescription_ogCard(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MetaDescription",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _MetaDescription_ogSite(ctx context.Context, field graphql.CollectedField, obj *database_types.MetaDescription) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_MetaDescription_ogSite(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.OGSite, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalOString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_MetaDescription_ogSite(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MetaDescription",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _MetaDescription_ogType(ctx context.Context, field graphql.CollectedField, obj *database_types.MetaDescription) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_MetaDescription_ogType(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.OGType, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalOString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_MetaDescription_ogType(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MetaDescription",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _MetaDescription_ogCreator(ctx context.Context, field graphql.CollectedField, obj *database_types.MetaDescription) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_MetaDescription_ogCreator(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.OGCreator, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalOString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_MetaDescription_ogCreator(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MetaDescription",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -7896,65 +9635,6 @@ func (ec *executionContext) fieldContext_MetricAnalytics_endAt(_ context.Context
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type DateTime does not have child fields")
 		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Mutation_loginUser(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_loginUser(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().LoginUser(rctx, fc.Args["input"].(model.LoginInput))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(*model.LoginPayload)
-	fc.Result = res
-	return ec.marshalNLoginPayload2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐLoginPayload(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Mutation_loginUser(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Mutation",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "token":
-				return ec.fieldContext_LoginPayload_token(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type LoginPayload", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_loginUser_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
 	}
 	return fc, nil
 }
@@ -8244,8 +9924,8 @@ func (ec *executionContext) fieldContext_Mutation_createLink(ctx context.Context
 				return ec.fieldContext_Link_domain(ctx, field)
 			case "analytics":
 				return ec.fieldContext_Link_analytics(ctx, field)
-			case "openGraph":
-				return ec.fieldContext_Link_openGraph(ctx, field)
+			case "LinkContent":
+				return ec.fieldContext_Link_LinkContent(ctx, field)
 			case "redirectionOptions":
 				return ec.fieldContext_Link_redirectionOptions(ctx, field)
 			case "state":
@@ -8379,6 +10059,125 @@ func (ec *executionContext) fieldContext_Mutation_requestCrawl(ctx context.Conte
 	return fc, nil
 }
 
+func (ec *executionContext) _Mutation_updateLink(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_updateLink(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Mutation().UpdateLink(rctx, fc.Args["input"].(graph_inputs.LinkUpdateInput))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			permission, err := ec.unmarshalNPlatformPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐPlatformPermission(ctx, "LINK_READ")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.PlatformPermission == nil {
+				return nil, errors.New("directive platformPermission is not implemented")
+			}
+			return ec.directives.PlatformPermission(ctx, nil, directive0, permission)
+		}
+		directive2 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Auth == nil {
+				return nil, errors.New("directive auth is not implemented")
+			}
+			return ec.directives.Auth(ctx, nil, directive1)
+		}
+
+		tmp, err := directive2(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*database_models.Link); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/RouteHub-Link/routehub-service-graphql/database/models.Link`, tmp)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*database_models.Link)
+	fc.Result = res
+	return ec.marshalNLink2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋmodelsᚐLink(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_updateLink(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Link_id(ctx, field)
+			case "target":
+				return ec.fieldContext_Link_target(ctx, field)
+			case "path":
+				return ec.fieldContext_Link_path(ctx, field)
+			case "creator":
+				return ec.fieldContext_Link_creator(ctx, field)
+			case "platform":
+				return ec.fieldContext_Link_platform(ctx, field)
+			case "domain":
+				return ec.fieldContext_Link_domain(ctx, field)
+			case "analytics":
+				return ec.fieldContext_Link_analytics(ctx, field)
+			case "LinkContent":
+				return ec.fieldContext_Link_LinkContent(ctx, field)
+			case "redirectionOptions":
+				return ec.fieldContext_Link_redirectionOptions(ctx, field)
+			case "state":
+				return ec.fieldContext_Link_state(ctx, field)
+			case "validations":
+				return ec.fieldContext_Link_validations(ctx, field)
+			case "lastValidation":
+				return ec.fieldContext_Link_lastValidation(ctx, field)
+			case "crawls":
+				return ec.fieldContext_Link_crawls(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Link_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Link_updatedAt(ctx, field)
+			case "deletedAt":
+				return ec.fieldContext_Link_deletedAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Link", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_updateLink_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Mutation_addToPinnedLinks(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Mutation_addToPinnedLinks(ctx, field)
 	if err != nil {
@@ -8462,8 +10261,8 @@ func (ec *executionContext) fieldContext_Mutation_addToPinnedLinks(ctx context.C
 				return ec.fieldContext_Link_domain(ctx, field)
 			case "analytics":
 				return ec.fieldContext_Link_analytics(ctx, field)
-			case "openGraph":
-				return ec.fieldContext_Link_openGraph(ctx, field)
+			case "LinkContent":
+				return ec.fieldContext_Link_LinkContent(ctx, field)
 			case "redirectionOptions":
 				return ec.fieldContext_Link_redirectionOptions(ctx, field)
 			case "state":
@@ -8581,8 +10380,8 @@ func (ec *executionContext) fieldContext_Mutation_removeFromPinnedLinks(ctx cont
 				return ec.fieldContext_Link_domain(ctx, field)
 			case "analytics":
 				return ec.fieldContext_Link_analytics(ctx, field)
-			case "openGraph":
-				return ec.fieldContext_Link_openGraph(ctx, field)
+			case "LinkContent":
+				return ec.fieldContext_Link_LinkContent(ctx, field)
 			case "redirectionOptions":
 				return ec.fieldContext_Link_redirectionOptions(ctx, field)
 			case "state":
@@ -8908,8 +10707,8 @@ func (ec *executionContext) fieldContext_Mutation_createPlatform(ctx context.Con
 				return ec.fieldContext_Platform_id(ctx, field)
 			case "name":
 				return ec.fieldContext_Platform_name(ctx, field)
-			case "openGraph":
-				return ec.fieldContext_Platform_openGraph(ctx, field)
+			case "platformDescription":
+				return ec.fieldContext_Platform_platformDescription(ctx, field)
 			case "redirectionChoice":
 				return ec.fieldContext_Platform_redirectionChoice(ctx, field)
 			case "organization":
@@ -8950,8 +10749,8 @@ func (ec *executionContext) fieldContext_Mutation_createPlatform(ctx context.Con
 	return fc, nil
 }
 
-func (ec *executionContext) _Mutation_createUser(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_createUser(ctx, field)
+func (ec *executionContext) _Mutation_updatePlatform(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_updatePlatform(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -8963,8 +10762,38 @@ func (ec *executionContext) _Mutation_createUser(ctx context.Context, field grap
 		}
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().CreateUser(rctx, fc.Args["input"].(model.UserCreateInput))
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Mutation().UpdatePlatform(rctx, fc.Args["input"].(graph_inputs.PlatformUpdateInput))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			permission, err := ec.unmarshalNPlatformPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐPlatformPermission(ctx, "PLATFORM_READ")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.PlatformPermission == nil {
+				return nil, errors.New("directive platformPermission is not implemented")
+			}
+			return ec.directives.PlatformPermission(ctx, nil, directive0, permission)
+		}
+		directive2 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Auth == nil {
+				return nil, errors.New("directive auth is not implemented")
+			}
+			return ec.directives.Auth(ctx, nil, directive1)
+		}
+
+		tmp, err := directive2(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*database_models.Platform); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/RouteHub-Link/routehub-service-graphql/database/models.Platform`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -8976,12 +10805,12 @@ func (ec *executionContext) _Mutation_createUser(ctx context.Context, field grap
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*database_models.User)
+	res := resTmp.(*database_models.Platform)
 	fc.Result = res
-	return ec.marshalNUser2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋmodelsᚐUser(ctx, field.Selections, res)
+	return ec.marshalNPlatform2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋmodelsᚐPlatform(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Mutation_createUser(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Mutation_updatePlatform(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Mutation",
 		Field:      field,
@@ -8990,31 +10819,35 @@ func (ec *executionContext) fieldContext_Mutation_createUser(ctx context.Context
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "id":
-				return ec.fieldContext_User_id(ctx, field)
-			case "avatar":
-				return ec.fieldContext_User_avatar(ctx, field)
-			case "email":
-				return ec.fieldContext_User_email(ctx, field)
-			case "fullname":
-				return ec.fieldContext_User_fullname(ctx, field)
-			case "verified":
-				return ec.fieldContext_User_verified(ctx, field)
-			case "phone":
-				return ec.fieldContext_User_phone(ctx, field)
-			case "organizations":
-				return ec.fieldContext_User_organizations(ctx, field)
-			case "platforms":
-				return ec.fieldContext_User_platforms(ctx, field)
-			case "invites":
-				return ec.fieldContext_User_invites(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_User_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_User_updatedAt(ctx, field)
-			case "deletedAt":
-				return ec.fieldContext_User_deletedAt(ctx, field)
+				return ec.fieldContext_Platform_id(ctx, field)
+			case "name":
+				return ec.fieldContext_Platform_name(ctx, field)
+			case "platformDescription":
+				return ec.fieldContext_Platform_platformDescription(ctx, field)
+			case "redirectionChoice":
+				return ec.fieldContext_Platform_redirectionChoice(ctx, field)
+			case "organization":
+				return ec.fieldContext_Platform_organization(ctx, field)
+			case "domain":
+				return ec.fieldContext_Platform_domain(ctx, field)
+			case "permissions":
+				return ec.fieldContext_Platform_permissions(ctx, field)
+			case "deployments":
+				return ec.fieldContext_Platform_deployments(ctx, field)
+			case "links":
+				return ec.fieldContext_Platform_links(ctx, field)
+			case "analytics":
+				return ec.fieldContext_Platform_analytics(ctx, field)
+			case "analyticReports":
+				return ec.fieldContext_Platform_analyticReports(ctx, field)
+			case "status":
+				return ec.fieldContext_Platform_status(ctx, field)
+			case "templates":
+				return ec.fieldContext_Platform_templates(ctx, field)
+			case "pinnedLinks":
+				return ec.fieldContext_Platform_pinnedLinks(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type Platform", field.Name)
 		},
 	}
 	defer func() {
@@ -9024,7 +10857,7 @@ func (ec *executionContext) fieldContext_Mutation_createUser(ctx context.Context
 		}
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_createUser_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+	if fc.Args, err = ec.field_Mutation_updatePlatform_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -9183,6 +11016,708 @@ func (ec *executionContext) fieldContext_Mutation_updateUserInvitation(ctx conte
 	return fc, nil
 }
 
+func (ec *executionContext) _NavbarButton_text(ctx context.Context, field graphql.CollectedField, obj *database_types.NavbarButton) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_NavbarButton_text(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Text, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalOString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_NavbarButton_text(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "NavbarButton",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _NavbarButton_url(ctx context.Context, field graphql.CollectedField, obj *database_types.NavbarButton) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_NavbarButton_url(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.URL, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalOString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_NavbarButton_url(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "NavbarButton",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _NavbarButton_icon(ctx context.Context, field graphql.CollectedField, obj *database_types.NavbarButton) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_NavbarButton_icon(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Icon, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalOString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_NavbarButton_icon(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "NavbarButton",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _NavbarButton_target(ctx context.Context, field graphql.CollectedField, obj *database_types.NavbarButton) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_NavbarButton_target(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Target, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalOString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_NavbarButton_target(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "NavbarButton",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _NavbarButton_colorClass(ctx context.Context, field graphql.CollectedField, obj *database_types.NavbarButton) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_NavbarButton_colorClass(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ColorClass, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalOString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_NavbarButton_colorClass(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "NavbarButton",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _NavbarDescription_brandImg(ctx context.Context, field graphql.CollectedField, obj *database_types.NavbarDescription) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_NavbarDescription_brandImg(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.BrandImg, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*database_types.ImageDescription)
+	fc.Result = res
+	return ec.marshalOImageDescription2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐImageDescription(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_NavbarDescription_brandImg(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "NavbarDescription",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "src":
+				return ec.fieldContext_ImageDescription_src(ctx, field)
+			case "alt":
+				return ec.fieldContext_ImageDescription_alt(ctx, field)
+			case "height":
+				return ec.fieldContext_ImageDescription_height(ctx, field)
+			case "width":
+				return ec.fieldContext_ImageDescription_width(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ImageDescription", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _NavbarDescription_brandURL(ctx context.Context, field graphql.CollectedField, obj *database_types.NavbarDescription) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_NavbarDescription_brandURL(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.BrandURL, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalOString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_NavbarDescription_brandURL(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "NavbarDescription",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _NavbarDescription_brandName(ctx context.Context, field graphql.CollectedField, obj *database_types.NavbarDescription) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_NavbarDescription_brandName(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.BrandName, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalOString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_NavbarDescription_brandName(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "NavbarDescription",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _NavbarDescription_target(ctx context.Context, field graphql.CollectedField, obj *database_types.NavbarDescription) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_NavbarDescription_target(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Target, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalOString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_NavbarDescription_target(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "NavbarDescription",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _NavbarDescription_startItems(ctx context.Context, field graphql.CollectedField, obj *database_types.NavbarDescription) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_NavbarDescription_startItems(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.StartItems, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*[]database_types.NavbarItem)
+	fc.Result = res
+	return ec.marshalONavbarItem2ᚖᚕgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐNavbarItem(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_NavbarDescription_startItems(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "NavbarDescription",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "text":
+				return ec.fieldContext_NavbarItem_text(ctx, field)
+			case "url":
+				return ec.fieldContext_NavbarItem_url(ctx, field)
+			case "target":
+				return ec.fieldContext_NavbarItem_target(ctx, field)
+			case "icon":
+				return ec.fieldContext_NavbarItem_icon(ctx, field)
+			case "dropdown":
+				return ec.fieldContext_NavbarItem_dropdown(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type NavbarItem", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _NavbarDescription_endButtons(ctx context.Context, field graphql.CollectedField, obj *database_types.NavbarDescription) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_NavbarDescription_endButtons(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.EndButtons, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*[]database_types.NavbarButton)
+	fc.Result = res
+	return ec.marshalONavbarButton2ᚖᚕgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐNavbarButtonᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_NavbarDescription_endButtons(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "NavbarDescription",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "text":
+				return ec.fieldContext_NavbarButton_text(ctx, field)
+			case "url":
+				return ec.fieldContext_NavbarButton_url(ctx, field)
+			case "icon":
+				return ec.fieldContext_NavbarButton_icon(ctx, field)
+			case "target":
+				return ec.fieldContext_NavbarButton_target(ctx, field)
+			case "colorClass":
+				return ec.fieldContext_NavbarButton_colorClass(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type NavbarButton", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _NavbarItem_text(ctx context.Context, field graphql.CollectedField, obj *database_types.NavbarItem) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_NavbarItem_text(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Text, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalOString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_NavbarItem_text(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "NavbarItem",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _NavbarItem_url(ctx context.Context, field graphql.CollectedField, obj *database_types.NavbarItem) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_NavbarItem_url(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.URL, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalOString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_NavbarItem_url(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "NavbarItem",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _NavbarItem_target(ctx context.Context, field graphql.CollectedField, obj *database_types.NavbarItem) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_NavbarItem_target(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Target, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalOString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_NavbarItem_target(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "NavbarItem",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _NavbarItem_icon(ctx context.Context, field graphql.CollectedField, obj *database_types.NavbarItem) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_NavbarItem_icon(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Icon, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalOString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_NavbarItem_icon(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "NavbarItem",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _NavbarItem_dropdown(ctx context.Context, field graphql.CollectedField, obj *database_types.NavbarItem) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_NavbarItem_dropdown(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Dropdown, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*[]database_types.NavbarItem)
+	fc.Result = res
+	return ec.marshalONavbarItem2ᚖᚕgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐNavbarItem(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_NavbarItem_dropdown(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "NavbarItem",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "text":
+				return ec.fieldContext_NavbarItem_text(ctx, field)
+			case "url":
+				return ec.fieldContext_NavbarItem_url(ctx, field)
+			case "target":
+				return ec.fieldContext_NavbarItem_target(ctx, field)
+			case "icon":
+				return ec.fieldContext_NavbarItem_icon(ctx, field)
+			case "dropdown":
+				return ec.fieldContext_NavbarItem_dropdown(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type NavbarItem", field.Name)
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _ObservationAnalytic_id(ctx context.Context, field graphql.CollectedField, obj *model.ObservationAnalytic) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_ObservationAnalytic_id(ctx, field)
 	if err != nil {
@@ -9304,8 +11839,8 @@ func (ec *executionContext) fieldContext_ObservationAnalytic_link(_ context.Cont
 				return ec.fieldContext_Link_domain(ctx, field)
 			case "analytics":
 				return ec.fieldContext_Link_analytics(ctx, field)
-			case "openGraph":
-				return ec.fieldContext_Link_openGraph(ctx, field)
+			case "LinkContent":
+				return ec.fieldContext_Link_LinkContent(ctx, field)
 			case "redirectionOptions":
 				return ec.fieldContext_Link_redirectionOptions(ctx, field)
 			case "state":
@@ -9470,8 +12005,8 @@ func (ec *executionContext) fieldContext_ObservationAnalytic_platform(_ context.
 				return ec.fieldContext_Platform_id(ctx, field)
 			case "name":
 				return ec.fieldContext_Platform_name(ctx, field)
-			case "openGraph":
-				return ec.fieldContext_Platform_openGraph(ctx, field)
+			case "platformDescription":
+				return ec.fieldContext_Platform_platformDescription(ctx, field)
 			case "redirectionChoice":
 				return ec.fieldContext_Platform_redirectionChoice(ctx, field)
 			case "organization":
@@ -9850,762 +12385,6 @@ func (ec *executionContext) fieldContext_ObservationAnalytic_updatedAt(_ context
 	return fc, nil
 }
 
-func (ec *executionContext) _OpenGraph_title(ctx context.Context, field graphql.CollectedField, obj *database_types.OpenGraph) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_OpenGraph_title(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Title, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalOString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_OpenGraph_title(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "OpenGraph",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _OpenGraph_description(ctx context.Context, field graphql.CollectedField, obj *database_types.OpenGraph) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_OpenGraph_description(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Description, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalOString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_OpenGraph_description(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "OpenGraph",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _OpenGraph_favIcon(ctx context.Context, field graphql.CollectedField, obj *database_types.OpenGraph) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_OpenGraph_favIcon(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.FavIcon, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalOString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_OpenGraph_favIcon(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "OpenGraph",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _OpenGraph_image(ctx context.Context, field graphql.CollectedField, obj *database_types.OpenGraph) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_OpenGraph_image(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Image, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalOString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_OpenGraph_image(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "OpenGraph",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _OpenGraph_alternateImage(ctx context.Context, field graphql.CollectedField, obj *database_types.OpenGraph) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_OpenGraph_alternateImage(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.AlternateImage, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalOString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_OpenGraph_alternateImage(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "OpenGraph",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _OpenGraph_url(ctx context.Context, field graphql.CollectedField, obj *database_types.OpenGraph) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_OpenGraph_url(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.URL, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalOString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_OpenGraph_url(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "OpenGraph",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _OpenGraph_siteName(ctx context.Context, field graphql.CollectedField, obj *database_types.OpenGraph) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_OpenGraph_siteName(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.SiteName, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalOString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_OpenGraph_siteName(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "OpenGraph",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _OpenGraph_type(ctx context.Context, field graphql.CollectedField, obj *database_types.OpenGraph) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_OpenGraph_type(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Type, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalOString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_OpenGraph_type(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "OpenGraph",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _OpenGraph_locale(ctx context.Context, field graphql.CollectedField, obj *database_types.OpenGraph) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_OpenGraph_locale(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Locale, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalOString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_OpenGraph_locale(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "OpenGraph",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _OpenGraph_x(ctx context.Context, field graphql.CollectedField, obj *database_types.OpenGraph) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_OpenGraph_x(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.X, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*database_types.OpenGraphX)
-	fc.Result = res
-	return ec.marshalOOpenGraphX2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐOpenGraphX(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_OpenGraph_x(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "OpenGraph",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "card":
-				return ec.fieldContext_OpenGraphX_card(ctx, field)
-			case "site":
-				return ec.fieldContext_OpenGraphX_site(ctx, field)
-			case "title":
-				return ec.fieldContext_OpenGraphX_title(ctx, field)
-			case "description":
-				return ec.fieldContext_OpenGraphX_description(ctx, field)
-			case "image":
-				return ec.fieldContext_OpenGraphX_image(ctx, field)
-			case "url":
-				return ec.fieldContext_OpenGraphX_url(ctx, field)
-			case "type":
-				return ec.fieldContext_OpenGraphX_type(ctx, field)
-			case "creator":
-				return ec.fieldContext_OpenGraphX_creator(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type OpenGraphX", field.Name)
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _OpenGraphX_card(ctx context.Context, field graphql.CollectedField, obj *database_types.OpenGraphX) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_OpenGraphX_card(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Card, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalOString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_OpenGraphX_card(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "OpenGraphX",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _OpenGraphX_site(ctx context.Context, field graphql.CollectedField, obj *database_types.OpenGraphX) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_OpenGraphX_site(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Site, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalOString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_OpenGraphX_site(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "OpenGraphX",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _OpenGraphX_title(ctx context.Context, field graphql.CollectedField, obj *database_types.OpenGraphX) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_OpenGraphX_title(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Title, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalOString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_OpenGraphX_title(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "OpenGraphX",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _OpenGraphX_description(ctx context.Context, field graphql.CollectedField, obj *database_types.OpenGraphX) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_OpenGraphX_description(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Description, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalOString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_OpenGraphX_description(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "OpenGraphX",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _OpenGraphX_image(ctx context.Context, field graphql.CollectedField, obj *database_types.OpenGraphX) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_OpenGraphX_image(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Image, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalOString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_OpenGraphX_image(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "OpenGraphX",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _OpenGraphX_url(ctx context.Context, field graphql.CollectedField, obj *database_types.OpenGraphX) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_OpenGraphX_url(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.URL, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalOString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_OpenGraphX_url(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "OpenGraphX",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _OpenGraphX_type(ctx context.Context, field graphql.CollectedField, obj *database_types.OpenGraphX) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_OpenGraphX_type(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Type, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalOString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_OpenGraphX_type(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "OpenGraphX",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _OpenGraphX_creator(ctx context.Context, field graphql.CollectedField, obj *database_types.OpenGraphX) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_OpenGraphX_creator(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Creator, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalOString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_OpenGraphX_creator(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "OpenGraphX",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
 func (ec *executionContext) _Organization_id(ctx context.Context, field graphql.CollectedField, obj *database_models.Organization) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Organization_id(ctx, field)
 	if err != nil {
@@ -10955,8 +12734,8 @@ func (ec *executionContext) fieldContext_Organization_platforms(_ context.Contex
 				return ec.fieldContext_Platform_id(ctx, field)
 			case "name":
 				return ec.fieldContext_Platform_name(ctx, field)
-			case "openGraph":
-				return ec.fieldContext_Platform_openGraph(ctx, field)
+			case "platformDescription":
+				return ec.fieldContext_Platform_platformDescription(ctx, field)
 			case "redirectionChoice":
 				return ec.fieldContext_Platform_redirectionChoice(ctx, field)
 			case "organization":
@@ -11994,8 +13773,8 @@ func (ec *executionContext) fieldContext_Permission_platforms(_ context.Context,
 				return ec.fieldContext_Platform_id(ctx, field)
 			case "name":
 				return ec.fieldContext_Platform_name(ctx, field)
-			case "openGraph":
-				return ec.fieldContext_Platform_openGraph(ctx, field)
+			case "platformDescription":
+				return ec.fieldContext_Platform_platformDescription(ctx, field)
 			case "redirectionChoice":
 				return ec.fieldContext_Platform_redirectionChoice(ctx, field)
 			case "organization":
@@ -12161,8 +13940,8 @@ func (ec *executionContext) fieldContext_Platform_name(_ context.Context, field 
 	return fc, nil
 }
 
-func (ec *executionContext) _Platform_openGraph(ctx context.Context, field graphql.CollectedField, obj *database_models.Platform) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Platform_openGraph(ctx, field)
+func (ec *executionContext) _Platform_platformDescription(ctx context.Context, field graphql.CollectedField, obj *database_models.Platform) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Platform_platformDescription(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -12176,7 +13955,7 @@ func (ec *executionContext) _Platform_openGraph(ctx context.Context, field graph
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		directive0 := func(rctx context.Context) (interface{}, error) {
 			ctx = rctx // use context from middleware stack in children
-			return obj.OpenGraph, nil
+			return obj.PlatformDescription, nil
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
 			permission, err := ec.unmarshalNPlatformPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐPlatformPermission(ctx, "PLATFORM_READ")
@@ -12196,10 +13975,10 @@ func (ec *executionContext) _Platform_openGraph(ctx context.Context, field graph
 		if tmp == nil {
 			return nil, nil
 		}
-		if data, ok := tmp.(*database_types.OpenGraph); ok {
+		if data, ok := tmp.(*database_types.PlatformDescription); ok {
 			return data, nil
 		}
-		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/RouteHub-Link/routehub-service-graphql/database/types.OpenGraph`, tmp)
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/RouteHub-Link/routehub-service-graphql/database/types.PlatformDescription`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -12211,12 +13990,12 @@ func (ec *executionContext) _Platform_openGraph(ctx context.Context, field graph
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*database_types.OpenGraph)
+	res := resTmp.(*database_types.PlatformDescription)
 	fc.Result = res
-	return ec.marshalNOpenGraph2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐOpenGraph(ctx, field.Selections, res)
+	return ec.marshalNPlatformDescription2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐPlatformDescription(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Platform_openGraph(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Platform_platformDescription(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Platform",
 		Field:      field,
@@ -12224,28 +14003,14 @@ func (ec *executionContext) fieldContext_Platform_openGraph(_ context.Context, f
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
-			case "title":
-				return ec.fieldContext_OpenGraph_title(ctx, field)
-			case "description":
-				return ec.fieldContext_OpenGraph_description(ctx, field)
-			case "favIcon":
-				return ec.fieldContext_OpenGraph_favIcon(ctx, field)
-			case "image":
-				return ec.fieldContext_OpenGraph_image(ctx, field)
-			case "alternateImage":
-				return ec.fieldContext_OpenGraph_alternateImage(ctx, field)
-			case "url":
-				return ec.fieldContext_OpenGraph_url(ctx, field)
-			case "siteName":
-				return ec.fieldContext_OpenGraph_siteName(ctx, field)
-			case "type":
-				return ec.fieldContext_OpenGraph_type(ctx, field)
-			case "locale":
-				return ec.fieldContext_OpenGraph_locale(ctx, field)
-			case "x":
-				return ec.fieldContext_OpenGraph_x(ctx, field)
+			case "metaDescription":
+				return ec.fieldContext_PlatformDescription_metaDescription(ctx, field)
+			case "navbarDescription":
+				return ec.fieldContext_PlatformDescription_navbarDescription(ctx, field)
+			case "footerDescription":
+				return ec.fieldContext_PlatformDescription_footerDescription(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type OpenGraph", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type PlatformDescription", field.Name)
 		},
 	}
 	return fc, nil
@@ -12760,8 +14525,8 @@ func (ec *executionContext) fieldContext_Platform_links(_ context.Context, field
 				return ec.fieldContext_Link_domain(ctx, field)
 			case "analytics":
 				return ec.fieldContext_Link_analytics(ctx, field)
-			case "openGraph":
-				return ec.fieldContext_Link_openGraph(ctx, field)
+			case "LinkContent":
+				return ec.fieldContext_Link_LinkContent(ctx, field)
 			case "redirectionOptions":
 				return ec.fieldContext_Link_redirectionOptions(ctx, field)
 			case "state":
@@ -13090,8 +14855,8 @@ func (ec *executionContext) fieldContext_Platform_templates(_ context.Context, f
 				return ec.fieldContext_Template_name(ctx, field)
 			case "platform":
 				return ec.fieldContext_Template_platform(ctx, field)
-			case "openGraph":
-				return ec.fieldContext_Template_openGraph(ctx, field)
+			case "platformDescription":
+				return ec.fieldContext_Template_platformDescription(ctx, field)
 			case "redirectionChoice":
 				return ec.fieldContext_Template_redirectionChoice(ctx, field)
 			case "state":
@@ -13200,8 +14965,8 @@ func (ec *executionContext) fieldContext_Platform_pinnedLinks(_ context.Context,
 				return ec.fieldContext_Link_domain(ctx, field)
 			case "analytics":
 				return ec.fieldContext_Link_analytics(ctx, field)
-			case "openGraph":
-				return ec.fieldContext_Link_openGraph(ctx, field)
+			case "LinkContent":
+				return ec.fieldContext_Link_LinkContent(ctx, field)
 			case "redirectionOptions":
 				return ec.fieldContext_Link_redirectionOptions(ctx, field)
 			case "state":
@@ -13336,8 +15101,8 @@ func (ec *executionContext) fieldContext_PlatformDeployment_platform(_ context.C
 				return ec.fieldContext_Platform_id(ctx, field)
 			case "name":
 				return ec.fieldContext_Platform_name(ctx, field)
-			case "openGraph":
-				return ec.fieldContext_Platform_openGraph(ctx, field)
+			case "platformDescription":
+				return ec.fieldContext_Platform_platformDescription(ctx, field)
 			case "redirectionChoice":
 				return ec.fieldContext_Platform_redirectionChoice(ctx, field)
 			case "organization":
@@ -13663,6 +15428,193 @@ func (ec *executionContext) fieldContext_PlatformDeployment_deletedAt(_ context.
 	return fc, nil
 }
 
+func (ec *executionContext) _PlatformDescription_metaDescription(ctx context.Context, field graphql.CollectedField, obj *database_types.PlatformDescription) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_PlatformDescription_metaDescription(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.MetaDescription, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(database_types.MetaDescription)
+	fc.Result = res
+	return ec.marshalOMetaDescription2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐMetaDescription(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_PlatformDescription_metaDescription(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "PlatformDescription",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "title":
+				return ec.fieldContext_MetaDescription_title(ctx, field)
+			case "favIcon":
+				return ec.fieldContext_MetaDescription_favIcon(ctx, field)
+			case "description":
+				return ec.fieldContext_MetaDescription_description(ctx, field)
+			case "locale":
+				return ec.fieldContext_MetaDescription_locale(ctx, field)
+			case "ogTitle":
+				return ec.fieldContext_MetaDescription_ogTitle(ctx, field)
+			case "ogDescription":
+				return ec.fieldContext_MetaDescription_ogDescription(ctx, field)
+			case "ogURL":
+				return ec.fieldContext_MetaDescription_ogURL(ctx, field)
+			case "ogSiteName":
+				return ec.fieldContext_MetaDescription_ogSiteName(ctx, field)
+			case "ogMetaType":
+				return ec.fieldContext_MetaDescription_ogMetaType(ctx, field)
+			case "ogLocale":
+				return ec.fieldContext_MetaDescription_ogLocale(ctx, field)
+			case "ogBigImage":
+				return ec.fieldContext_MetaDescription_ogBigImage(ctx, field)
+			case "ogBigWidth":
+				return ec.fieldContext_MetaDescription_ogBigWidth(ctx, field)
+			case "ogBigHeight":
+				return ec.fieldContext_MetaDescription_ogBigHeight(ctx, field)
+			case "ogSmallImage":
+				return ec.fieldContext_MetaDescription_ogSmallImage(ctx, field)
+			case "ogSmallWidth":
+				return ec.fieldContext_MetaDescription_ogSmallWidth(ctx, field)
+			case "ogSmallHeight":
+				return ec.fieldContext_MetaDescription_ogSmallHeight(ctx, field)
+			case "ogCard":
+				return ec.fieldContext_MetaDescription_ogCard(ctx, field)
+			case "ogSite":
+				return ec.fieldContext_MetaDescription_ogSite(ctx, field)
+			case "ogType":
+				return ec.fieldContext_MetaDescription_ogType(ctx, field)
+			case "ogCreator":
+				return ec.fieldContext_MetaDescription_ogCreator(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type MetaDescription", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _PlatformDescription_navbarDescription(ctx context.Context, field graphql.CollectedField, obj *database_types.PlatformDescription) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_PlatformDescription_navbarDescription(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.NavbarDescription, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(database_types.NavbarDescription)
+	fc.Result = res
+	return ec.marshalONavbarDescription2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐNavbarDescription(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_PlatformDescription_navbarDescription(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "PlatformDescription",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "brandImg":
+				return ec.fieldContext_NavbarDescription_brandImg(ctx, field)
+			case "brandURL":
+				return ec.fieldContext_NavbarDescription_brandURL(ctx, field)
+			case "brandName":
+				return ec.fieldContext_NavbarDescription_brandName(ctx, field)
+			case "target":
+				return ec.fieldContext_NavbarDescription_target(ctx, field)
+			case "startItems":
+				return ec.fieldContext_NavbarDescription_startItems(ctx, field)
+			case "endButtons":
+				return ec.fieldContext_NavbarDescription_endButtons(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type NavbarDescription", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _PlatformDescription_footerDescription(ctx context.Context, field graphql.CollectedField, obj *database_types.PlatformDescription) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_PlatformDescription_footerDescription(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.FooterDescription, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(database_types.FooterDescription)
+	fc.Result = res
+	return ec.marshalOFooterDescription2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐFooterDescription(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_PlatformDescription_footerDescription(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "PlatformDescription",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "showRouteHubBranding":
+				return ec.fieldContext_FooterDescription_showRouteHubBranding(ctx, field)
+			case "companyBrandingHtml":
+				return ec.fieldContext_FooterDescription_companyBrandingHtml(ctx, field)
+			case "socialMediaContainer":
+				return ec.fieldContext_FooterDescription_socialMediaContainer(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type FooterDescription", field.Name)
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Query_links(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Query_links(ctx, field)
 	if err != nil {
@@ -13897,8 +15849,8 @@ func (ec *executionContext) fieldContext_Query_platforms(_ context.Context, fiel
 				return ec.fieldContext_Platform_id(ctx, field)
 			case "name":
 				return ec.fieldContext_Platform_name(ctx, field)
-			case "openGraph":
-				return ec.fieldContext_Platform_openGraph(ctx, field)
+			case "platformDescription":
+				return ec.fieldContext_Platform_platformDescription(ctx, field)
 			case "redirectionChoice":
 				return ec.fieldContext_Platform_redirectionChoice(ctx, field)
 			case "organization":
@@ -14435,6 +16387,178 @@ func (ec *executionContext) fieldContext_SocialMedia_icon(_ context.Context, fie
 	return fc, nil
 }
 
+func (ec *executionContext) _SocialMediaContainer_socialMediaPeddingClass(ctx context.Context, field graphql.CollectedField, obj *database_types.SocialMediaContainer) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_SocialMediaContainer_socialMediaPeddingClass(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.SocialMediaPeddingClass, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalOString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_SocialMediaContainer_socialMediaPeddingClass(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "SocialMediaContainer",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _SocialMediaContainer_socialMediaColorClass(ctx context.Context, field graphql.CollectedField, obj *database_types.SocialMediaContainer) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_SocialMediaContainer_socialMediaColorClass(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.SocialMediaColorClass, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalOString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_SocialMediaContainer_socialMediaColorClass(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "SocialMediaContainer",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _SocialMediaContainer_socialMediaSizeClass(ctx context.Context, field graphql.CollectedField, obj *database_types.SocialMediaContainer) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_SocialMediaContainer_socialMediaSizeClass(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.SocialMediaSizeClass, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalOString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_SocialMediaContainer_socialMediaSizeClass(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "SocialMediaContainer",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _SocialMediaContainer_socialMediaLinks(ctx context.Context, field graphql.CollectedField, obj *database_types.SocialMediaContainer) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_SocialMediaContainer_socialMediaLinks(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.SocialMediaLinks, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*[]database_types.ASocialMedia)
+	fc.Result = res
+	return ec.marshalOASocialMedia2ᚖᚕgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐASocialMediaᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_SocialMediaContainer_socialMediaLinks(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "SocialMediaContainer",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "icon":
+				return ec.fieldContext_ASocialMedia_icon(ctx, field)
+			case "link":
+				return ec.fieldContext_ASocialMedia_link(ctx, field)
+			case "target":
+				return ec.fieldContext_ASocialMedia_target(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ASocialMedia", field.Name)
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Template_id(ctx context.Context, field graphql.CollectedField, obj *model.Template) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Template_id(ctx, field)
 	if err != nil {
@@ -14590,8 +16714,8 @@ func (ec *executionContext) fieldContext_Template_platform(_ context.Context, fi
 				return ec.fieldContext_Platform_id(ctx, field)
 			case "name":
 				return ec.fieldContext_Platform_name(ctx, field)
-			case "openGraph":
-				return ec.fieldContext_Platform_openGraph(ctx, field)
+			case "platformDescription":
+				return ec.fieldContext_Platform_platformDescription(ctx, field)
 			case "redirectionChoice":
 				return ec.fieldContext_Platform_redirectionChoice(ctx, field)
 			case "organization":
@@ -14621,8 +16745,8 @@ func (ec *executionContext) fieldContext_Template_platform(_ context.Context, fi
 	return fc, nil
 }
 
-func (ec *executionContext) _Template_openGraph(ctx context.Context, field graphql.CollectedField, obj *model.Template) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Template_openGraph(ctx, field)
+func (ec *executionContext) _Template_platformDescription(ctx context.Context, field graphql.CollectedField, obj *model.Template) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Template_platformDescription(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -14635,7 +16759,7 @@ func (ec *executionContext) _Template_openGraph(ctx context.Context, field graph
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.OpenGraph, nil
+		return obj.PlatformDescription, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -14647,12 +16771,12 @@ func (ec *executionContext) _Template_openGraph(ctx context.Context, field graph
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*database_types.OpenGraph)
+	res := resTmp.(*database_types.PlatformDescription)
 	fc.Result = res
-	return ec.marshalNOpenGraph2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐOpenGraph(ctx, field.Selections, res)
+	return ec.marshalNPlatformDescription2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐPlatformDescription(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Template_openGraph(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Template_platformDescription(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Template",
 		Field:      field,
@@ -14660,28 +16784,14 @@ func (ec *executionContext) fieldContext_Template_openGraph(_ context.Context, f
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
-			case "title":
-				return ec.fieldContext_OpenGraph_title(ctx, field)
-			case "description":
-				return ec.fieldContext_OpenGraph_description(ctx, field)
-			case "favIcon":
-				return ec.fieldContext_OpenGraph_favIcon(ctx, field)
-			case "image":
-				return ec.fieldContext_OpenGraph_image(ctx, field)
-			case "alternateImage":
-				return ec.fieldContext_OpenGraph_alternateImage(ctx, field)
-			case "url":
-				return ec.fieldContext_OpenGraph_url(ctx, field)
-			case "siteName":
-				return ec.fieldContext_OpenGraph_siteName(ctx, field)
-			case "type":
-				return ec.fieldContext_OpenGraph_type(ctx, field)
-			case "locale":
-				return ec.fieldContext_OpenGraph_locale(ctx, field)
-			case "x":
-				return ec.fieldContext_OpenGraph_x(ctx, field)
+			case "metaDescription":
+				return ec.fieldContext_PlatformDescription_metaDescription(ctx, field)
+			case "navbarDescription":
+				return ec.fieldContext_PlatformDescription_navbarDescription(ctx, field)
+			case "footerDescription":
+				return ec.fieldContext_PlatformDescription_footerDescription(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type OpenGraph", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type PlatformDescription", field.Name)
 		},
 	}
 	return fc, nil
@@ -15099,7 +17209,7 @@ func (ec *executionContext) _User_avatar(ctx context.Context, field graphql.Coll
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Avatar, nil
+		return ec.resolvers.User().Avatar(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -15120,8 +17230,8 @@ func (ec *executionContext) fieldContext_User_avatar(_ context.Context, field gr
 	fc = &graphql.FieldContext{
 		Object:     "User",
 		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type String does not have child fields")
 		},
@@ -15143,7 +17253,7 @@ func (ec *executionContext) _User_email(ctx context.Context, field graphql.Colle
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Email, nil
+		return ec.resolvers.User().Email(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -15164,8 +17274,8 @@ func (ec *executionContext) fieldContext_User_email(_ context.Context, field gra
 	fc = &graphql.FieldContext{
 		Object:     "User",
 		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type String does not have child fields")
 		},
@@ -15187,7 +17297,7 @@ func (ec *executionContext) _User_fullname(ctx context.Context, field graphql.Co
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Fullname, nil
+		return ec.resolvers.User().Fullname(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -15208,8 +17318,8 @@ func (ec *executionContext) fieldContext_User_fullname(_ context.Context, field 
 	fc = &graphql.FieldContext{
 		Object:     "User",
 		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type String does not have child fields")
 		},
@@ -15231,7 +17341,7 @@ func (ec *executionContext) _User_verified(ctx context.Context, field graphql.Co
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Verified, nil
+		return ec.resolvers.User().Verified(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -15252,8 +17362,8 @@ func (ec *executionContext) fieldContext_User_verified(_ context.Context, field 
 	fc = &graphql.FieldContext{
 		Object:     "User",
 		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type Boolean does not have child fields")
 		},
@@ -15275,7 +17385,7 @@ func (ec *executionContext) _User_phone(ctx context.Context, field graphql.Colle
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Phone, nil
+		return ec.resolvers.User().Phone(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -15296,20 +17406,14 @@ func (ec *executionContext) fieldContext_User_phone(_ context.Context, field gra
 	fc = &graphql.FieldContext{
 		Object:     "User",
 		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "number":
 				return ec.fieldContext_AccountPhone_number(ctx, field)
-			case "countryCode":
-				return ec.fieldContext_AccountPhone_countryCode(ctx, field)
 			case "verified":
 				return ec.fieldContext_AccountPhone_verified(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_AccountPhone_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_AccountPhone_updatedAt(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type AccountPhone", field.Name)
 		},
@@ -15476,8 +17580,8 @@ func (ec *executionContext) fieldContext_User_platforms(_ context.Context, field
 				return ec.fieldContext_Platform_id(ctx, field)
 			case "name":
 				return ec.fieldContext_Platform_name(ctx, field)
-			case "openGraph":
-				return ec.fieldContext_Platform_openGraph(ctx, field)
+			case "platformDescription":
+				return ec.fieldContext_Platform_platformDescription(ctx, field)
 			case "redirectionChoice":
 				return ec.fieldContext_Platform_redirectionChoice(ctx, field)
 			case "organization":
@@ -15990,8 +18094,8 @@ func (ec *executionContext) fieldContext_UserInvite_platforms(_ context.Context,
 				return ec.fieldContext_Platform_id(ctx, field)
 			case "name":
 				return ec.fieldContext_Platform_name(ctx, field)
-			case "openGraph":
-				return ec.fieldContext_Platform_openGraph(ctx, field)
+			case "platformDescription":
+				return ec.fieldContext_Platform_platformDescription(ctx, field)
 			case "redirectionChoice":
 				return ec.fieldContext_Platform_redirectionChoice(ctx, field)
 			case "organization":
@@ -18031,34 +20135,41 @@ func (ec *executionContext) fieldContext___Type_specifiedByURL(_ context.Context
 
 // region    **************************** input.gotpl *****************************
 
-func (ec *executionContext) unmarshalInputAccountPhoneInput(ctx context.Context, obj interface{}) (model.AccountPhoneInput, error) {
-	var it model.AccountPhoneInput
+func (ec *executionContext) unmarshalInputASocialMediaInput(ctx context.Context, obj interface{}) (database_types.ASocialMedia, error) {
+	var it database_types.ASocialMedia
 	asMap := map[string]interface{}{}
 	for k, v := range obj.(map[string]interface{}) {
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"number", "countryCode"}
+	fieldsInOrder := [...]string{"icon", "link", "target"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
 			continue
 		}
 		switch k {
-		case "number":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("number"))
+		case "icon":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("icon"))
 			data, err := ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.Number = data
-		case "countryCode":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("countryCode"))
+			it.Icon = data
+		case "link":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("link"))
 			data, err := ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.CountryCode = data
+			it.Link = data
+		case "target":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("target"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Target = data
 		}
 	}
 
@@ -18375,6 +20486,47 @@ func (ec *executionContext) unmarshalInputFloatFilter(ctx context.Context, obj i
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputFooterDescriptionInput(ctx context.Context, obj interface{}) (database_types.FooterDescription, error) {
+	var it database_types.FooterDescription
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"showRouteHubBranding", "companyBrandingHtml", "socialMediaContainer"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "showRouteHubBranding":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("showRouteHubBranding"))
+			data, err := ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ShowRouteHubBranding = data
+		case "companyBrandingHtml":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("companyBrandingHtml"))
+			data, err := ec.unmarshalOString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CompanyBrandingHtml = data
+		case "socialMediaContainer":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("socialMediaContainer"))
+			data, err := ec.unmarshalOSocialMediaContainerInput2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐSocialMediaContainer(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.SocialMediaContainer = data
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputIDFilter(ctx context.Context, obj interface{}) (model.IDFilter, error) {
 	var it model.IDFilter
 	asMap := map[string]interface{}{}
@@ -18493,6 +20645,54 @@ func (ec *executionContext) unmarshalInputIDFilter(ctx context.Context, obj inte
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputImageDescriptionInput(ctx context.Context, obj interface{}) (database_types.ImageDescription, error) {
+	var it database_types.ImageDescription
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"src", "alt", "height", "width"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "src":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("src"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.SRC = data
+		case "alt":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("alt"))
+			data, err := ec.unmarshalOString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Alt = data
+		case "height":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("height"))
+			data, err := ec.unmarshalOString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Height = data
+		case "width":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("width"))
+			data, err := ec.unmarshalOString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Width = data
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputIntFilter(ctx context.Context, obj interface{}) (model.IntFilter, error) {
 	var it model.IntFilter
 	asMap := map[string]interface{}{}
@@ -18576,6 +20776,75 @@ func (ec *executionContext) unmarshalInputIntFilter(ctx context.Context, obj int
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputLinkContentInput(ctx context.Context, obj interface{}) (database_types.LinkContent, error) {
+	var it database_types.LinkContent
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"title", "subtitle", "redirectionURLText", "redirectionDelay", "additionalHead", "additionalFooter", "metaDescription"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "title":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("title"))
+			data, err := ec.unmarshalOString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Title = data
+		case "subtitle":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("subtitle"))
+			data, err := ec.unmarshalOString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Subtitle = data
+		case "redirectionURLText":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("redirectionURLText"))
+			data, err := ec.unmarshalOString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.RedirectionURLText = data
+		case "redirectionDelay":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("redirectionDelay"))
+			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.RedirectionDelay = data
+		case "additionalHead":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("additionalHead"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.AdditionalHead = data
+		case "additionalFooter":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("additionalFooter"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.AdditionalFooter = data
+		case "metaDescription":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("metaDescription"))
+			data, err := ec.unmarshalOMetaDescriptionInput2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐMetaDescription(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.MetaDescription = data
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputLinkCreateInput(ctx context.Context, obj interface{}) (model.LinkCreateInput, error) {
 	var it model.LinkCreateInput
 	asMap := map[string]interface{}{}
@@ -18583,7 +20852,7 @@ func (ec *executionContext) unmarshalInputLinkCreateInput(ctx context.Context, o
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"target", "path", "platformId", "redirectionOptions", "openGraph"}
+	fieldsInOrder := [...]string{"target", "path", "platformId", "redirectionOptions", "LinkContent"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -18694,10 +20963,10 @@ func (ec *executionContext) unmarshalInputLinkCreateInput(ctx context.Context, o
 				err := fmt.Errorf(`unexpected type %T from directive, should be *github.com/RouteHub-Link/routehub-service-graphql/database/enums.RedirectionOptions`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
-		case "openGraph":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("openGraph"))
+		case "LinkContent":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("LinkContent"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
-				return ec.unmarshalOOpenGraphInput2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐOpenGraph(ctx, v)
+				return ec.unmarshalOLinkContentInput2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐLinkContent(ctx, v)
 			}
 			directive1 := func(ctx context.Context) (interface{}, error) {
 				permission, err := ec.unmarshalNPlatformPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐPlatformPermission(ctx, "LINK_CREATE")
@@ -18714,12 +20983,12 @@ func (ec *executionContext) unmarshalInputLinkCreateInput(ctx context.Context, o
 			if err != nil {
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
-			if data, ok := tmp.(*database_types.OpenGraph); ok {
-				it.OpenGraph = data
+			if data, ok := tmp.(*database_types.LinkContent); ok {
+				it.LinkContent = data
 			} else if tmp == nil {
-				it.OpenGraph = nil
+				it.LinkContent = nil
 			} else {
-				err := fmt.Errorf(`unexpected type %T from directive, should be *github.com/RouteHub-Link/routehub-service-graphql/database/types.OpenGraph`, tmp)
+				err := fmt.Errorf(`unexpected type %T from directive, should be *github.com/RouteHub-Link/routehub-service-graphql/database/types.LinkContent`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		}
@@ -18762,34 +21031,154 @@ func (ec *executionContext) unmarshalInputLinkFilter(ctx context.Context, obj in
 	return it, nil
 }
 
-func (ec *executionContext) unmarshalInputLoginInput(ctx context.Context, obj interface{}) (model.LoginInput, error) {
-	var it model.LoginInput
+func (ec *executionContext) unmarshalInputLinkUpdateInput(ctx context.Context, obj interface{}) (graph_inputs.LinkUpdateInput, error) {
+	var it graph_inputs.LinkUpdateInput
 	asMap := map[string]interface{}{}
 	for k, v := range obj.(map[string]interface{}) {
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"email", "password"}
+	fieldsInOrder := [...]string{"linkId", "target", "path", "redirectionOptions", "LinkContent"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
 			continue
 		}
 		switch k {
-		case "email":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("email"))
-			data, err := ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
+		case "linkId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("linkId"))
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalNUUID2githubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, v)
 			}
-			it.Email = data
-		case "password":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("password"))
-			data, err := ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				permission, err := ec.unmarshalNPlatformPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐPlatformPermission(ctx, "LINK_UPDATE")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.PlatformPermission == nil {
+					return nil, errors.New("directive platformPermission is not implemented")
+				}
+				return ec.directives.PlatformPermission(ctx, obj, directive0, permission)
 			}
-			it.Password = data
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(uuid.UUID); ok {
+				it.LinkID = data
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be github.com/google/uuid.UUID`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "target":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("target"))
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				permission, err := ec.unmarshalNPlatformPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐPlatformPermission(ctx, "LINK_UPDATE")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.PlatformPermission == nil {
+					return nil, errors.New("directive platformPermission is not implemented")
+				}
+				return ec.directives.PlatformPermission(ctx, obj, directive0, permission)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*string); ok {
+				it.Target = data
+			} else if tmp == nil {
+				it.Target = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "path":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("path"))
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				permission, err := ec.unmarshalNPlatformPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐPlatformPermission(ctx, "LINK_UPDATE")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.PlatformPermission == nil {
+					return nil, errors.New("directive platformPermission is not implemented")
+				}
+				return ec.directives.PlatformPermission(ctx, obj, directive0, permission)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*string); ok {
+				it.Path = data
+			} else if tmp == nil {
+				it.Path = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "redirectionOptions":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("redirectionOptions"))
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalORedirectionOptions2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐRedirectionOptions(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				permission, err := ec.unmarshalNPlatformPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐPlatformPermission(ctx, "LINK_UPDATE")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.PlatformPermission == nil {
+					return nil, errors.New("directive platformPermission is not implemented")
+				}
+				return ec.directives.PlatformPermission(ctx, obj, directive0, permission)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*database_enums.RedirectionOptions); ok {
+				it.RedirectionOptions = data
+			} else if tmp == nil {
+				it.RedirectionOptions = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *github.com/RouteHub-Link/routehub-service-graphql/database/enums.RedirectionOptions`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "LinkContent":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("LinkContent"))
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalOLinkContentInput2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐLinkContent(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				permission, err := ec.unmarshalNPlatformPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐPlatformPermission(ctx, "LINK_UPDATE")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.PlatformPermission == nil {
+					return nil, errors.New("directive platformPermission is not implemented")
+				}
+				return ec.directives.PlatformPermission(ctx, obj, directive0, permission)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*database_types.LinkContent); ok {
+				it.LinkContent = data
+			} else if tmp == nil {
+				it.LinkContent = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *github.com/RouteHub-Link/routehub-service-graphql/database/types.LinkContent`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
 		}
 	}
 
@@ -18982,6 +21371,338 @@ func (ec *executionContext) unmarshalInputMapInEntry(ctx context.Context, obj in
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputMetaDescriptionInput(ctx context.Context, obj interface{}) (database_types.MetaDescription, error) {
+	var it database_types.MetaDescription
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"title", "favIcon", "description", "locale", "ogTitle", "ogDescription", "ogURL", "ogSiteName", "ogMetaType", "ogLocale", "ogBigImage", "ogBigWidth", "ogBigHeight", "ogSmallImage", "ogSmallWidth", "ogSmallHeight", "ogCard", "ogSite", "ogType", "ogCreator"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "title":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("title"))
+			data, err := ec.unmarshalOString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Title = data
+		case "favIcon":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("favIcon"))
+			data, err := ec.unmarshalOString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.FavIcon = data
+		case "description":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("description"))
+			data, err := ec.unmarshalOString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Description = data
+		case "locale":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("locale"))
+			data, err := ec.unmarshalOString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Locale = data
+		case "ogTitle":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ogTitle"))
+			data, err := ec.unmarshalOString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.OGTitle = data
+		case "ogDescription":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ogDescription"))
+			data, err := ec.unmarshalOString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.OGDescription = data
+		case "ogURL":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ogURL"))
+			data, err := ec.unmarshalOString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.OGURL = data
+		case "ogSiteName":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ogSiteName"))
+			data, err := ec.unmarshalOString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.OGSiteName = data
+		case "ogMetaType":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ogMetaType"))
+			data, err := ec.unmarshalOString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.OGMetaType = data
+		case "ogLocale":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ogLocale"))
+			data, err := ec.unmarshalOString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.OGLocale = data
+		case "ogBigImage":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ogBigImage"))
+			data, err := ec.unmarshalOString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.OGBigImage = data
+		case "ogBigWidth":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ogBigWidth"))
+			data, err := ec.unmarshalOString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.OGBigWidth = data
+		case "ogBigHeight":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ogBigHeight"))
+			data, err := ec.unmarshalOString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.OGBigHeight = data
+		case "ogSmallImage":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ogSmallImage"))
+			data, err := ec.unmarshalOString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.OGSmallImage = data
+		case "ogSmallWidth":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ogSmallWidth"))
+			data, err := ec.unmarshalOString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.OGSmallWidth = data
+		case "ogSmallHeight":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ogSmallHeight"))
+			data, err := ec.unmarshalOString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.OGSmallHeight = data
+		case "ogCard":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ogCard"))
+			data, err := ec.unmarshalOString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.OGCard = data
+		case "ogSite":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ogSite"))
+			data, err := ec.unmarshalOString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.OGSite = data
+		case "ogType":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ogType"))
+			data, err := ec.unmarshalOString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.OGType = data
+		case "ogCreator":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ogCreator"))
+			data, err := ec.unmarshalOString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.OGCreator = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputNavbarButtonInput(ctx context.Context, obj interface{}) (database_types.NavbarButton, error) {
+	var it database_types.NavbarButton
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"text", "url", "icon", "target", "colorClass"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "text":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("text"))
+			data, err := ec.unmarshalOString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Text = data
+		case "url":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("url"))
+			data, err := ec.unmarshalOString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.URL = data
+		case "icon":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("icon"))
+			data, err := ec.unmarshalOString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Icon = data
+		case "target":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("target"))
+			data, err := ec.unmarshalOString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Target = data
+		case "colorClass":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("colorClass"))
+			data, err := ec.unmarshalOString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ColorClass = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputNavbarDescriptionInput(ctx context.Context, obj interface{}) (database_types.NavbarDescription, error) {
+	var it database_types.NavbarDescription
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"brandImg", "brandURL", "brandName", "target", "startItems", "endButtons"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "brandImg":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("brandImg"))
+			data, err := ec.unmarshalOImageDescriptionInput2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐImageDescription(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.BrandImg = data
+		case "brandURL":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("brandURL"))
+			data, err := ec.unmarshalOString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.BrandURL = data
+		case "brandName":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("brandName"))
+			data, err := ec.unmarshalOString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.BrandName = data
+		case "target":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("target"))
+			data, err := ec.unmarshalOString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Target = data
+		case "startItems":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("startItems"))
+			data, err := ec.unmarshalONavbarItemInput2ᚖᚕgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐNavbarItemᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.StartItems = data
+		case "endButtons":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("endButtons"))
+			data, err := ec.unmarshalONavbarButtonInput2ᚖᚕgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐNavbarButtonᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.EndButtons = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputNavbarItemInput(ctx context.Context, obj interface{}) (database_types.NavbarItem, error) {
+	var it database_types.NavbarItem
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"text", "url", "target", "icon", "dropdown"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "text":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("text"))
+			data, err := ec.unmarshalOString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Text = data
+		case "url":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("url"))
+			data, err := ec.unmarshalOString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.URL = data
+		case "target":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("target"))
+			data, err := ec.unmarshalOString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Target = data
+		case "icon":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("icon"))
+			data, err := ec.unmarshalOString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Icon = data
+		case "dropdown":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("dropdown"))
+			data, err := ec.unmarshalONavbarItemInput2ᚖᚕgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐNavbarItem(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Dropdown = data
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputObservationInput(ctx context.Context, obj interface{}) (model.ObservationInput, error) {
 	var it model.ObservationInput
 	asMap := map[string]interface{}{}
@@ -19059,172 +21780,6 @@ func (ec *executionContext) unmarshalInputObservationInput(ctx context.Context, 
 				return it, err
 			}
 			it.Success = data
-		}
-	}
-
-	return it, nil
-}
-
-func (ec *executionContext) unmarshalInputOpenGraphInput(ctx context.Context, obj interface{}) (database_types.OpenGraph, error) {
-	var it database_types.OpenGraph
-	asMap := map[string]interface{}{}
-	for k, v := range obj.(map[string]interface{}) {
-		asMap[k] = v
-	}
-
-	fieldsInOrder := [...]string{"title", "description", "favIcon", "image", "alternateImage", "url", "siteName", "type", "locale", "x"}
-	for _, k := range fieldsInOrder {
-		v, ok := asMap[k]
-		if !ok {
-			continue
-		}
-		switch k {
-		case "title":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("title"))
-			data, err := ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Title = data
-		case "description":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("description"))
-			data, err := ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Description = data
-		case "favIcon":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("favIcon"))
-			data, err := ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.FavIcon = data
-		case "image":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("image"))
-			data, err := ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Image = data
-		case "alternateImage":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("alternateImage"))
-			data, err := ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.AlternateImage = data
-		case "url":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("url"))
-			data, err := ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.URL = data
-		case "siteName":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("siteName"))
-			data, err := ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.SiteName = data
-		case "type":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("type"))
-			data, err := ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Type = data
-		case "locale":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("locale"))
-			data, err := ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Locale = data
-		case "x":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("x"))
-			data, err := ec.unmarshalNOpenGraphXInput2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐOpenGraphX(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.X = data
-		}
-	}
-
-	return it, nil
-}
-
-func (ec *executionContext) unmarshalInputOpenGraphXInput(ctx context.Context, obj interface{}) (database_types.OpenGraphX, error) {
-	var it database_types.OpenGraphX
-	asMap := map[string]interface{}{}
-	for k, v := range obj.(map[string]interface{}) {
-		asMap[k] = v
-	}
-
-	fieldsInOrder := [...]string{"card", "site", "title", "description", "image", "url", "type", "creator"}
-	for _, k := range fieldsInOrder {
-		v, ok := asMap[k]
-		if !ok {
-			continue
-		}
-		switch k {
-		case "card":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("card"))
-			data, err := ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Card = data
-		case "site":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("site"))
-			data, err := ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Site = data
-		case "title":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("title"))
-			data, err := ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Title = data
-		case "description":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("description"))
-			data, err := ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Description = data
-		case "image":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("image"))
-			data, err := ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Image = data
-		case "url":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("url"))
-			data, err := ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.URL = data
-		case "type":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("type"))
-			data, err := ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Type = data
-		case "creator":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("creator"))
-			data, err := ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Creator = data
 		}
 	}
 
@@ -19499,7 +22054,7 @@ func (ec *executionContext) unmarshalInputPlatformCreateInput(ctx context.Contex
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"organizationId", "domainId", "name", "openGraph", "redirectionChoice", "templates"}
+	fieldsInOrder := [...]string{"organizationId", "domainId", "name", "platformDescription", "redirectionChoice", "templates"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -19582,10 +22137,10 @@ func (ec *executionContext) unmarshalInputPlatformCreateInput(ctx context.Contex
 				err := fmt.Errorf(`unexpected type %T from directive, should be string`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
-		case "openGraph":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("openGraph"))
+		case "platformDescription":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("platformDescription"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
-				return ec.unmarshalNOpenGraphInput2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐOpenGraph(ctx, v)
+				return ec.unmarshalNPlatformDescriptionInput2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐPlatformDescription(ctx, v)
 			}
 			directive1 := func(ctx context.Context) (interface{}, error) {
 				permission, err := ec.unmarshalNOrganizationPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐOrganizationPermission(ctx, "PLATFORM_CREATE")
@@ -19602,12 +22157,12 @@ func (ec *executionContext) unmarshalInputPlatformCreateInput(ctx context.Contex
 			if err != nil {
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
-			if data, ok := tmp.(*database_types.OpenGraph); ok {
-				it.OpenGraph = data
+			if data, ok := tmp.(*database_types.PlatformDescription); ok {
+				it.PlatformDescription = data
 			} else if tmp == nil {
-				it.OpenGraph = nil
+				it.PlatformDescription = nil
 			} else {
-				err := fmt.Errorf(`unexpected type %T from directive, should be *github.com/RouteHub-Link/routehub-service-graphql/database/types.OpenGraph`, tmp)
+				err := fmt.Errorf(`unexpected type %T from directive, should be *github.com/RouteHub-Link/routehub-service-graphql/database/types.PlatformDescription`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "redirectionChoice":
@@ -19670,6 +22225,253 @@ func (ec *executionContext) unmarshalInputPlatformCreateInput(ctx context.Contex
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputPlatformDescriptionInput(ctx context.Context, obj interface{}) (database_types.PlatformDescription, error) {
+	var it database_types.PlatformDescription
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"metaDescription", "navbarDescription", "footerDescription"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "metaDescription":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("metaDescription"))
+			data, err := ec.unmarshalOMetaDescriptionInput2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐMetaDescription(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.MetaDescription = data
+		case "navbarDescription":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("navbarDescription"))
+			data, err := ec.unmarshalONavbarDescriptionInput2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐNavbarDescription(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.NavbarDescription = data
+		case "footerDescription":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("footerDescription"))
+			data, err := ec.unmarshalOFooterDescriptionInput2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐFooterDescription(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.FooterDescription = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputPlatformUpdateInput(ctx context.Context, obj interface{}) (graph_inputs.PlatformUpdateInput, error) {
+	var it graph_inputs.PlatformUpdateInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"platformId", "organizationId", "name", "platformDescription", "redirectionChoice", "templates", "status"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "platformId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("platformId"))
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalNUUID2githubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				permission, err := ec.unmarshalNPlatformPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐPlatformPermission(ctx, "PLATFORM_UPDATE")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.PlatformPermission == nil {
+					return nil, errors.New("directive platformPermission is not implemented")
+				}
+				return ec.directives.PlatformPermission(ctx, obj, directive0, permission)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(uuid.UUID); ok {
+				it.PlatformID = data
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be github.com/google/uuid.UUID`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "organizationId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("organizationId"))
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalNUUID2githubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				permission, err := ec.unmarshalNPlatformPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐPlatformPermission(ctx, "PLATFORM_UPDATE")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.PlatformPermission == nil {
+					return nil, errors.New("directive platformPermission is not implemented")
+				}
+				return ec.directives.PlatformPermission(ctx, obj, directive0, permission)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(uuid.UUID); ok {
+				it.OrganizationID = data
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be github.com/google/uuid.UUID`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "name":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalNString2string(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				permission, err := ec.unmarshalNPlatformPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐPlatformPermission(ctx, "PLATFORM_UPDATE")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.PlatformPermission == nil {
+					return nil, errors.New("directive platformPermission is not implemented")
+				}
+				return ec.directives.PlatformPermission(ctx, obj, directive0, permission)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(string); ok {
+				it.Name = data
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be string`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "platformDescription":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("platformDescription"))
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalNPlatformDescriptionInput2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐPlatformDescription(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				permission, err := ec.unmarshalNPlatformPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐPlatformPermission(ctx, "PLATFORM_UPDATE")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.PlatformPermission == nil {
+					return nil, errors.New("directive platformPermission is not implemented")
+				}
+				return ec.directives.PlatformPermission(ctx, obj, directive0, permission)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*database_types.PlatformDescription); ok {
+				it.PlatformDescription = data
+			} else if tmp == nil {
+				it.PlatformDescription = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *github.com/RouteHub-Link/routehub-service-graphql/database/types.PlatformDescription`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "redirectionChoice":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("redirectionChoice"))
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalNRedirectionOptions2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐRedirectionOptions(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				permission, err := ec.unmarshalNPlatformPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐPlatformPermission(ctx, "PLATFORM_UPDATE")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.PlatformPermission == nil {
+					return nil, errors.New("directive platformPermission is not implemented")
+				}
+				return ec.directives.PlatformPermission(ctx, obj, directive0, permission)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*database_enums.RedirectionOptions); ok {
+				it.RedirectionChoice = data
+			} else if tmp == nil {
+				it.RedirectionChoice = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *github.com/RouteHub-Link/routehub-service-graphql/database/enums.RedirectionOptions`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "templates":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("templates"))
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalOTemplateInput2ᚕgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐTemplateInput(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				permission, err := ec.unmarshalNPlatformPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐPlatformPermission(ctx, "PLATFORM_UPDATE")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.PlatformPermission == nil {
+					return nil, errors.New("directive platformPermission is not implemented")
+				}
+				return ec.directives.PlatformPermission(ctx, obj, directive0, permission)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.([]model.TemplateInput); ok {
+				it.Templates = data
+			} else if tmp == nil {
+				it.Templates = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be []github.com/RouteHub-Link/routehub-service-graphql/graph/model.TemplateInput`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "status":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("status"))
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalNStatusState2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐStatusState(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				permission, err := ec.unmarshalNPlatformPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐPlatformPermission(ctx, "PLATFORM_UPDATE")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.PlatformPermission == nil {
+					return nil, errors.New("directive platformPermission is not implemented")
+				}
+				return ec.directives.PlatformPermission(ctx, obj, directive0, permission)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(database_enums.StatusState); ok {
+				it.Status = data
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be github.com/RouteHub-Link/routehub-service-graphql/database/enums.StatusState`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputPlatformsWithPermissionsInput(ctx context.Context, obj interface{}) (database_relations.PlatformsWithPermissions, error) {
 	var it database_relations.PlatformsWithPermissions
 	asMap := map[string]interface{}{}
@@ -19700,6 +22502,54 @@ func (ec *executionContext) unmarshalInputPlatformsWithPermissionsInput(ctx cont
 			if err = ec.resolvers.PlatformsWithPermissionsInput().Permissions(ctx, &it, data); err != nil {
 				return it, err
 			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputSocialMediaContainerInput(ctx context.Context, obj interface{}) (database_types.SocialMediaContainer, error) {
+	var it database_types.SocialMediaContainer
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"socialMediaPeddingClass", "socialMediaColorClass", "socialMediaSizeClass", "socialMediaLinks"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "socialMediaPeddingClass":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("socialMediaPeddingClass"))
+			data, err := ec.unmarshalOString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.SocialMediaPeddingClass = data
+		case "socialMediaColorClass":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("socialMediaColorClass"))
+			data, err := ec.unmarshalOString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.SocialMediaColorClass = data
+		case "socialMediaSizeClass":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("socialMediaSizeClass"))
+			data, err := ec.unmarshalOString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.SocialMediaSizeClass = data
+		case "socialMediaLinks":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("socialMediaLinks"))
+			data, err := ec.unmarshalOASocialMediaInput2ᚖᚕgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐASocialMediaᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.SocialMediaLinks = data
 		}
 	}
 
@@ -19872,7 +22722,7 @@ func (ec *executionContext) unmarshalInputTemplateInput(ctx context.Context, obj
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"name", "openGraph", "redirectionChoice", "state"}
+	fieldsInOrder := [...]string{"name", "templateDescription", "redirectionChoice", "state"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -19886,13 +22736,13 @@ func (ec *executionContext) unmarshalInputTemplateInput(ctx context.Context, obj
 				return it, err
 			}
 			it.Name = data
-		case "openGraph":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("openGraph"))
-			data, err := ec.unmarshalNOpenGraphInput2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐOpenGraph(ctx, v)
+		case "templateDescription":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("templateDescription"))
+			data, err := ec.unmarshalNPlatformDescriptionInput2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐPlatformDescription(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.OpenGraph = data
+			it.TemplateDescription = data
 		case "redirectionChoice":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("redirectionChoice"))
 			data, err := ec.unmarshalNRedirectionOptions2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐRedirectionOptions(ctx, v)
@@ -20086,7 +22936,7 @@ func (ec *executionContext) unmarshalInputUpdateUserInviteInput(ctx context.Cont
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"code", "status", "user"}
+	fieldsInOrder := [...]string{"code", "status"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -20107,82 +22957,6 @@ func (ec *executionContext) unmarshalInputUpdateUserInviteInput(ctx context.Cont
 				return it, err
 			}
 			it.Status = data
-		case "user":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("user"))
-			data, err := ec.unmarshalNUserCreateInput2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐUserCreateInput(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.User = data
-		}
-	}
-
-	return it, nil
-}
-
-func (ec *executionContext) unmarshalInputUserCreateInput(ctx context.Context, obj interface{}) (model.UserCreateInput, error) {
-	var it model.UserCreateInput
-	asMap := map[string]interface{}{}
-	for k, v := range obj.(map[string]interface{}) {
-		asMap[k] = v
-	}
-
-	fieldsInOrder := [...]string{"email", "password", "confirmPassword", "fullname", "phone", "clientInformation", "organization"}
-	for _, k := range fieldsInOrder {
-		v, ok := asMap[k]
-		if !ok {
-			continue
-		}
-		switch k {
-		case "email":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("email"))
-			data, err := ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Email = data
-		case "password":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("password"))
-			data, err := ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Password = data
-		case "confirmPassword":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("confirmPassword"))
-			data, err := ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.ConfirmPassword = data
-		case "fullname":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("fullname"))
-			data, err := ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Fullname = data
-		case "phone":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("phone"))
-			data, err := ec.unmarshalNAccountPhoneInput2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐAccountPhoneInput(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Phone = data
-		case "clientInformation":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clientInformation"))
-			data, err := ec.unmarshalNClientInformationInput2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐClientInformationInput(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.ClientInformation = data
-		case "organization":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("organization"))
-			data, err := ec.unmarshalOOrganizationCreateInput2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐOrganizationCreateInput(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Organization = data
 		}
 	}
 
@@ -20284,6 +23058,55 @@ func (ec *executionContext) unmarshalInputpinnedLinkInput(ctx context.Context, o
 
 // region    **************************** object.gotpl ****************************
 
+var aSocialMediaImplementors = []string{"ASocialMedia"}
+
+func (ec *executionContext) _ASocialMedia(ctx context.Context, sel ast.SelectionSet, obj *database_types.ASocialMedia) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, aSocialMediaImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("ASocialMedia")
+		case "icon":
+			out.Values[i] = ec._ASocialMedia_icon(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "link":
+			out.Values[i] = ec._ASocialMedia_link(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "target":
+			out.Values[i] = ec._ASocialMedia_target(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
 var accountPhoneImplementors = []string{"AccountPhone"}
 
 func (ec *executionContext) _AccountPhone(ctx context.Context, sel ast.SelectionSet, obj *database_types.AccountPhone) graphql.Marshaler {
@@ -20300,23 +23123,11 @@ func (ec *executionContext) _AccountPhone(ctx context.Context, sel ast.Selection
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
-		case "countryCode":
-			out.Values[i] = ec._AccountPhone_countryCode(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
 		case "verified":
 			out.Values[i] = ec._AccountPhone_verified(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
-		case "createdAt":
-			out.Values[i] = ec._AccountPhone_createdAt(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		case "updatedAt":
-			out.Values[i] = ec._AccountPhone_updatedAt(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -20875,6 +23686,91 @@ func (ec *executionContext) _Domain(ctx context.Context, sel ast.SelectionSet, o
 	return out
 }
 
+var footerDescriptionImplementors = []string{"FooterDescription"}
+
+func (ec *executionContext) _FooterDescription(ctx context.Context, sel ast.SelectionSet, obj *database_types.FooterDescription) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, footerDescriptionImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("FooterDescription")
+		case "showRouteHubBranding":
+			out.Values[i] = ec._FooterDescription_showRouteHubBranding(ctx, field, obj)
+		case "companyBrandingHtml":
+			out.Values[i] = ec._FooterDescription_companyBrandingHtml(ctx, field, obj)
+		case "socialMediaContainer":
+			out.Values[i] = ec._FooterDescription_socialMediaContainer(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var imageDescriptionImplementors = []string{"ImageDescription"}
+
+func (ec *executionContext) _ImageDescription(ctx context.Context, sel ast.SelectionSet, obj *database_types.ImageDescription) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, imageDescriptionImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("ImageDescription")
+		case "src":
+			out.Values[i] = ec._ImageDescription_src(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "alt":
+			out.Values[i] = ec._ImageDescription_alt(ctx, field, obj)
+		case "height":
+			out.Values[i] = ec._ImageDescription_height(ctx, field, obj)
+		case "width":
+			out.Values[i] = ec._ImageDescription_width(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
 var industryImplementors = []string{"Industry"}
 
 func (ec *executionContext) _Industry(ctx context.Context, sel ast.SelectionSet, obj *database_types.Industry) graphql.Marshaler {
@@ -21053,39 +23949,11 @@ func (ec *executionContext) _Link(ctx context.Context, sel ast.SelectionSet, obj
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "openGraph":
-			field := field
-
-			innerFunc := func(ctx context.Context, _ *graphql.FieldSet) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Link_openGraph(ctx, field, obj)
-				return res
+		case "LinkContent":
+			out.Values[i] = ec._Link_LinkContent(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
 			}
-
-			if field.Deferrable != nil {
-				dfs, ok := deferred[field.Deferrable.Label]
-				di := 0
-				if ok {
-					dfs.AddField(field)
-					di = len(dfs.Values) - 1
-				} else {
-					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
-					deferred[field.Deferrable.Label] = dfs
-				}
-				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
-					return innerFunc(ctx, dfs)
-				})
-
-				// don't run the out.Concurrently() call below
-				out.Values[i] = graphql.Null
-				continue
-			}
-
-			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "redirectionOptions":
 			field := field
 
@@ -21310,6 +24178,54 @@ func (ec *executionContext) _LinkConnection(ctx context.Context, sel ast.Selecti
 	return out
 }
 
+var linkContentImplementors = []string{"LinkContent"}
+
+func (ec *executionContext) _LinkContent(ctx context.Context, sel ast.SelectionSet, obj *database_types.LinkContent) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, linkContentImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("LinkContent")
+		case "title":
+			out.Values[i] = ec._LinkContent_title(ctx, field, obj)
+		case "subtitle":
+			out.Values[i] = ec._LinkContent_subtitle(ctx, field, obj)
+		case "redirectionURLText":
+			out.Values[i] = ec._LinkContent_redirectionURLText(ctx, field, obj)
+		case "redirectionDelay":
+			out.Values[i] = ec._LinkContent_redirectionDelay(ctx, field, obj)
+		case "additionalHead":
+			out.Values[i] = ec._LinkContent_additionalHead(ctx, field, obj)
+		case "additionalFooter":
+			out.Values[i] = ec._LinkContent_additionalFooter(ctx, field, obj)
+		case "metaDescription":
+			out.Values[i] = ec._LinkContent_metaDescription(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
 var linkCrawlImplementors = []string{"LinkCrawl"}
 
 func (ec *executionContext) _LinkCrawl(ctx context.Context, sel ast.SelectionSet, obj *database_models.LinkCrawl) graphql.Marshaler {
@@ -21378,7 +24294,38 @@ func (ec *executionContext) _LinkCrawl(ctx context.Context, sel ast.SelectionSet
 				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "result":
-			out.Values[i] = ec._LinkCrawl_result(ctx, field, obj)
+			field := field
+
+			innerFunc := func(ctx context.Context, _ *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._LinkCrawl_result(ctx, field, obj)
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "crawledBy":
 			field := field
 
@@ -21634,22 +24581,57 @@ func (ec *executionContext) _Log(ctx context.Context, sel ast.SelectionSet, obj 
 	return out
 }
 
-var loginPayloadImplementors = []string{"LoginPayload"}
+var metaDescriptionImplementors = []string{"MetaDescription"}
 
-func (ec *executionContext) _LoginPayload(ctx context.Context, sel ast.SelectionSet, obj *model.LoginPayload) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, loginPayloadImplementors)
+func (ec *executionContext) _MetaDescription(ctx context.Context, sel ast.SelectionSet, obj *database_types.MetaDescription) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, metaDescriptionImplementors)
 
 	out := graphql.NewFieldSet(fields)
 	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
-			out.Values[i] = graphql.MarshalString("LoginPayload")
-		case "token":
-			out.Values[i] = ec._LoginPayload_token(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
+			out.Values[i] = graphql.MarshalString("MetaDescription")
+		case "title":
+			out.Values[i] = ec._MetaDescription_title(ctx, field, obj)
+		case "favIcon":
+			out.Values[i] = ec._MetaDescription_favIcon(ctx, field, obj)
+		case "description":
+			out.Values[i] = ec._MetaDescription_description(ctx, field, obj)
+		case "locale":
+			out.Values[i] = ec._MetaDescription_locale(ctx, field, obj)
+		case "ogTitle":
+			out.Values[i] = ec._MetaDescription_ogTitle(ctx, field, obj)
+		case "ogDescription":
+			out.Values[i] = ec._MetaDescription_ogDescription(ctx, field, obj)
+		case "ogURL":
+			out.Values[i] = ec._MetaDescription_ogURL(ctx, field, obj)
+		case "ogSiteName":
+			out.Values[i] = ec._MetaDescription_ogSiteName(ctx, field, obj)
+		case "ogMetaType":
+			out.Values[i] = ec._MetaDescription_ogMetaType(ctx, field, obj)
+		case "ogLocale":
+			out.Values[i] = ec._MetaDescription_ogLocale(ctx, field, obj)
+		case "ogBigImage":
+			out.Values[i] = ec._MetaDescription_ogBigImage(ctx, field, obj)
+		case "ogBigWidth":
+			out.Values[i] = ec._MetaDescription_ogBigWidth(ctx, field, obj)
+		case "ogBigHeight":
+			out.Values[i] = ec._MetaDescription_ogBigHeight(ctx, field, obj)
+		case "ogSmallImage":
+			out.Values[i] = ec._MetaDescription_ogSmallImage(ctx, field, obj)
+		case "ogSmallWidth":
+			out.Values[i] = ec._MetaDescription_ogSmallWidth(ctx, field, obj)
+		case "ogSmallHeight":
+			out.Values[i] = ec._MetaDescription_ogSmallHeight(ctx, field, obj)
+		case "ogCard":
+			out.Values[i] = ec._MetaDescription_ogCard(ctx, field, obj)
+		case "ogSite":
+			out.Values[i] = ec._MetaDescription_ogSite(ctx, field, obj)
+		case "ogType":
+			out.Values[i] = ec._MetaDescription_ogType(ctx, field, obj)
+		case "ogCreator":
+			out.Values[i] = ec._MetaDescription_ogCreator(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -21756,13 +24738,6 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Mutation")
-		case "loginUser":
-			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_loginUser(ctx, field)
-			})
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
 		case "createDomain":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_createDomain(ctx, field)
@@ -21787,6 +24762,13 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		case "requestCrawl":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_requestCrawl(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "updateLink":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_updateLink(ctx, field)
 			})
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
@@ -21826,9 +24808,9 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
-		case "createUser":
+		case "updatePlatform":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_createUser(ctx, field)
+				return ec._Mutation_updatePlatform(ctx, field)
 			})
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
@@ -21847,6 +24829,140 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var navbarButtonImplementors = []string{"NavbarButton"}
+
+func (ec *executionContext) _NavbarButton(ctx context.Context, sel ast.SelectionSet, obj *database_types.NavbarButton) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, navbarButtonImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("NavbarButton")
+		case "text":
+			out.Values[i] = ec._NavbarButton_text(ctx, field, obj)
+		case "url":
+			out.Values[i] = ec._NavbarButton_url(ctx, field, obj)
+		case "icon":
+			out.Values[i] = ec._NavbarButton_icon(ctx, field, obj)
+		case "target":
+			out.Values[i] = ec._NavbarButton_target(ctx, field, obj)
+		case "colorClass":
+			out.Values[i] = ec._NavbarButton_colorClass(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var navbarDescriptionImplementors = []string{"NavbarDescription"}
+
+func (ec *executionContext) _NavbarDescription(ctx context.Context, sel ast.SelectionSet, obj *database_types.NavbarDescription) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, navbarDescriptionImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("NavbarDescription")
+		case "brandImg":
+			out.Values[i] = ec._NavbarDescription_brandImg(ctx, field, obj)
+		case "brandURL":
+			out.Values[i] = ec._NavbarDescription_brandURL(ctx, field, obj)
+		case "brandName":
+			out.Values[i] = ec._NavbarDescription_brandName(ctx, field, obj)
+		case "target":
+			out.Values[i] = ec._NavbarDescription_target(ctx, field, obj)
+		case "startItems":
+			out.Values[i] = ec._NavbarDescription_startItems(ctx, field, obj)
+		case "endButtons":
+			out.Values[i] = ec._NavbarDescription_endButtons(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var navbarItemImplementors = []string{"NavbarItem"}
+
+func (ec *executionContext) _NavbarItem(ctx context.Context, sel ast.SelectionSet, obj *database_types.NavbarItem) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, navbarItemImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("NavbarItem")
+		case "text":
+			out.Values[i] = ec._NavbarItem_text(ctx, field, obj)
+		case "url":
+			out.Values[i] = ec._NavbarItem_url(ctx, field, obj)
+		case "target":
+			out.Values[i] = ec._NavbarItem_target(ctx, field, obj)
+		case "icon":
+			out.Values[i] = ec._NavbarItem_icon(ctx, field, obj)
+		case "dropdown":
+			out.Values[i] = ec._NavbarItem_dropdown(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -21938,110 +25054,6 @@ func (ec *executionContext) _ObservationAnalytic(ctx context.Context, sel ast.Se
 			}
 		case "updatedAt":
 			out.Values[i] = ec._ObservationAnalytic_updatedAt(ctx, field, obj)
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-	out.Dispatch(ctx)
-	if out.Invalids > 0 {
-		return graphql.Null
-	}
-
-	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
-
-	for label, dfs := range deferred {
-		ec.processDeferredGroup(graphql.DeferredGroup{
-			Label:    label,
-			Path:     graphql.GetPath(ctx),
-			FieldSet: dfs,
-			Context:  ctx,
-		})
-	}
-
-	return out
-}
-
-var openGraphImplementors = []string{"OpenGraph"}
-
-func (ec *executionContext) _OpenGraph(ctx context.Context, sel ast.SelectionSet, obj *database_types.OpenGraph) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, openGraphImplementors)
-
-	out := graphql.NewFieldSet(fields)
-	deferred := make(map[string]*graphql.FieldSet)
-	for i, field := range fields {
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("OpenGraph")
-		case "title":
-			out.Values[i] = ec._OpenGraph_title(ctx, field, obj)
-		case "description":
-			out.Values[i] = ec._OpenGraph_description(ctx, field, obj)
-		case "favIcon":
-			out.Values[i] = ec._OpenGraph_favIcon(ctx, field, obj)
-		case "image":
-			out.Values[i] = ec._OpenGraph_image(ctx, field, obj)
-		case "alternateImage":
-			out.Values[i] = ec._OpenGraph_alternateImage(ctx, field, obj)
-		case "url":
-			out.Values[i] = ec._OpenGraph_url(ctx, field, obj)
-		case "siteName":
-			out.Values[i] = ec._OpenGraph_siteName(ctx, field, obj)
-		case "type":
-			out.Values[i] = ec._OpenGraph_type(ctx, field, obj)
-		case "locale":
-			out.Values[i] = ec._OpenGraph_locale(ctx, field, obj)
-		case "x":
-			out.Values[i] = ec._OpenGraph_x(ctx, field, obj)
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-	out.Dispatch(ctx)
-	if out.Invalids > 0 {
-		return graphql.Null
-	}
-
-	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
-
-	for label, dfs := range deferred {
-		ec.processDeferredGroup(graphql.DeferredGroup{
-			Label:    label,
-			Path:     graphql.GetPath(ctx),
-			FieldSet: dfs,
-			Context:  ctx,
-		})
-	}
-
-	return out
-}
-
-var openGraphXImplementors = []string{"OpenGraphX"}
-
-func (ec *executionContext) _OpenGraphX(ctx context.Context, sel ast.SelectionSet, obj *database_types.OpenGraphX) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, openGraphXImplementors)
-
-	out := graphql.NewFieldSet(fields)
-	deferred := make(map[string]*graphql.FieldSet)
-	for i, field := range fields {
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("OpenGraphX")
-		case "card":
-			out.Values[i] = ec._OpenGraphX_card(ctx, field, obj)
-		case "site":
-			out.Values[i] = ec._OpenGraphX_site(ctx, field, obj)
-		case "title":
-			out.Values[i] = ec._OpenGraphX_title(ctx, field, obj)
-		case "description":
-			out.Values[i] = ec._OpenGraphX_description(ctx, field, obj)
-		case "image":
-			out.Values[i] = ec._OpenGraphX_image(ctx, field, obj)
-		case "url":
-			out.Values[i] = ec._OpenGraphX_url(ctx, field, obj)
-		case "type":
-			out.Values[i] = ec._OpenGraphX_type(ctx, field, obj)
-		case "creator":
-			out.Values[i] = ec._OpenGraphX_creator(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -22408,8 +25420,8 @@ func (ec *executionContext) _Platform(ctx context.Context, sel ast.SelectionSet,
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
-		case "openGraph":
-			out.Values[i] = ec._Platform_openGraph(ctx, field, obj)
+		case "platformDescription":
+			out.Values[i] = ec._Platform_platformDescription(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
@@ -22838,6 +25850,46 @@ func (ec *executionContext) _PlatformDeployment(ctx context.Context, sel ast.Sel
 	return out
 }
 
+var platformDescriptionImplementors = []string{"PlatformDescription"}
+
+func (ec *executionContext) _PlatformDescription(ctx context.Context, sel ast.SelectionSet, obj *database_types.PlatformDescription) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, platformDescriptionImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("PlatformDescription")
+		case "metaDescription":
+			out.Values[i] = ec._PlatformDescription_metaDescription(ctx, field, obj)
+		case "navbarDescription":
+			out.Values[i] = ec._PlatformDescription_navbarDescription(ctx, field, obj)
+		case "footerDescription":
+			out.Values[i] = ec._PlatformDescription_footerDescription(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
 var queryImplementors = []string{"Query"}
 
 func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) graphql.Marshaler {
@@ -23069,6 +26121,48 @@ func (ec *executionContext) _SocialMedia(ctx context.Context, sel ast.SelectionS
 	return out
 }
 
+var socialMediaContainerImplementors = []string{"SocialMediaContainer"}
+
+func (ec *executionContext) _SocialMediaContainer(ctx context.Context, sel ast.SelectionSet, obj *database_types.SocialMediaContainer) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, socialMediaContainerImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("SocialMediaContainer")
+		case "socialMediaPeddingClass":
+			out.Values[i] = ec._SocialMediaContainer_socialMediaPeddingClass(ctx, field, obj)
+		case "socialMediaColorClass":
+			out.Values[i] = ec._SocialMediaContainer_socialMediaColorClass(ctx, field, obj)
+		case "socialMediaSizeClass":
+			out.Values[i] = ec._SocialMediaContainer_socialMediaSizeClass(ctx, field, obj)
+		case "socialMediaLinks":
+			out.Values[i] = ec._SocialMediaContainer_socialMediaLinks(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
 var templateImplementors = []string{"Template"}
 
 func (ec *executionContext) _Template(ctx context.Context, sel ast.SelectionSet, obj *model.Template) graphql.Marshaler {
@@ -23095,8 +26189,8 @@ func (ec *executionContext) _Template(ctx context.Context, sel ast.SelectionSet,
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
-		case "openGraph":
-			out.Values[i] = ec._Template_openGraph(ctx, field, obj)
+		case "platformDescription":
+			out.Values[i] = ec._Template_platformDescription(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -23169,30 +26263,185 @@ func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj
 				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "avatar":
-			out.Values[i] = ec._User_avatar(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&out.Invalids, 1)
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._User_avatar(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
 			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "email":
-			out.Values[i] = ec._User_email(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&out.Invalids, 1)
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._User_email(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
 			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "fullname":
-			out.Values[i] = ec._User_fullname(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&out.Invalids, 1)
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._User_fullname(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
 			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "verified":
-			out.Values[i] = ec._User_verified(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&out.Invalids, 1)
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._User_verified(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
 			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "phone":
-			out.Values[i] = ec._User_phone(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&out.Invalids, 1)
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._User_phone(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
 			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "organizations":
 			field := field
 
@@ -23827,6 +27076,19 @@ func (ec *executionContext) ___Type(ctx context.Context, sel ast.SelectionSet, o
 
 // region    ***************************** type.gotpl *****************************
 
+func (ec *executionContext) marshalNASocialMedia2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐASocialMedia(ctx context.Context, sel ast.SelectionSet, v database_types.ASocialMedia) graphql.Marshaler {
+	return ec._ASocialMedia(ctx, sel, &v)
+}
+
+func (ec *executionContext) unmarshalNASocialMediaInput2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐASocialMedia(ctx context.Context, v interface{}) (database_types.ASocialMedia, error) {
+	res, err := ec.unmarshalInputASocialMediaInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNAccountPhone2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐAccountPhone(ctx context.Context, sel ast.SelectionSet, v database_types.AccountPhone) graphql.Marshaler {
+	return ec._AccountPhone(ctx, sel, &v)
+}
+
 func (ec *executionContext) marshalNAccountPhone2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐAccountPhone(ctx context.Context, sel ast.SelectionSet, v *database_types.AccountPhone) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
@@ -23835,11 +27097,6 @@ func (ec *executionContext) marshalNAccountPhone2ᚖgithubᚗcomᚋRouteHubᚑLi
 		return graphql.Null
 	}
 	return ec._AccountPhone(ctx, sel, v)
-}
-
-func (ec *executionContext) unmarshalNAccountPhoneInput2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐAccountPhoneInput(ctx context.Context, v interface{}) (*model.AccountPhoneInput, error) {
-	res, err := ec.unmarshalInputAccountPhoneInput(ctx, v)
-	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) marshalNAnalyticReport2ᚕᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐAnalyticReport(ctx context.Context, sel ast.SelectionSet, v []*model.AnalyticReport) graphql.Marshaler {
@@ -24198,6 +27455,16 @@ func (ec *executionContext) marshalNLinkConnection2ᚖgithubᚗcomᚋcloudmatela
 	return ec._LinkConnection(ctx, sel, v)
 }
 
+func (ec *executionContext) marshalNLinkContent2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐLinkContent(ctx context.Context, sel ast.SelectionSet, v *database_types.LinkContent) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._LinkContent(ctx, sel, v)
+}
+
 func (ec *executionContext) marshalNLinkCrawl2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋmodelsᚐLinkCrawl(ctx context.Context, sel ast.SelectionSet, v database_models.LinkCrawl) graphql.Marshaler {
 	return ec._LinkCrawl(ctx, sel, &v)
 }
@@ -24315,6 +27582,11 @@ func (ec *executionContext) marshalNLinkEdge2ᚖgithubᚗcomᚋcloudmatelabsᚋg
 	return ec._LinkEdge(ctx, sel, v)
 }
 
+func (ec *executionContext) unmarshalNLinkUpdateInput2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚋinputsᚐLinkUpdateInput(ctx context.Context, v interface{}) (graph_inputs.LinkUpdateInput, error) {
+	res, err := ec.unmarshalInputLinkUpdateInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) marshalNLinkValidation2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋmodelsᚐLinkValidation(ctx context.Context, sel ast.SelectionSet, v *database_models.LinkValidation) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
@@ -24379,25 +27651,6 @@ func (ec *executionContext) marshalNLog2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋrout
 	return ec._Log(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNLoginInput2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐLoginInput(ctx context.Context, v interface{}) (model.LoginInput, error) {
-	res, err := ec.unmarshalInputLoginInput(ctx, v)
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalNLoginPayload2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐLoginPayload(ctx context.Context, sel ast.SelectionSet, v model.LoginPayload) graphql.Marshaler {
-	return ec._LoginPayload(ctx, sel, &v)
-}
-
-func (ec *executionContext) marshalNLoginPayload2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐLoginPayload(ctx context.Context, sel ast.SelectionSet, v *model.LoginPayload) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._LoginPayload(ctx, sel, v)
-}
-
 func (ec *executionContext) marshalNMetricAnalytics2ᚕᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐMetricAnalyticsᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.MetricAnalytics) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
@@ -24450,6 +27703,20 @@ func (ec *executionContext) marshalNMetricAnalytics2ᚖgithubᚗcomᚋRouteHub�
 		return graphql.Null
 	}
 	return ec._MetricAnalytics(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNNavbarButton2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐNavbarButton(ctx context.Context, sel ast.SelectionSet, v database_types.NavbarButton) graphql.Marshaler {
+	return ec._NavbarButton(ctx, sel, &v)
+}
+
+func (ec *executionContext) unmarshalNNavbarButtonInput2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐNavbarButton(ctx context.Context, v interface{}) (database_types.NavbarButton, error) {
+	res, err := ec.unmarshalInputNavbarButtonInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNNavbarItemInput2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐNavbarItem(ctx context.Context, v interface{}) (database_types.NavbarItem, error) {
+	res, err := ec.unmarshalInputNavbarItemInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalNObject2string(ctx context.Context, v interface{}) (string, error) {
@@ -24519,26 +27786,6 @@ func (ec *executionContext) marshalNObservationAnalytic2ᚖgithubᚗcomᚋRouteH
 		return graphql.Null
 	}
 	return ec._ObservationAnalytic(ctx, sel, v)
-}
-
-func (ec *executionContext) marshalNOpenGraph2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐOpenGraph(ctx context.Context, sel ast.SelectionSet, v *database_types.OpenGraph) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._OpenGraph(ctx, sel, v)
-}
-
-func (ec *executionContext) unmarshalNOpenGraphInput2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐOpenGraph(ctx context.Context, v interface{}) (*database_types.OpenGraph, error) {
-	res, err := ec.unmarshalInputOpenGraphInput(ctx, v)
-	return &res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) unmarshalNOpenGraphXInput2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐOpenGraphX(ctx context.Context, v interface{}) (*database_types.OpenGraphX, error) {
-	res, err := ec.unmarshalInputOpenGraphXInput(ctx, v)
-	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) marshalNOrganization2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋmodelsᚐOrganization(ctx context.Context, sel ast.SelectionSet, v database_models.Organization) graphql.Marshaler {
@@ -24867,6 +28114,21 @@ func (ec *executionContext) marshalNPlatformDeployment2ᚖgithubᚗcomᚋRouteHu
 	return ec._PlatformDeployment(ctx, sel, v)
 }
 
+func (ec *executionContext) marshalNPlatformDescription2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐPlatformDescription(ctx context.Context, sel ast.SelectionSet, v *database_types.PlatformDescription) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._PlatformDescription(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNPlatformDescriptionInput2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐPlatformDescription(ctx context.Context, v interface{}) (*database_types.PlatformDescription, error) {
+	res, err := ec.unmarshalInputPlatformDescriptionInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalNPlatformPermission2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐPlatformPermission(ctx context.Context, v interface{}) (database_enums.PlatformPermission, error) {
 	var res database_enums.PlatformPermission
 	err := res.UnmarshalGQL(v)
@@ -24938,6 +28200,11 @@ func (ec *executionContext) marshalNPlatformPermission2ᚕgithubᚗcomᚋRouteHu
 	return ret
 }
 
+func (ec *executionContext) unmarshalNPlatformUpdateInput2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚋinputsᚐPlatformUpdateInput(ctx context.Context, v interface{}) (graph_inputs.PlatformUpdateInput, error) {
+	res, err := ec.unmarshalInputPlatformUpdateInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalNPlatformsWithPermissionsInput2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋrelationsᚐPlatformsWithPermissions(ctx context.Context, v interface{}) (database_relations.PlatformsWithPermissions, error) {
 	res, err := ec.unmarshalInputPlatformsWithPermissionsInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -24967,6 +28234,22 @@ func (ec *executionContext) unmarshalNRedirectionOptions2githubᚗcomᚋRouteHub
 }
 
 func (ec *executionContext) marshalNRedirectionOptions2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐRedirectionOptions(ctx context.Context, sel ast.SelectionSet, v database_enums.RedirectionOptions) graphql.Marshaler {
+	return v
+}
+
+func (ec *executionContext) unmarshalNRedirectionOptions2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐRedirectionOptions(ctx context.Context, v interface{}) (*database_enums.RedirectionOptions, error) {
+	var res = new(database_enums.RedirectionOptions)
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNRedirectionOptions2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋenumsᚐRedirectionOptions(ctx context.Context, sel ast.SelectionSet, v *database_enums.RedirectionOptions) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
 	return v
 }
 
@@ -25222,16 +28505,6 @@ func (ec *executionContext) marshalNUser2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋrou
 		return graphql.Null
 	}
 	return ec._User(ctx, sel, v)
-}
-
-func (ec *executionContext) unmarshalNUserCreateInput2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐUserCreateInput(ctx context.Context, v interface{}) (model.UserCreateInput, error) {
-	res, err := ec.unmarshalInputUserCreateInput(ctx, v)
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) unmarshalNUserCreateInput2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐUserCreateInput(ctx context.Context, v interface{}) (*model.UserCreateInput, error) {
-	res, err := ec.unmarshalInputUserCreateInput(ctx, v)
-	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) marshalNUserInvite2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋrelationsᚐUserInvite(ctx context.Context, sel ast.SelectionSet, v database_relations.UserInvite) graphql.Marshaler {
@@ -25555,6 +28828,85 @@ func (ec *executionContext) unmarshalNpinnedLinkInput2githubᚗcomᚋRouteHubᚑ
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
+func (ec *executionContext) marshalOASocialMedia2ᚕgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐASocialMediaᚄ(ctx context.Context, sel ast.SelectionSet, v []database_types.ASocialMedia) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNASocialMedia2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐASocialMedia(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalOASocialMedia2ᚖᚕgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐASocialMediaᚄ(ctx context.Context, sel ast.SelectionSet, v *[]database_types.ASocialMedia) graphql.Marshaler {
+	return ec.marshalOASocialMedia2ᚕgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐASocialMediaᚄ(ctx, sel, *v)
+}
+
+func (ec *executionContext) unmarshalOASocialMediaInput2ᚕgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐASocialMediaᚄ(ctx context.Context, v interface{}) ([]database_types.ASocialMedia, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		vSlice = graphql.CoerceList(v)
+	}
+	var err error
+	res := make([]database_types.ASocialMedia, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNASocialMediaInput2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐASocialMedia(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) unmarshalOASocialMediaInput2ᚖᚕgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐASocialMediaᚄ(ctx context.Context, v interface{}) (*[]database_types.ASocialMedia, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalOASocialMediaInput2ᚕgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐASocialMediaᚄ(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) marshalOAnalyticReport2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐAnalyticReport(ctx context.Context, sel ast.SelectionSet, v *model.AnalyticReport) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
@@ -25712,6 +29064,15 @@ func (ec *executionContext) marshalOFloat2ᚖfloat64(ctx context.Context, sel as
 	return graphql.WrapContextMarshaler(ctx, res)
 }
 
+func (ec *executionContext) marshalOFooterDescription2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐFooterDescription(ctx context.Context, sel ast.SelectionSet, v database_types.FooterDescription) graphql.Marshaler {
+	return ec._FooterDescription(ctx, sel, &v)
+}
+
+func (ec *executionContext) unmarshalOFooterDescriptionInput2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐFooterDescription(ctx context.Context, v interface{}) (database_types.FooterDescription, error) {
+	res, err := ec.unmarshalInputFooterDescriptionInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalOID2ᚕstringᚄ(ctx context.Context, v interface{}) ([]string, error) {
 	if v == nil {
 		return nil, nil
@@ -25764,6 +29125,21 @@ func (ec *executionContext) marshalOID2ᚖstring(ctx context.Context, sel ast.Se
 	}
 	res := graphql.MarshalID(*v)
 	return res
+}
+
+func (ec *executionContext) marshalOImageDescription2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐImageDescription(ctx context.Context, sel ast.SelectionSet, v *database_types.ImageDescription) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._ImageDescription(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalOImageDescriptionInput2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐImageDescription(ctx context.Context, v interface{}) (*database_types.ImageDescription, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputImageDescriptionInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) marshalOIndustry2ᚕᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐIndustryᚄ(ctx context.Context, sel ast.SelectionSet, v []*database_types.Industry) graphql.Marshaler {
@@ -25867,6 +29243,21 @@ func (ec *executionContext) marshalOInt2ᚖint(ctx context.Context, sel ast.Sele
 	return res
 }
 
+func (ec *executionContext) marshalOLinkContent2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐLinkContent(ctx context.Context, sel ast.SelectionSet, v *database_types.LinkContent) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._LinkContent(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalOLinkContentInput2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐLinkContent(ctx context.Context, v interface{}) (*database_types.LinkContent, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputLinkContentInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalOLinkFilter2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐLinkFilter(ctx context.Context, v interface{}) (*model.LinkFilter, error) {
 	if v == nil {
 		return nil, nil
@@ -25961,6 +29352,228 @@ func (ec *executionContext) unmarshalOMapInEntry2ᚖgithubᚗcomᚋRouteHubᚑLi
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
+func (ec *executionContext) marshalOMetaDescription2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐMetaDescription(ctx context.Context, sel ast.SelectionSet, v database_types.MetaDescription) graphql.Marshaler {
+	return ec._MetaDescription(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalOMetaDescription2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐMetaDescription(ctx context.Context, sel ast.SelectionSet, v *database_types.MetaDescription) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._MetaDescription(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalOMetaDescriptionInput2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐMetaDescription(ctx context.Context, v interface{}) (database_types.MetaDescription, error) {
+	res, err := ec.unmarshalInputMetaDescriptionInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalOMetaDescriptionInput2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐMetaDescription(ctx context.Context, v interface{}) (*database_types.MetaDescription, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputMetaDescriptionInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalONavbarButton2ᚕgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐNavbarButtonᚄ(ctx context.Context, sel ast.SelectionSet, v []database_types.NavbarButton) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNNavbarButton2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐNavbarButton(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalONavbarButton2ᚖᚕgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐNavbarButtonᚄ(ctx context.Context, sel ast.SelectionSet, v *[]database_types.NavbarButton) graphql.Marshaler {
+	return ec.marshalONavbarButton2ᚕgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐNavbarButtonᚄ(ctx, sel, *v)
+}
+
+func (ec *executionContext) unmarshalONavbarButtonInput2ᚕgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐNavbarButtonᚄ(ctx context.Context, v interface{}) ([]database_types.NavbarButton, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		vSlice = graphql.CoerceList(v)
+	}
+	var err error
+	res := make([]database_types.NavbarButton, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNNavbarButtonInput2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐNavbarButton(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) unmarshalONavbarButtonInput2ᚖᚕgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐNavbarButtonᚄ(ctx context.Context, v interface{}) (*[]database_types.NavbarButton, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalONavbarButtonInput2ᚕgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐNavbarButtonᚄ(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalONavbarDescription2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐNavbarDescription(ctx context.Context, sel ast.SelectionSet, v database_types.NavbarDescription) graphql.Marshaler {
+	return ec._NavbarDescription(ctx, sel, &v)
+}
+
+func (ec *executionContext) unmarshalONavbarDescriptionInput2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐNavbarDescription(ctx context.Context, v interface{}) (database_types.NavbarDescription, error) {
+	res, err := ec.unmarshalInputNavbarDescriptionInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalONavbarItem2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐNavbarItem(ctx context.Context, sel ast.SelectionSet, v database_types.NavbarItem) graphql.Marshaler {
+	return ec._NavbarItem(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalONavbarItem2ᚕgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐNavbarItem(ctx context.Context, sel ast.SelectionSet, v []database_types.NavbarItem) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalONavbarItem2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐNavbarItem(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	return ret
+}
+
+func (ec *executionContext) marshalONavbarItem2ᚖᚕgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐNavbarItem(ctx context.Context, sel ast.SelectionSet, v *[]database_types.NavbarItem) graphql.Marshaler {
+	return ec.marshalONavbarItem2ᚕgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐNavbarItem(ctx, sel, *v)
+}
+
+func (ec *executionContext) unmarshalONavbarItemInput2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐNavbarItem(ctx context.Context, v interface{}) (database_types.NavbarItem, error) {
+	res, err := ec.unmarshalInputNavbarItemInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalONavbarItemInput2ᚕgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐNavbarItem(ctx context.Context, v interface{}) ([]database_types.NavbarItem, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		vSlice = graphql.CoerceList(v)
+	}
+	var err error
+	res := make([]database_types.NavbarItem, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalONavbarItemInput2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐNavbarItem(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) unmarshalONavbarItemInput2ᚕgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐNavbarItemᚄ(ctx context.Context, v interface{}) ([]database_types.NavbarItem, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		vSlice = graphql.CoerceList(v)
+	}
+	var err error
+	res := make([]database_types.NavbarItem, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNNavbarItemInput2githubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐNavbarItem(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) unmarshalONavbarItemInput2ᚖᚕgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐNavbarItem(ctx context.Context, v interface{}) (*[]database_types.NavbarItem, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalONavbarItemInput2ᚕgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐNavbarItem(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalONavbarItemInput2ᚖᚕgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐNavbarItemᚄ(ctx context.Context, v interface{}) (*[]database_types.NavbarItem, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalONavbarItemInput2ᚕgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐNavbarItemᚄ(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalOObject2ᚕstringᚄ(ctx context.Context, v interface{}) ([]string, error) {
 	if v == nil {
 		return nil, nil
@@ -25999,88 +29612,11 @@ func (ec *executionContext) marshalOObject2ᚕstringᚄ(ctx context.Context, sel
 	return ret
 }
 
-func (ec *executionContext) marshalOOpenGraph2ᚕᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐOpenGraphᚄ(ctx context.Context, sel ast.SelectionSet, v []*database_types.OpenGraph) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	ret := make(graphql.Array, len(v))
-	var wg sync.WaitGroup
-	isLen1 := len(v) == 1
-	if !isLen1 {
-		wg.Add(len(v))
-	}
-	for i := range v {
-		i := i
-		fc := &graphql.FieldContext{
-			Index:  &i,
-			Result: &v[i],
-		}
-		ctx := graphql.WithFieldContext(ctx, fc)
-		f := func(i int) {
-			defer func() {
-				if r := recover(); r != nil {
-					ec.Error(ctx, ec.Recover(ctx, r))
-					ret = nil
-				}
-			}()
-			if !isLen1 {
-				defer wg.Done()
-			}
-			ret[i] = ec.marshalNOpenGraph2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐOpenGraph(ctx, sel, v[i])
-		}
-		if isLen1 {
-			f(i)
-		} else {
-			go f(i)
-		}
-
-	}
-	wg.Wait()
-
-	for _, e := range ret {
-		if e == graphql.Null {
-			return graphql.Null
-		}
-	}
-
-	return ret
-}
-
-func (ec *executionContext) marshalOOpenGraph2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐOpenGraph(ctx context.Context, sel ast.SelectionSet, v *database_types.OpenGraph) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return ec._OpenGraph(ctx, sel, v)
-}
-
-func (ec *executionContext) unmarshalOOpenGraphInput2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐOpenGraph(ctx context.Context, v interface{}) (*database_types.OpenGraph, error) {
-	if v == nil {
-		return nil, nil
-	}
-	res, err := ec.unmarshalInputOpenGraphInput(ctx, v)
-	return &res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalOOpenGraphX2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐOpenGraphX(ctx context.Context, sel ast.SelectionSet, v *database_types.OpenGraphX) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return ec._OpenGraphX(ctx, sel, v)
-}
-
 func (ec *executionContext) marshalOOrganization2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋmodelsᚐOrganization(ctx context.Context, sel ast.SelectionSet, v *database_models.Organization) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return ec._Organization(ctx, sel, v)
-}
-
-func (ec *executionContext) unmarshalOOrganizationCreateInput2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋgraphᚋmodelᚐOrganizationCreateInput(ctx context.Context, v interface{}) (*model.OrganizationCreateInput, error) {
-	if v == nil {
-		return nil, nil
-	}
-	res, err := ec.unmarshalInputOrganizationCreateInput(ctx, v)
-	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) marshalOPlatform2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋmodelsᚐPlatform(ctx context.Context, sel ast.SelectionSet, v *database_models.Platform) graphql.Marshaler {
@@ -26104,6 +29640,21 @@ func (ec *executionContext) marshalORedirectionOptions2ᚖgithubᚗcomᚋRouteHu
 		return graphql.Null
 	}
 	return v
+}
+
+func (ec *executionContext) marshalOSocialMediaContainer2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐSocialMediaContainer(ctx context.Context, sel ast.SelectionSet, v *database_types.SocialMediaContainer) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._SocialMediaContainer(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalOSocialMediaContainerInput2ᚖgithubᚗcomᚋRouteHubᚑLinkᚋroutehubᚑserviceᚑgraphqlᚋdatabaseᚋtypesᚐSocialMediaContainer(ctx context.Context, v interface{}) (*database_types.SocialMediaContainer, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputSocialMediaContainerInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalOString2string(ctx context.Context, v interface{}) (string, error) {

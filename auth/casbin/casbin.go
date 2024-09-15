@@ -1,7 +1,7 @@
-package auth
+package auth_casbin
 
 import (
-	"context"
+	"log"
 	"log/slog"
 	"os"
 	"sync"
@@ -10,29 +10,29 @@ import (
 	"github.com/RouteHub-Link/routehub-service-graphql/config"
 	"github.com/casbin/casbin/v2"
 	"github.com/casbin/casbin/v2/persist"
-	mongodbadapter "github.com/casbin/mongodb-adapter/v3"
+	gormadapter "github.com/casbin/gorm-adapter/v3"
+
 	"github.com/google/uuid"
-	"go.mongodb.org/mongo-driver/event"
-	mongooptions "go.mongodb.org/mongo-driver/mongo/options"
 )
 
 var (
-	CasbinAdapter     persist.Adapter
-	CasbinEnforcer    *casbin.SyncedCachedEnforcer
-	onceLogger        sync.Once
-	onceAdapter       sync.Once
-	onceEnforcer      sync.Once
-	casbinMongoLogger *slog.Logger
-	casbinSlog        *CasbinSlogLogger
-	level             slog.Level
+	CasbinAdapter  persist.Adapter
+	CasbinEnforcer *casbin.SyncedCachedEnforcer
+	onceLogger     sync.Once
+	onceAdapter    sync.Once
+	onceEnforcer   sync.Once
+	casbinLogger   *slog.Logger
+	casbinSlog     *CasbinSlogLogger
+	level          slog.Level
 )
 
 type CasbinConfigurer struct {
-	CasbinConfig config.CasbinConfig
+	CasbinConfig   config.CasbinConfig
+	databaseConfig config.DatabaseConfig
 }
 
-func NewCasbinConfigurer(casbinConfig config.CasbinConfig) CasbinConfigurer {
-	cc := CasbinConfigurer{CasbinConfig: casbinConfig}
+func NewCasbinConfigurer(casbinConfig config.CasbinConfig, databaseConfig config.DatabaseConfig) CasbinConfigurer {
+	cc := CasbinConfigurer{CasbinConfig: casbinConfig, databaseConfig: databaseConfig}
 
 	cc.getLogger()
 	cc.getAdapter()
@@ -55,35 +55,28 @@ func (cc CasbinConfigurer) getLogger() *slog.Logger {
 			Level: slog.Level(level),
 		}
 
-		casbinMongoLogger = slog.New(slog.NewJSONHandler(os.Stdout, opts))
-		casbinSlog = NewCasbinSlogLogger(casbinMongoLogger)
+		casbinLogger = slog.New(slog.NewJSONHandler(os.Stdout, opts))
+		casbinSlog = NewCasbinSlogLogger(casbinLogger)
 	})
 
-	return casbinMongoLogger
+	if casbinLogger == nil {
+		log.Fatal("Casbin Logger is nil")
+	}
+
+	return casbinLogger
 }
 
 func (cc CasbinConfigurer) getAdapter() persist.Adapter {
 	onceAdapter.Do(func() {
-		ctx := context.Background()
+		dsn := cc.databaseConfig.GetPostgreDSN()
 
-		mongoClientOption := mongooptions.Client().ApplyURI(cc.CasbinConfig.Mongo.URI)
-
-		monitor := &event.CommandMonitor{
-			Started: func(_ context.Context, e *event.CommandStartedEvent) {
-				if e.CommandName != "endSessions" {
-					casbinMongoLogger.LogAttrs(ctx, slog.LevelDebug, "Casbin MongoDB Command", slog.String("Database", e.DatabaseName), slog.String("CommandName", e.CommandName), slog.Any("Command", e.Command))
-				}
-			},
-		}
-
-		mongoClientOption.SetMonitor(monitor)
-
-		a, err := mongodbadapter.NewAdapterWithCollectionName(mongoClientOption, cc.CasbinConfig.Mongo.Database, cc.CasbinConfig.Mongo.Collection)
-		if err != nil {
-			panic(err)
-		}
+		a, _ := gormadapter.NewAdapter(config.Postgres.String(), dsn, true)
 		CasbinAdapter = a
 	})
+
+	if CasbinAdapter == nil {
+		log.Fatal("Casbin Adapter is nil")
+	}
 
 	return CasbinAdapter
 }
@@ -113,11 +106,19 @@ func (cc CasbinConfigurer) initTestPolicy(e *casbin.SyncedCachedEnforcer) (*casb
 
 func (cc CasbinConfigurer) getEnforcer() *casbin.SyncedCachedEnforcer {
 	onceEnforcer.Do(func() {
-		e, _ := casbin.NewSyncedCachedEnforcer(cc.CasbinConfig.Model, cc.getAdapter())
+		e, err := casbin.NewSyncedCachedEnforcer(cc.CasbinConfig.Model, cc.getAdapter())
+		if err != nil {
+			log.Fatal(err)
+		}
+
 		e.SetLogger(casbinSlog)
 		e.EnableLog(true)
 		CasbinEnforcer = e
 	})
+
+	if CasbinEnforcer == nil {
+		log.Fatal("Casbin Enforcer is nil")
+	}
 
 	return CasbinEnforcer
 }

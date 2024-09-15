@@ -6,7 +6,7 @@ import (
 	"net/http"
 )
 
-func Middleware(next http.Handler) http.Handler {
+func JWTMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		header := r.Header.Get("Authorization")
 
@@ -34,13 +34,4 @@ func Middleware(next http.Handler) http.Handler {
 		r = r.WithContext(ctx)
 		next.ServeHTTP(w, r)
 	})
-}
-
-func ForContext(ctx context.Context) *UserSession {
-	raw, err := ctx.Value(userCtxKey).(*UserSession)
-	if !err {
-		log.Printf("session not found from context %s", userCtxKey)
-	}
-
-	return raw
 }

@@ -13,6 +13,7 @@ const (
 	RedirectionOptionsNotAutoRedirect    RedirectionOptions = "NOT_AUTO_REDIRECT"
 	RedirectionOptionsDirectHTTPRedirect RedirectionOptions = "DIRECT_HTTP_REDIRECT"
 	RedirectionOptionsConfirmRedirect    RedirectionOptions = "CONFIRM_REDIRECT"
+	RedirectionOptionsCustom             RedirectionOptions = "CUSTOM"
 )
 
 var AllRedirectionOptions = []RedirectionOptions{
@@ -20,11 +21,12 @@ var AllRedirectionOptions = []RedirectionOptions{
 	RedirectionOptionsNotAutoRedirect,
 	RedirectionOptionsDirectHTTPRedirect,
 	RedirectionOptionsConfirmRedirect,
+	RedirectionOptionsCustom,
 }
 
 func (e RedirectionOptions) IsValid() bool {
 	switch e {
-	case RedirectionOptionsTimed, RedirectionOptionsNotAutoRedirect, RedirectionOptionsDirectHTTPRedirect, RedirectionOptionsConfirmRedirect:
+	case RedirectionOptionsTimed, RedirectionOptionsNotAutoRedirect, RedirectionOptionsDirectHTTPRedirect, RedirectionOptionsConfirmRedirect, RedirectionOptionsCustom:
 		return true
 	}
 	return false

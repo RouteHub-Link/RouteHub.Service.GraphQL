@@ -12,7 +12,7 @@ type Platform @platformPermission(permission: PLATFORM_READ) {
   "This is a simple name of the platform nothing special."
   name: String!
   "Default SEO options for the client application."
-  openGraph: OpenGraph!
+  platformDescription: PlatformDescription!
   "Default redirection options for the client application behavior."
   redirectionChoice: RedirectionOptions!
   "Owner of the platform."
@@ -41,9 +41,20 @@ input PlatformCreateInput @organizationPermission(permission: PLATFORM_CREATE) {
   organizationId: UUID!
   domainId: UUID!
   name: String!
-  openGraph: OpenGraphInput!
+  platformDescription: PlatformDescriptionInput!
   redirectionChoice: RedirectionOptions!
   templates: [TemplateInput]
+}
+
+input PlatformUpdateInput @platformPermission(permission: PLATFORM_UPDATE) {
+  platformId: UUID!
+  organizationId: UUID!
+  name: String!
+  platformDescription: PlatformDescriptionInput!
+  redirectionChoice: RedirectionOptions!
+  templates: [TemplateInput]
+  status: StatusState!
+
 }
 
 "Platform deployment is not implemented"
@@ -62,7 +73,7 @@ type Template {
   id: UUID!
   name: String!
   platform: Platform!
-  openGraph: OpenGraph!
+  platformDescription: PlatformDescription!
   redirectionChoice: RedirectionOptions!
   state: StatusState!
   createdBy: User!
@@ -74,11 +85,10 @@ type Template {
 
 input TemplateInput {
   name: String!
-  openGraph: OpenGraphInput!
+  templateDescription: PlatformDescriptionInput!
   redirectionChoice: RedirectionOptions!
   state: StatusState!
 }
-
 
 extend type Query {
   "This query can retrive user related platforms via organization relations."
@@ -88,4 +98,5 @@ extend type Query {
 extend type Mutation {
   "This mutation is used for creating a platform for an organization."
   createPlatform(input: PlatformCreateInput!): Platform! @auth
+  updatePlatform(input: PlatformUpdateInput!): Platform! @auth
 }

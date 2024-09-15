@@ -1,0 +1,88 @@
+
+type PlatformDescription {
+  metaDescription: MetaDescription
+  navbarDescription: NavbarDescription
+  footerDescription: FooterDescription
+}
+
+input PlatformDescriptionInput {
+  metaDescription: MetaDescriptionInput
+  navbarDescription: NavbarDescriptionInput
+  footerDescription: FooterDescriptionInput
+}
+
+type NavbarDescription  {
+	brandImg: ImageDescription
+	brandURL:String
+	brandName:String
+	target:String
+	startItems: [NavbarItem]
+	endButtons: [NavbarButton!]
+}
+
+input NavbarDescriptionInput  {
+  brandImg: ImageDescriptionInput
+  brandURL:String
+  brandName:String
+  target:String
+  startItems: [NavbarItemInput!]
+  endButtons: [NavbarButtonInput!]
+}
+
+type NavbarItem  {
+	text: String
+	url: String
+	target: String
+	icon: String
+	dropdown: [NavbarItem]
+}
+
+input NavbarItemInput  {
+  text: String
+  url: String
+  target: String
+  icon: String
+  dropdown: [NavbarItemInput]
+}
+
+type NavbarButton  {
+	text: String
+	url: String
+	icon: String
+	target: String
+	colorClass: String
+}
+
+input NavbarButtonInput  {
+  text: String
+  url: String
+  icon: String
+  target: String
+  colorClass: String
+}
+
+type FooterDescription  {
+  showRouteHubBranding: Boolean
+  companyBrandingHtml: String
+  socialMediaContainer: SocialMediaContainer
+}
+
+input FooterDescriptionInput  {
+  showRouteHubBranding: Boolean
+  companyBrandingHtml: String
+  socialMediaContainer: SocialMediaContainerInput
+}
+
+type SocialMediaContainer  {
+  socialMediaPeddingClass: String
+  socialMediaColorClass: String
+  socialMediaSizeClass: String
+  socialMediaLinks: [ASocialMedia!]
+}
+
+input SocialMediaContainerInput  {
+  socialMediaPeddingClass: String
+  socialMediaColorClass: String
+  socialMediaSizeClass: String
+  socialMediaLinks: [ASocialMediaInput!]
+}

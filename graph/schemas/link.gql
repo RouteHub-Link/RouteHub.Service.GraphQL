@@ -13,8 +13,8 @@ type Link @platformPermission(permission: LINK_READ) {
     domain: Domain!
     "Analytics of the link this should be retrived by another analytics provider."
     analytics: [MetricAnalytics!]!
-    "This is the link OG Options also has some SEO fields. This could be crwaled by the system or customized by user."
-    openGraph: [OpenGraph!]
+    "This is the link Link Content also has some SEO fields. This could be crwaled by the system or customized by user."
+    LinkContent: LinkContent!
     "This is the redirection choice of the link. This could be gethered by platform default or user."
     redirectionOptions: RedirectionOptions!
     "Links state."
@@ -52,7 +52,7 @@ type LinkCrawl {
     link: Link!
     crawlStatus: CrawlStatus!
     logs: [Log!]!
-    result: OpenGraph
+    result: LinkContent
     crawledBy: User!
     createdAt: DateTime!
     startAt: DateTime
@@ -83,55 +83,35 @@ input LinkCreateInput @platformPermission(permission: LINK_CREATE) {
     path: String
     platformId: UUID!
     redirectionOptions: RedirectionOptions
-    openGraph: OpenGraphInput
+    LinkContent: LinkContentInput
 }
 
-type OpenGraph {
+input LinkUpdateInput @platformPermission(permission: LINK_UPDATE) {
+    linkId: UUID!
+    target: String
+    path: String
+    redirectionOptions: RedirectionOptions
+    LinkContent: LinkContentInput
+}
+
+type LinkContent {
     title: String
-    description: String
-    favIcon: String
-    image: String
-    alternateImage: String
-    url: String
-    siteName: String
-    type: String
-    locale: String
-    x: OpenGraphX
+    subtitle: String
+    redirectionURLText: String
+    redirectionDelay: Int
+    additionalHead: String
+    additionalFooter: String
+    metaDescription: MetaDescription
 }
 
-type OpenGraphX {
-    card: String
-    site: String
+input LinkContentInput {
     title: String
-    description: String
-    image: String
-    url: String
-    type: String
-    creator: String
-}
-
-input OpenGraphInput {
-    title: String!
-    description: String!
-    favIcon: String!
-    image: String!
-    alternateImage: String!
-    url: String!
-    siteName: String!
-    type: String!
-    locale: String!
-    x: OpenGraphXInput!
-}
-
-input OpenGraphXInput {
-    card: String!
-    site: String!
-    title: String!
-    description: String!
-    image: String!
-    url: String!
-    type: String!
-    creator: String!
+    subtitle: String
+    redirectionURLText: String
+    redirectionDelay: Int
+    additionalHead: String
+    additionalFooter: String
+    metaDescription: MetaDescriptionInput
 }
 
 input pinnedLinkInput @platformPermission(permission: PLATFORM_UPDATE) {
@@ -155,6 +135,8 @@ extend type Mutation {
     createLink(input: LinkCreateInput!): Link! @auth
     "This mutation is used for requesting a crawl for a link. Link crawling status can be checked in link query with crawls field."
     requestCrawl(input: CrawlRequestInput!): LinkCrawl! @auth
+
+    updateLink(input: LinkUpdateInput!): Link! @auth
 
     addToPinnedLinks(input: pinnedLinkInput!): Link! @auth
     removeFromPinnedLinks(input: pinnedLinkInput!): Link! @auth

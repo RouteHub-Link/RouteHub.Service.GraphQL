@@ -6,6 +6,7 @@ package graph
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"time"
 
@@ -16,6 +17,7 @@ import (
 	database_types "github.com/RouteHub-Link/routehub-service-graphql/database/types"
 	"github.com/RouteHub-Link/routehub-service-graphql/graph"
 	"github.com/RouteHub-Link/routehub-service-graphql/graph/model"
+	graph_inputs "github.com/RouteHub-Link/routehub-service-graphql/graph/model/inputs"
 	services_domain_utils "github.com/RouteHub-Link/routehub-service-graphql/services/domain_utils"
 	"github.com/RouteHub-Link/routehub-service-graphql/worker"
 	"github.com/cloudmatelabs/gorm-gqlgen-relay/relay"
@@ -63,11 +65,6 @@ func (r *linkResolver) Analytics(ctx context.Context, obj *database_models.Link)
 	return mock, nil
 }
 
-// OpenGraph is the resolver for the openGraph field.
-func (r *linkResolver) OpenGraph(ctx context.Context, obj *database_models.Link) ([]*database_types.OpenGraph, error) {
-	return []*database_types.OpenGraph{obj.OpenGraph}, nil
-}
-
 // RedirectionOptions is the resolver for the redirectionOptions field.
 func (r *linkResolver) RedirectionOptions(ctx context.Context, obj *database_models.Link) (database_enums.RedirectionOptions, error) {
 	return obj.RedirectionChoice, nil
@@ -91,6 +88,11 @@ func (r *linkResolver) Crawls(ctx context.Context, obj *database_models.Link) ([
 // Link is the resolver for the link field.
 func (r *linkCrawlResolver) Link(ctx context.Context, obj *database_models.LinkCrawl) (*database_models.Link, error) {
 	return r.ServiceContainer.LinkService.GetLinkById(obj.LinkId)
+}
+
+// Result is the resolver for the result field.
+func (r *linkCrawlResolver) Result(ctx context.Context, obj *database_models.LinkCrawl) (*database_types.LinkContent, error) {
+	panic(fmt.Errorf("not implemented: Result - result"))
 }
 
 // CrawledBy is the resolver for the crawledBy field.
@@ -193,6 +195,16 @@ func (r *mutationResolver) RequestCrawl(ctx context.Context, input model.CrawlRe
 	crawls, err := r.ServiceContainer.LinkService.GetCrawls(link.ID)
 
 	return crawls[len(crawls)-1], err
+}
+
+// UpdateLink is the resolver for the updateLink field.
+func (r *mutationResolver) UpdateLink(ctx context.Context, input graph_inputs.LinkUpdateInput) (*database_models.Link, error) {
+	userSession := auth.ForContext(ctx)
+	if userSession == nil {
+		return nil, gqlerror.Errorf("Access Denied")
+	}
+
+	return r.ServiceContainer.LinkService.UpdateLink(input, userSession.ID)
 }
 
 // AddToPinnedLinks is the resolver for the addToPinnedLinks field.

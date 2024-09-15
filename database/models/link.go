@@ -8,13 +8,15 @@ import (
 	"github.com/google/uuid"
 )
 
+//  link.TargetDetails String by default html for redirection custom
+
 type Link struct {
 	ID                uuid.UUID                         `gorm:"type:uuid;primary_key;"`
 	PlatformID        uuid.UUID                         `gorm:"type:uuid;not null;field:platform_id"`
 	Platform          *Platform                         `json:"platform" gorm:"foreignKey:PlatformID;references:id"`
 	Target            string                            `gorm:"type:varchar(255);not null;"`
 	Path              string                            `gorm:"type:varchar(255);not null;"`
-	OpenGraph         *database_types.OpenGraph         `json:"open_graph" gorm:"serializer:json;field:open_graph"`
+	LinkContent       *database_types.LinkContent       `json:"link_content" gorm:"serializer:json;field:link_content"`
 	RedirectionChoice database_enums.RedirectionOptions `json:"redirectionChoice" gorm:"serializer:json"`
 	State             database_enums.StatusState        `json:"State" gorm:"serializer:json"`
 	ValidationTaskID  uuid.UUID                         `gorm:"type:uuid;field:validation_task_id"`

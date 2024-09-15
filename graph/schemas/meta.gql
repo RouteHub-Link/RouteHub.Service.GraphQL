@@ -1,0 +1,45 @@
+type MetaDescription {
+	title: String
+	favIcon: String
+	description: String
+    locale: String
+	ogTitle: String
+	ogDescription: String
+	ogURL: String
+	ogSiteName: String
+	ogMetaType: String
+	ogLocale: String
+	ogBigImage: String
+	ogBigWidth: String
+	ogBigHeight: String
+	ogSmallImage: String
+	ogSmallWidth: String
+	ogSmallHeight: String
+	ogCard: String
+	ogSite: String
+	ogType: String
+	ogCreator: String
+}
+
+input MetaDescriptionInput {
+    title: String
+    favIcon: String
+    description: String
+    locale: String
+    ogTitle: String
+    ogDescription: String
+    ogURL: String
+    ogSiteName: String
+    ogMetaType: String
+    ogLocale: String
+    ogBigImage: String
+    ogBigWidth: String
+    ogBigHeight: String
+    ogSmallImage: String
+    ogSmallWidth: String
+    ogSmallHeight: String
+    ogCard: String
+    ogSite: String
+    ogType: String
+    ogCreator: String
+}

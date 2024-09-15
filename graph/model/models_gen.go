@@ -14,11 +14,6 @@ import (
 	"github.com/google/uuid"
 )
 
-type AccountPhoneInput struct {
-	Number      string `json:"number"`
-	CountryCode string `json:"countryCode"`
-}
-
 type AnalyticReport struct {
 	Link         *database_models.Link   `json:"link"`
 	Domain       *database_models.Domain `json:"domain"`
@@ -110,23 +105,12 @@ type LinkCreateInput struct {
 	Path               *string                            `json:"path,omitempty"`
 	PlatformID         uuid.UUID                          `json:"platformId"`
 	RedirectionOptions *database_enums.RedirectionOptions `json:"redirectionOptions,omitempty"`
-	OpenGraph          *database_types.OpenGraph          `json:"openGraph,omitempty"`
+	LinkContent        *database_types.LinkContent        `json:"LinkContent,omitempty"`
 }
 
 type LinkFilter struct {
 	Platform *UUIDFilter `json:"platform,omitempty"`
 	Domain   *UUIDFilter `json:"domain,omitempty"`
-}
-
-// This input is used to loging a user.
-type LoginInput struct {
-	Email    string `json:"email"`
-	Password string `json:"password"`
-}
-
-// Payload returned after a user is logged in.
-type LoginPayload struct {
-	Token string `json:"token"`
 }
 
 type MapEntry struct {
@@ -261,24 +245,24 @@ type StringFilter struct {
 }
 
 type Template struct {
-	ID                uuid.UUID                         `json:"id"`
-	Name              string                            `json:"name"`
-	Platform          *database_models.Platform         `json:"platform"`
-	OpenGraph         *database_types.OpenGraph         `json:"openGraph"`
-	RedirectionChoice database_enums.RedirectionOptions `json:"redirectionChoice"`
-	State             database_enums.StatusState        `json:"state"`
-	CreatedBy         *database_models.User             `json:"createdBy"`
-	EditedBy          *database_models.User             `json:"editedBy"`
-	CreatedAt         time.Time                         `json:"createdAt"`
-	UpdatedAt         *time.Time                        `json:"updatedAt,omitempty"`
-	DeletedAt         *time.Time                        `json:"deletedAt,omitempty"`
+	ID                  uuid.UUID                           `json:"id"`
+	Name                string                              `json:"name"`
+	Platform            *database_models.Platform           `json:"platform"`
+	PlatformDescription *database_types.PlatformDescription `json:"platformDescription"`
+	RedirectionChoice   database_enums.RedirectionOptions   `json:"redirectionChoice"`
+	State               database_enums.StatusState          `json:"state"`
+	CreatedBy           *database_models.User               `json:"createdBy"`
+	EditedBy            *database_models.User               `json:"editedBy"`
+	CreatedAt           time.Time                           `json:"createdAt"`
+	UpdatedAt           *time.Time                          `json:"updatedAt,omitempty"`
+	DeletedAt           *time.Time                          `json:"deletedAt,omitempty"`
 }
 
 type TemplateInput struct {
-	Name              string                            `json:"name"`
-	OpenGraph         *database_types.OpenGraph         `json:"openGraph"`
-	RedirectionChoice database_enums.RedirectionOptions `json:"redirectionChoice"`
-	State             database_enums.StatusState        `json:"state"`
+	Name                string                              `json:"name"`
+	TemplateDescription *database_types.PlatformDescription `json:"templateDescription"`
+	RedirectionChoice   database_enums.RedirectionOptions   `json:"redirectionChoice"`
+	State               database_enums.StatusState          `json:"state"`
 }
 
 type TimeFilter struct {
@@ -308,17 +292,6 @@ type UUIDFilter struct {
 type UpdateUserInviteInput struct {
 	Code   string                          `json:"code"`
 	Status database_enums.InvitationStatus `json:"status"`
-	User   *UserCreateInput                `json:"user"`
-}
-
-type UserCreateInput struct {
-	Email             string                   `json:"email"`
-	Password          string                   `json:"password"`
-	ConfirmPassword   string                   `json:"confirmPassword"`
-	Fullname          string                   `json:"fullname"`
-	Phone             *AccountPhoneInput       `json:"phone"`
-	ClientInformation *ClientInformationInput  `json:"clientInformation"`
-	Organization      *OrganizationCreateInput `json:"organization,omitempty"`
 }
 
 type PinnedLinkInput struct {

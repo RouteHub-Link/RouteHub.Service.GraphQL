@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/RouteHub-Link/routehub-service-graphql/auth"
+	auth_casbin "github.com/RouteHub-Link/routehub-service-graphql/auth/casbin"
 	Configuration "github.com/RouteHub-Link/routehub-service-graphql/config"
 	"github.com/RouteHub-Link/routehub-service-graphql/database"
 )
@@ -9,9 +9,12 @@ import (
 var applicationConfig = Configuration.ConfigurationService{}.Get()
 
 func main() {
-	auth.NewCasbinConfigurer(applicationConfig.CasbinConfig)
-
 	database.Init()
+	database.Migration()
+
+	auth_casbin.NewCasbinConfigurer(applicationConfig.CasbinConfig, applicationConfig.Database)
+
+	database.Seed()
 
 	Serve()
 }

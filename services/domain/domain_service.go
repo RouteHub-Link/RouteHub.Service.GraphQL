@@ -3,8 +3,8 @@ package services_domain
 import (
 	database_enums "github.com/RouteHub-Link/routehub-service-graphql/database/enums"
 	database_models "github.com/RouteHub-Link/routehub-service-graphql/database/models"
-
 	"github.com/RouteHub-Link/routehub-service-graphql/graph/model"
+
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 )

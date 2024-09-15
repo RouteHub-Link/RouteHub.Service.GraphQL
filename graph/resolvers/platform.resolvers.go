@@ -25,6 +25,14 @@ func (r *mutationResolver) CreatePlatform(ctx context.Context, input graph_input
 	return &platform, err
 }
 
+// UpdatePlatform is the resolver for the updatePlatform field.
+func (r *mutationResolver) UpdatePlatform(ctx context.Context, input graph_inputs.PlatformUpdateInput) (*database_models.Platform, error) {
+	platformService := r.ServiceContainer.PlatformService
+	userSession := auth.ForContext(ctx)
+
+	return platformService.UpdatePlatform(input, userSession.ID)
+}
+
 // Organization is the resolver for the organization field.
 func (r *platformResolver) Organization(ctx context.Context, obj *database_models.Platform) (*database_models.Organization, error) {
 	return r.ServiceContainer.PlatformService.GetPlatformOrganization(obj.ID)

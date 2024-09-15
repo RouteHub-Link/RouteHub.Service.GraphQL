@@ -4,7 +4,6 @@ import (
 	"errors"
 	"log"
 
-	"github.com/RouteHub-Link/routehub-service-graphql/clients"
 	"github.com/RouteHub-Link/routehub-service-graphql/database"
 	database_enums "github.com/RouteHub-Link/routehub-service-graphql/database/enums"
 	database_models "github.com/RouteHub-Link/routehub-service-graphql/database/models"
@@ -14,7 +13,7 @@ import (
 type LinkCrawlerService struct {
 	link          *database_models.Link
 	crawl         *database_models.LinkCrawl
-	scrapedResult *database_types.OpenGraph
+	scrapedResult *database_types.MetaDescription
 }
 
 func NewLinkCrawlerService(link *database_models.Link, crawl *database_models.LinkCrawl) *LinkCrawlerService {
@@ -22,11 +21,11 @@ func NewLinkCrawlerService(link *database_models.Link, crawl *database_models.Li
 }
 
 func (lcs *LinkCrawlerService) Crawl(updateFromDatabase bool) (err error) {
-	collyClient := clients.CollyClient{}
+	//collyClient := clients.CollyClient{}
 
 	lcs.Started()
 
-	lcs.link.OpenGraph = collyClient.VisitScrapeOG(lcs.link.Target)
+	//lcs.link.OpenGraph = collyClient.VisitScrapeOG(lcs.link.Target)
 
 	if updateFromDatabase {
 		err = lcs.updateLink(lcs.link)
@@ -41,12 +40,12 @@ func (lcs *LinkCrawlerService) Crawl(updateFromDatabase bool) (err error) {
 }
 
 func (lcs *LinkCrawlerService) updateLink(link *database_models.Link) (err error) {
-	ogJson, err := link.OpenGraph.AsJson()
+	//ogJson, err := link.OpenGraph.AsJson()
 	if err != nil {
 		return
 	}
 
-	err = database.DB.Model(&link).Update("open_graph", ogJson).Error
+	//err = database.DB.Model(&link).Update("open_graph", ogJson).Error
 	if err != nil {
 		return
 	}
@@ -64,11 +63,11 @@ func (lcs *LinkCrawlerService) Started() (err error) {
 }
 
 func (lcs *LinkCrawlerService) Finished(isSuccess *bool) (err error) {
-	lcs.scrapedResult = lcs.link.OpenGraph
+	//lcs.scrapedResult = lcs.link.OpenGraph
 	success := false
 	if isSuccess == nil {
 		if lcs.scrapedResult == nil {
-			lcs.scrapedResult = &database_types.OpenGraph{}
+			lcs.scrapedResult = &database_types.MetaDescription{}
 			success = false
 		} else {
 			success = true
